@@ -1,6 +1,6 @@
 {
   "name": "@litert/http",
-  "version": "0.1.0-b1",
+  "version": "0.2.0",
   "description": "A simple HTTP server based on LiteRT framework.",
   "main": "./dist/index.js",
   "scripts": {
@@ -26,11 +26,11 @@
   "types": "./dist/index.d.ts",
   "typings": "./dist/index.d.ts",
   "dependencies": {
-    "langext": "^1.2.1-rc-2",
-    "@litert/core": "git+https://github.com/litert/core.js.git#v0.1.0"
+    "@litert/core": "git+https://github.com/litert/core.js.git#v0.2.0",
+    "langext": "^1.2.1-rc-2"
   },
   "devDependencies": {
-    "@types/node": "^7.0.0",
-    "typescript": "^2.5.2"
+    "@types/node": "^7.0.46",
+    "typescript": "^2.6.1"
   }
 }

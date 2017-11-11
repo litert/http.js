@@ -19,7 +19,10 @@
         "object-literal-key-quotes": [false],
         "no-string-literal": false,
         "no-angle-bracket-type-assertion": false,
-        "only-arrow-functions": false
+        "only-arrow-functions": false,
+        "no-namespace": false,
+        "no-internal-module": false,
+        "unified-signatures": false
     },
     "rulesDirectory": []
 }
