@@ -9,6 +9,8 @@ import Context = require("./Context");
 import libUrl = require("url");
 import events = require("events");
 import queryString = require("querystring");
+import "./Response";
+import "./Request";
 
 class Server extends events.EventEmitter implements Core.Server {
 
@@ -127,121 +129,8 @@ class Server extends events.EventEmitter implements Core.Server {
         request.path = url.path;
         request.queryString = url.query;
         request.query = url.query ? queryString.parse(url.query) : {};
-
-        request.getBodyAsJSON = async function(
-            maxLength: number = 0
-        ): Promise<any> {
-
-            try {
-
-                return JSON.parse(
-                    (await this.getBody(maxLength)).toString()
-                );
-            }
-            catch (e) {
-
-                return Promise.reject(e);
-            }
-        };
-
-        request.getBody = async function(
-            maxLength: number = 0
-        ): Promise<Buffer> {
-
-            let ret = new RawPromise<Buffer, HttpException>();
-
-            let buf: Buffer[] = [];
-
-            if (maxLength) {
-
-                let length: number = 0;
-
-                request.on("data", function(d: Buffer) {
-
-                    length += d.byteLength;
-
-                    if (length > maxLength) {
-
-                        request.removeAllListeners("end");
-                        request.removeAllListeners("data");
-
-                        return ret.reject(new HttpException(
-                            ServerError.EXCEED_MAX_BODY_LENGTH,
-                            "The received body exceed max length restriction."
-                        ));
-                    }
-
-                    buf.push(d);
-                });
-            }
-            else {
-
-                request.on("data", function(d: Buffer) {
-
-                    buf.push(d);
-                });
-            }
-
-            request.on("end", function() {
-
-                let data = Buffer.concat(buf);
-
-                // @ts-ignore
-                buf = undefined;
-
-                ret.resolve(data);
-            });
-
-            return ret.promise;
-        };
-    }
-
-    protected __initializeResponse(
-        response: Core.ServerResponse
-    ): void {
-
-        response.redirect = function(
-            target: string,
-            statusCode: number = Core.HTTPStatus.TEMPORARY_REDIRECT
-        ): Core.ServerResponse {
-
-            if (this.headersSent) {
-
-                throw new HttpException(
-                    ServerError.HEADERS_ALREADY_SENT,
-                    "Response headers were already sent."
-                );
-            }
-
-            this.writeHead(statusCode, {"Location": target});
-
-            return this;
-        };
-
-        response.sendJSON = function(
-            data: any
-        ): Core.ServerResponse {
-
-            if (this.finished) {
-
-                throw new HttpException(
-                    ServerError.RESPONSE_ALREADY_CLOSED,
-                    "Response has been closed"
-                );
-            }
-
-            data = JSON.stringify(data);
-
-            if (!this.headersSent) {
-
-                this.setHeader("Content-Type", "application/json");
-                this.setHeader("Content-Length", data.length);
-            }
-
-            this.end(data);
-
-            return this;
-        };
+        request.server = this;
+        request.time = Date.now();
     }
 
     protected async __requestCallback(
@@ -254,7 +143,6 @@ class Server extends events.EventEmitter implements Core.Server {
         let path = <string> url.pathname;
 
         this.__initializeRequest(request, url);
-        this.__initializeResponse(response);
 
         // @ts-ignore
         url = null;
@@ -276,7 +164,6 @@ class Server extends events.EventEmitter implements Core.Server {
 
         context.request = request;
         context.response = response;
-        context.data = {};
 
         try {
 

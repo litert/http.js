@@ -13,7 +13,6 @@ export {
     EXCEPTION_TYPE,
     HTTP_METHODS,
     HTTPMethod,
-    HTTPMethods,
     HTTPStatus
 
 } from "./server/Core";

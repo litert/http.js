@@ -4,13 +4,30 @@ import { EventEmitter } from "events";
 
 export interface ServerRequest extends http.IncomingMessage {
 
+    /**
+     * The request path.
+     */
     "path": string;
 
+    /**
+     * The unseriailized data of query-string of request.
+     */
     "query": IDictionary<any>;
 
+    /**
+     * The query-string of request.
+     */
     "queryString": string;
 
+    /**
+     * The server object.
+     */
     "server": Server;
+
+    /**
+     * The timestamp of requested time.
+     */
+    "time": number;
 
     /**
      * Get HTTP request body as raw stream.
@@ -34,6 +51,9 @@ export interface ServerResponse extends http.ServerResponse {
      */
     redirect(target: string, statusCode?: number): ServerResponse;
 
+    /**
+     * Encode the data as JSON and send it to client.
+     */
     sendJSON(data: any): ServerResponse;
 }
 
@@ -48,12 +68,24 @@ export type RequestMiddleware = (
 
 export interface RequestContext {
 
+    /**
+     * The object describes the request.
+     */
     "request": ServerRequest;
 
+    /**
+     * The obejct controlling the response.
+     */
     "response": ServerResponse;
 
+    /**
+     * The data through out the request.
+     */
     "data": IDictionary<any>;
 
+    /**
+     * The parameters from request path (currently from Smart router only)
+     */
     "params": IDictionary<any>;
 }
 
@@ -150,16 +182,10 @@ export interface CreateServerOptions {
      */
     "router": RequestRouter;
 
+    /**
+     * Configure this field to enabled HTTPS.
+     */
     "ssl"?: SSLConfiguration;
-}
-
-export enum HTTPMethods {
-    GET, POST, PUT, TRACE,
-    DELETE, OPTIONS, HEAD, PATCH,
-    COPY, LOCK, UNLOCK, MOVE,
-    MKCOL, PROPFIND, PROPPATCH, REPORT,
-    MKACTIVITY, CHECKOUT, MERGE, MSEARCH,
-    NOTIFY, SUBSCRIBE, UNSUBSCRIBE
 }
 
 export enum ServerStatus {
@@ -180,7 +206,7 @@ export enum ServerStatus {
     WORKING,
 
     /**
-     * Server is closing.
+     * Server is shutting down.
      */
     CLOSING
 
@@ -221,26 +247,58 @@ export interface Server extends EventEmitter {
 
 export interface RequestRouter {
 
+    /**
+     * Use a middleware, without PATH and METHOD filter.
+     *
+     * @param method The method to be handled by middleware.
+     * @param path The path to be handled by middleware.
+     * @param middleware The middleware handler.
+     */
     use(
         method: HTTPMethod,
         path: string | RegExp,
         middleware: RequestMiddleware
     ): RequestRouter;
 
+    /**
+     * Use a middleware, with a METHOD filter.
+     *
+     * @param method The method to be handled by middleware.
+     * @param middleware The middleware handler.
+     */
     use(
         method: HTTPMethod,
         middleware: RequestMiddleware
     ): RequestRouter;
 
+    /**
+     * Use a middleware, with a PATH filter.
+     *
+     * @param path The path to be handled by middleware.
+     * @param middleware The middleware handler.
+     */
     use(
         path: string | RegExp,
         middleware: RequestMiddleware
     ): RequestRouter;
 
+    /**
+     * Use a middleware, without any filter.
+     *
+     * @param middleware the middleware handler.
+     */
     use(
         middleware: RequestMiddleware
     ): RequestRouter;
 
+    /**
+     * Bind a handler with a HTTP request.
+     *
+     * @param method The upper-case name of HTTP method. Allow WebDAV methods.
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
     register(
         method: HTTPMethod,
         path: string | RegExp,
@@ -254,9 +312,121 @@ export interface RequestRouter {
         context: RequestContext
     ): RouteResult;
 
+    /**
+     * Register the handler for NOT FOUND request.
+     */
     notFound(handler: RequestHandler): RequestRouter;
 
+    /**
+     * Register the handler for METHOD NOT ALLOWED request.
+     *
+     * > For those not used method.
+     */
     badMethod(handler: RequestHandler): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP GET request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    get(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP POST request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    post(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP PUT request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    put(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP PATCH request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    patch(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP DELETE request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    delete(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP OPTIONS request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    options(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP HEAD request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    head(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
+
+    /**
+     * Bind a handler with a HTTP TRACE request.
+     *
+     * @param path The requested path to be handled.
+     * @param handler The handler of request.
+     * @param data (Optional) The data bound with handler.
+     */
+    trace(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter;
 }
 
 export interface RouteRule<T> {

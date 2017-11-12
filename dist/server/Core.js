@@ -8,32 +8,6 @@ exports.HTTP_METHODS = [
     "MKACTIVITY", "CHECKOUT", "MERGE", "M-SEARCH",
     "NOTIFY", "SUBSCRIBE", "UNSUBSCRIBE"
 ];
-var HTTPMethods;
-(function (HTTPMethods) {
-    HTTPMethods[HTTPMethods["GET"] = 0] = "GET";
-    HTTPMethods[HTTPMethods["POST"] = 1] = "POST";
-    HTTPMethods[HTTPMethods["PUT"] = 2] = "PUT";
-    HTTPMethods[HTTPMethods["TRACE"] = 3] = "TRACE";
-    HTTPMethods[HTTPMethods["DELETE"] = 4] = "DELETE";
-    HTTPMethods[HTTPMethods["OPTIONS"] = 5] = "OPTIONS";
-    HTTPMethods[HTTPMethods["HEAD"] = 6] = "HEAD";
-    HTTPMethods[HTTPMethods["PATCH"] = 7] = "PATCH";
-    HTTPMethods[HTTPMethods["COPY"] = 8] = "COPY";
-    HTTPMethods[HTTPMethods["LOCK"] = 9] = "LOCK";
-    HTTPMethods[HTTPMethods["UNLOCK"] = 10] = "UNLOCK";
-    HTTPMethods[HTTPMethods["MOVE"] = 11] = "MOVE";
-    HTTPMethods[HTTPMethods["MKCOL"] = 12] = "MKCOL";
-    HTTPMethods[HTTPMethods["PROPFIND"] = 13] = "PROPFIND";
-    HTTPMethods[HTTPMethods["PROPPATCH"] = 14] = "PROPPATCH";
-    HTTPMethods[HTTPMethods["REPORT"] = 15] = "REPORT";
-    HTTPMethods[HTTPMethods["MKACTIVITY"] = 16] = "MKACTIVITY";
-    HTTPMethods[HTTPMethods["CHECKOUT"] = 17] = "CHECKOUT";
-    HTTPMethods[HTTPMethods["MERGE"] = 18] = "MERGE";
-    HTTPMethods[HTTPMethods["MSEARCH"] = 19] = "MSEARCH";
-    HTTPMethods[HTTPMethods["NOTIFY"] = 20] = "NOTIFY";
-    HTTPMethods[HTTPMethods["SUBSCRIBE"] = 21] = "SUBSCRIBE";
-    HTTPMethods[HTTPMethods["UNSUBSCRIBE"] = 22] = "UNSUBSCRIBE";
-})(HTTPMethods = exports.HTTPMethods || (exports.HTTPMethods = {}));
 var ServerStatus;
 (function (ServerStatus) {
     /**
@@ -49,7 +23,7 @@ var ServerStatus;
      */
     ServerStatus[ServerStatus["WORKING"] = 2] = "WORKING";
     /**
-     * Server is closing.
+     * Server is shutting down.
      */
     ServerStatus[ServerStatus["CLOSING"] = 3] = "CLOSING";
 })(ServerStatus = exports.ServerStatus || (exports.ServerStatus = {}));

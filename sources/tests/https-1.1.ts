@@ -33,19 +33,19 @@ router.use("GET", async function(context, next): Promise<void> {
     ctx.response.statusCode = 405;
     ctx.response.end("METHOD NOT ALLOWED");
 
-}).register("GET", "/", async function(context) {
+}).get("/", async function(context) {
 
     context.response.write(context.request.path);
 
-}).register("GET", "/test", async function(context) {
+}).get("/test", async function(context) {
 
-    context.response.write("test");
+    context.response.write(`Requested at ${new Date(context.request.time)}`);
 
-}).register("GET", "/users/{user:int}", async function(context) {
+}).get("/users/{user:int}", async function(context) {
 
     context.response.write(JSON.stringify(context.params));
 
-}).register("GET", "/redirection", async function(context) {
+}).get("/redirection", async function(context) {
 
     context.response.redirect("/");
 });

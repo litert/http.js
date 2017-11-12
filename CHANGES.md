@@ -9,8 +9,12 @@
 - Added method redirect for ServerResponse object.
 - Added method sendJSON for ServerResponse object.
 - Added method getBodyAsJSON for ServerRequest object.
+- Added method getBody for ServerRequest object.
+- Allowed binding data with a router rule.
 - Added HTTPS/1.1 supports.
 - Implemented method shutdown for class Server.
+- Added shorcut methods for HTTP/1.1 standard methods in router, e.g. get, 
+post, put, etc.
 
 ## v0.1.0-b1
 

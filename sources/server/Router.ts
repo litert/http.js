@@ -97,6 +97,94 @@ class Router implements RequestRouter {
         return this;
     }
 
+    public get(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("GET", path, handler, data);
+
+        return this;
+    }
+
+    public post(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("POST", path, handler, data);
+
+        return this;
+    }
+
+    public put(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("PUT", path, handler, data);
+
+        return this;
+    }
+
+    public patch(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("PATCH", path, handler, data);
+
+        return this;
+    }
+
+    public delete(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("DELETE", path, handler, data);
+
+        return this;
+    }
+
+    public options(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("OPTIONS", path, handler, data);
+
+        return this;
+    }
+
+    public head(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("HEAD", path, handler, data);
+
+        return this;
+    }
+
+    public trace(
+        path: string | RegExp,
+        handler: RequestHandler,
+        data?: IDictionary<any>
+    ): RequestRouter {
+
+        this.register("TRACE", path, handler, data);
+
+        return this;
+    }
+
     protected _checkPath(path: string): void {
 
         if (
@@ -184,6 +272,7 @@ class Router implements RequestRouter {
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
 
             ret.handler = this._badMethodRouter;
+            context.data = {};
 
             return ret;
         }
@@ -191,6 +280,7 @@ class Router implements RequestRouter {
         if (this._stringRouter[method] && this._stringRouter[method][path]) {
 
             ret.handler = this._stringRouter[method][path].handler;
+            context.data = this._stringRouter[method][path].data || {};
             return ret;
         }
 
@@ -201,12 +291,14 @@ class Router implements RequestRouter {
                 if (route.route(path, context)) {
 
                     ret.handler = route.handler;
+                    context.data = route.data || {};
                     return ret;
                 }
             }
         }
 
         ret.handler = this._notFoundRouter;
+        context.data = {};
 
         return ret;
     }

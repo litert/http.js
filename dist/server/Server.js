@@ -9,6 +9,8 @@ const Context = require("./Context");
 const libUrl = require("url");
 const events = require("events");
 const queryString = require("querystring");
+require("./Response");
+require("./Request");
 class Server extends events.EventEmitter {
     constructor(opts) {
         super();
@@ -64,69 +66,13 @@ class Server extends events.EventEmitter {
         request.path = url.path;
         request.queryString = url.query;
         request.query = url.query ? queryString.parse(url.query) : {};
-        request.getBodyAsJSON = async function (maxLength = 0) {
-            try {
-                return JSON.parse((await this.getBody(maxLength)).toString());
-            }
-            catch (e) {
-                return Promise.reject(e);
-            }
-        };
-        request.getBody = async function (maxLength = 0) {
-            let ret = new core_1.RawPromise();
-            let buf = [];
-            if (maxLength) {
-                let length = 0;
-                request.on("data", function (d) {
-                    length += d.byteLength;
-                    if (length > maxLength) {
-                        request.removeAllListeners("end");
-                        request.removeAllListeners("data");
-                        return ret.reject(new HttpException(ServerError.EXCEED_MAX_BODY_LENGTH, "The received body exceed max length restriction."));
-                    }
-                    buf.push(d);
-                });
-            }
-            else {
-                request.on("data", function (d) {
-                    buf.push(d);
-                });
-            }
-            request.on("end", function () {
-                let data = Buffer.concat(buf);
-                // @ts-ignore
-                buf = undefined;
-                ret.resolve(data);
-            });
-            return ret.promise;
-        };
-    }
-    __initializeResponse(response) {
-        response.redirect = function (target, statusCode = Core.HTTPStatus.TEMPORARY_REDIRECT) {
-            if (this.headersSent) {
-                throw new HttpException(ServerError.HEADERS_ALREADY_SENT, "Response headers were already sent.");
-            }
-            this.writeHead(statusCode, { "Location": target });
-            return this;
-        };
-        response.sendJSON = function (data) {
-            if (this.finished) {
-                throw new HttpException(ServerError.RESPONSE_ALREADY_CLOSED, "Response has been closed");
-            }
-            data = JSON.stringify(data);
-            if (!this.headersSent) {
-                this.setHeader("Content-Type", "application/json");
-                this.setHeader("Content-Length", data.length);
-            }
-            this.end(data);
-            return this;
-        };
+        request.server = this;
+        request.time = Date.now();
     }
     async __requestCallback(request, response) {
         let url = libUrl.parse(request.url);
         let path = url.pathname;
         this.__initializeRequest(request, url);
-        this.__initializeResponse(response);
         // @ts-ignore
         url = null;
         if (path.length > 1 && path.endsWith("/")) {
@@ -137,7 +83,6 @@ class Server extends events.EventEmitter {
         let routeResult = this._router.route(request.method, path, context);
         context.request = request;
         context.response = response;
-        context.data = {};
         try {
             await this.__execute(routeResult.middlewares, routeResult.handler, context);
             if (!response.finished) {

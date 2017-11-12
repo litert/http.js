@@ -45,6 +45,38 @@ class Router {
         this._middlewares.push(middleware);
         return this;
     }
+    get(path, handler, data) {
+        this.register("GET", path, handler, data);
+        return this;
+    }
+    post(path, handler, data) {
+        this.register("POST", path, handler, data);
+        return this;
+    }
+    put(path, handler, data) {
+        this.register("PUT", path, handler, data);
+        return this;
+    }
+    patch(path, handler, data) {
+        this.register("PATCH", path, handler, data);
+        return this;
+    }
+    delete(path, handler, data) {
+        this.register("DELETE", path, handler, data);
+        return this;
+    }
+    options(path, handler, data) {
+        this.register("OPTIONS", path, handler, data);
+        return this;
+    }
+    head(path, handler, data) {
+        this.register("HEAD", path, handler, data);
+        return this;
+    }
+    trace(path, handler, data) {
+        this.register("TRACE", path, handler, data);
+        return this;
+    }
     _checkPath(path) {
         if (path[0] !== "/"
             || path.indexOf("?") > -1
@@ -85,21 +117,25 @@ class Router {
         };
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
             ret.handler = this._badMethodRouter;
+            context.data = {};
             return ret;
         }
         if (this._stringRouter[method] && this._stringRouter[method][path]) {
             ret.handler = this._stringRouter[method][path].handler;
+            context.data = this._stringRouter[method][path].data || {};
             return ret;
         }
         if (this._regexpRouter[method]) {
             for (const route of this._regexpRouter[method]) {
                 if (route.route(path, context)) {
                     ret.handler = route.handler;
+                    context.data = route.data || {};
                     return ret;
                 }
             }
         }
         ret.handler = this._notFoundRouter;
+        context.data = {};
         return ret;
     }
     _filterMiddlewares(method, path, context) {
