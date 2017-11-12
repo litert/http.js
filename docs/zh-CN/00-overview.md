@@ -21,4 +21,4 @@ LiteRT/HTTP.js 目前不会发布到 npmjs.org，因此请通过以下方法安�
 npm i git+https://github.com/litert/http.js.git
 ```
 
-> [下一章：快速上手](./01-quick-start.md) | [返回目录](./index.md)
+> [下一节：快速上手](./01-quick-start.md) | [返回目录](./index.md)

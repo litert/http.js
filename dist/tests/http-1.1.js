@@ -8,12 +8,12 @@ router.use(async function (context, next) {
     /**
      * 记录每条访问记录。
      */
-    console.log(`${req.method} ${req.path}`);
+    console.log(`${req.method} ${req.url}`);
     await next();
 }).use("GET", async function (context, next) {
     if (context.request.url === "/") {
         try {
-            await next(true);
+            await next();
             context.response.write("<br>bye bye");
         }
         catch (e) {
@@ -26,7 +26,8 @@ router.use(async function (context, next) {
 }).use("GET", async function (context, next) {
     if (context.request.path.startsWith("/users/")) {
         try {
-            await next(true);
+            console.log("xxx");
+            await next();
             console.log("responsed");
         }
         catch (e) {

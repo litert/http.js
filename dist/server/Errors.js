@@ -11,6 +11,10 @@ var ServerError;
     ServerError[ServerError["HEADERS_ALREADY_SENT"] = 4101] = "HEADERS_ALREADY_SENT";
     ServerError[ServerError["SERVER_NOT_WORKING"] = 4102] = "SERVER_NOT_WORKING";
     ServerError[ServerError["RESPONSE_ALREADY_CLOSED"] = 4103] = "RESPONSE_ALREADY_CLOSED";
+    /**
+     * The next callback is not called inside middleware.
+     */
+    ServerError[ServerError["MISSING_CALLING_NEXT"] = 4104] = "MISSING_CALLING_NEXT";
 })(ServerError || (ServerError = {}));
 module.exports = ServerError;
 //# sourceMappingURL=Errors.js.map

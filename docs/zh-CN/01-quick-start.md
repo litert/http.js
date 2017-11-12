@@ -1,6 +1,6 @@
 # LiteRT/HTTP.js 快速上手
 
-> [上一章：概述](./00-overview.md) | [返回目录](./index.md)
+> [上一节：概述](./00-overview.md) | [返回目录](./index.md)
 
 ## 基本概念
 
@@ -176,4 +176,4 @@ server.start().then(() => {
 
 (未完待续)
 
-> [下一章：使用路由](./02-router.md) | [返回目录](./index.md)
+> [下一节：使用路由](./02-router.md) | [返回目录](./index.md)

@@ -10,7 +10,7 @@ router.use(async function(context, next) {
     /**
      * 记录每条访问记录。
      */
-    console.log(`${req.method} ${req.path}`);
+    console.log(`${req.method} ${req.url}`);
 
     await next();
 
@@ -20,7 +20,7 @@ router.use(async function(context, next) {
 
         try {
 
-            await next(true);
+            await next();
             context.response.write("<br>bye bye");
 
         }
@@ -40,7 +40,8 @@ router.use(async function(context, next) {
 
         try {
 
-            await next(true);
+            console.log("xxx");
+            await next();
             console.log("responsed");
 
         }

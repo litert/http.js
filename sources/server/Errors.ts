@@ -9,7 +9,12 @@ enum ServerError {
     EXCEED_MAX_BODY_LENGTH,
     HEADERS_ALREADY_SENT,
     SERVER_NOT_WORKING,
-    RESPONSE_ALREADY_CLOSED
+    RESPONSE_ALREADY_CLOSED,
+
+    /**
+     * The next callback is not called inside middleware.
+     */
+    MISSING_CALLING_NEXT
 }
 
 export = ServerError;

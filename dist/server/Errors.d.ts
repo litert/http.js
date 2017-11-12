@@ -9,5 +9,9 @@ declare enum ServerError {
     HEADERS_ALREADY_SENT = 4101,
     SERVER_NOT_WORKING = 4102,
     RESPONSE_ALREADY_CLOSED = 4103,
+    /**
+     * The next callback is not called inside middleware.
+     */
+    MISSING_CALLING_NEXT = 4104,
 }
 export = ServerError;

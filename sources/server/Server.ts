@@ -121,12 +121,13 @@ class Server extends events.EventEmitter implements Core.Server {
     }
 
     protected __initializeRequest(
-        request: Core.ServerRequest,
-        url: libUrl.Url
+        request: Core.ServerRequest
     ): void {
 
+        let url = libUrl.parse(<string> request.url);
+
         // @ts-ignore
-        request.path = url.path;
+        request.path = url.pathname;
         request.queryString = url.query;
         request.query = url.query ? queryString.parse(url.query) : {};
         request.server = this;
@@ -138,14 +139,9 @@ class Server extends events.EventEmitter implements Core.Server {
         response: Core.ServerResponse
     ): Promise<void> {
 
-        let url = libUrl.parse(<string> request.url);
+        this.__initializeRequest(request);
 
-        let path = <string> url.pathname;
-
-        this.__initializeRequest(request, url);
-
-        // @ts-ignore
-        url = null;
+        let path = <string> request.path;
 
         if (path.length > 1 && path.endsWith("/")) {
 
@@ -202,7 +198,11 @@ class Server extends events.EventEmitter implements Core.Server {
 
             if (middlewares[index]) {
 
+                let called: boolean = false;
+
                 await middlewares[index](context, (end: boolean = false) => {
+
+                    called = true;
 
                     return this.__execute(
                         middlewares,
@@ -211,6 +211,14 @@ class Server extends events.EventEmitter implements Core.Server {
                         end ? -1 : index + 1
                     );
                 });
+
+                if (!called) {
+
+                    return Promise.reject(new HttpException(
+                        ServerError.MISSING_CALLING_NEXT,
+                        "The next callback is not called inside middleware."
+                    ));
+                }
             }
             else {
 

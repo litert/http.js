@@ -61,20 +61,18 @@ class Server extends events.EventEmitter {
         });
         return ret.promise;
     }
-    __initializeRequest(request, url) {
+    __initializeRequest(request) {
+        let url = libUrl.parse(request.url);
         // @ts-ignore
-        request.path = url.path;
+        request.path = url.pathname;
         request.queryString = url.query;
         request.query = url.query ? queryString.parse(url.query) : {};
         request.server = this;
         request.time = Date.now();
     }
     async __requestCallback(request, response) {
-        let url = libUrl.parse(request.url);
-        let path = url.pathname;
-        this.__initializeRequest(request, url);
-        // @ts-ignore
-        url = null;
+        this.__initializeRequest(request);
+        let path = request.path;
         if (path.length > 1 && path.endsWith("/")) {
             path = path.substr(0, path.length - 1);
         }
@@ -101,9 +99,14 @@ class Server extends events.EventEmitter {
     async __execute(middlewares, handler, context, index = 0) {
         try {
             if (middlewares[index]) {
+                let called = false;
                 await middlewares[index](context, (end = false) => {
+                    called = true;
                     return this.__execute(middlewares, handler, context, end ? -1 : index + 1);
                 });
+                if (!called) {
+                    return Promise.reject(new HttpException(ServerError.MISSING_CALLING_NEXT, "The next callback is not called inside middleware."));
+                }
             }
             else {
                 await handler(context);
