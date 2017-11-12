@@ -9,6 +9,8 @@ var ServerError;
     ServerError[ServerError["INVALID_VARIABLE_TYPE"] = 4099] = "INVALID_VARIABLE_TYPE";
     ServerError[ServerError["EXCEED_MAX_BODY_LENGTH"] = 4100] = "EXCEED_MAX_BODY_LENGTH";
     ServerError[ServerError["HEADERS_ALREADY_SENT"] = 4101] = "HEADERS_ALREADY_SENT";
+    ServerError[ServerError["SERVER_NOT_WORKING"] = 4102] = "SERVER_NOT_WORKING";
+    ServerError[ServerError["RESPONSE_ALREADY_CLOSED"] = 4103] = "RESPONSE_ALREADY_CLOSED";
 })(ServerError || (ServerError = {}));
 module.exports = ServerError;
 //# sourceMappingURL=Errors.js.map

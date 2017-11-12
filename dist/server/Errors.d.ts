@@ -7,5 +7,7 @@ declare enum ServerError {
     INVALID_VARIABLE_TYPE = 4099,
     EXCEED_MAX_BODY_LENGTH = 4100,
     HEADERS_ALREADY_SENT = 4101,
+    SERVER_NOT_WORKING = 4102,
+    RESPONSE_ALREADY_CLOSED = 4103,
 }
 export = ServerError;

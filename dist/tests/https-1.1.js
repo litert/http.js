@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const http = require("../");
+const fs = require("fs");
 let router = http.createRouter();
 router.use("GET", async function (context, next) {
     if (context.request.url === "/") {
@@ -33,10 +34,14 @@ router.use("GET", async function (context, next) {
 });
 let server = http.createServer({
     "port": 8080,
-    "router": router
+    "router": router,
+    "ssl": {
+        "key": fs.readFileSync("localhost-privkey.pem"),
+        "certificate": fs.readFileSync("localhost-cert.pem")
+    }
 });
 server.on("error", function (err) {
     console.log(err);
 });
 server.start();
-//# sourceMappingURL=simple.js.map
+//# sourceMappingURL=https-1.1.js.map

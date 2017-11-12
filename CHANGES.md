@@ -6,7 +6,11 @@
 - Temporarily disabled HTTP CONNECT method. (Return 405)
 - Added middleware supports.
 - Added supports for all WebDav methods.
-- Added method sendRedirection for Response object.
+- Added method redirect for ServerResponse object.
+- Added method sendJSON for ServerResponse object.
+- Added method getBodyAsJSON for ServerRequest object.
+- Added HTTPS/1.1 supports.
+- Implemented method shutdown for class Server.
 
 ## v0.1.0-b1
 

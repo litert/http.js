@@ -6,10 +6,26 @@ export interface ServerRequest extends http.IncomingMessage {
     "path": string;
     "query": IDictionary<any>;
     "queryString": string;
+    "server": Server;
+    /**
+     * Get HTTP request body as raw stream.
+     *
+     * @param maxLength (uint) Limit the max length of body.
+     */
     getBody(maxLength?: number): Promise<Buffer>;
+    /**
+     * Get HTTP request body as JSON encoded data.
+     *
+     * @param maxLength (uint) Limit the max length of body.
+     */
+    getBodyAsJSON(maxLength?: number): Promise<any>;
 }
 export interface ServerResponse extends http.ServerResponse {
-    sendRedirection(target: string, statusCode?: number): void;
+    /**
+     * Send a redirection to client.
+     */
+    redirect(target: string, statusCode?: number): ServerResponse;
+    sendJSON(data: any): ServerResponse;
 }
 export declare type RequestHandler = (context: RequestContext) => Promise<void>;
 export declare type RequestMiddleware = (context: RequestContext, next: (end?: boolean) => Promise<void>) => void;
@@ -50,6 +66,20 @@ export interface HTTPMethodDictionary<T> {
 }
 export declare type HTTPMethod = keyof HTTPMethodDictionary<any>;
 export declare const HTTP_METHODS: HTTPMethod[];
+export interface SSLConfiguration {
+    /**
+     * The content of private key for SSL
+     */
+    "key": string | Buffer;
+    /**
+     * The content of certificate for SSL.
+     */
+    "certificate": string | Buffer;
+    /**
+     * Optional passphrase for the private key.
+     */
+    "passphrase"?: string;
+}
 /**
  * The options for creating HTTP server object.
  */
@@ -76,6 +106,7 @@ export interface CreateServerOptions {
      * The router object.
      */
     "router": RequestRouter;
+    "ssl"?: SSLConfiguration;
 }
 export declare enum HTTPMethods {
     GET = 0,
@@ -119,10 +150,6 @@ export declare enum ServerStatus {
      * Server is closing.
      */
     CLOSING = 3,
-    /**
-     * Server is closed.
-     */
-    CLOSED = 4,
 }
 export interface Server extends EventEmitter {
     /**

@@ -1,5 +1,6 @@
 // tslint:disable:no-console
 import * as http from "../";
+import fs = require("fs");
 
 let router = http.createRouter();
 
@@ -11,7 +12,6 @@ router.use("GET", async function(context, next): Promise<void> {
 
             await next(true);
             context.response.write("<br>bye bye");
-
         }
         catch (e) {
 
@@ -47,12 +47,16 @@ router.use("GET", async function(context, next): Promise<void> {
 
 }).register("GET", "/redirection", async function(context) {
 
-    context.response.sendRedirection("/");
+    context.response.redirect("/");
 });
 
 let server = http.createServer({
     "port": 8080,
-    "router": router
+    "router": router,
+    "ssl": {
+        "key": fs.readFileSync("localhost-privkey.pem"),
+        "certificate": fs.readFileSync("localhost-cert.pem")
+    }
 });
 
 server.on("error", function(err: Error) {

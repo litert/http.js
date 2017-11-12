@@ -52,10 +52,6 @@ var ServerStatus;
      * Server is closing.
      */
     ServerStatus[ServerStatus["CLOSING"] = 3] = "CLOSING";
-    /**
-     * Server is closed.
-     */
-    ServerStatus[ServerStatus["CLOSED"] = 4] = "CLOSED";
 })(ServerStatus = exports.ServerStatus || (exports.ServerStatus = {}));
 exports.DEFAULT_PORT = 80;
 exports.DEFAULT_HOST = "0.0.0.0";

@@ -7,8 +7,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceRoot}\\sources\\tests\\simple.ts",
+            "name": "HTTP/1.1 Server",
+            "program": "${workspaceRoot}\\sources\\tests\\http-1.1.ts",
             "outFiles": [
                 "${workspaceRoot}\\dist\\*.js",
                 "${workspaceRoot}\\dist\\**\\*.js"
@@ -17,11 +17,14 @@
         },
         {
             "type": "node",
-            "request": "attach",
-            "name": "Attach to Process",
-            "address": "localhost",
-            "port": 5858,
-            "outFiles": []
+            "request": "launch",
+            "name": "HTTPS/1.1 Server",
+            "program": "${workspaceRoot}\\sources\\tests\\https-1.1.ts",
+            "outFiles": [
+                "${workspaceRoot}\\dist\\*.js",
+                "${workspaceRoot}\\dist\\**\\*.js"
+            ],
+            "sourceMaps": true
         }
     ]
 }

@@ -1,6 +1,7 @@
 import * as Core from "./Core";
 import net = require("net");
 import http = require("http");
+import https = require("https");
 import { RawPromise } from "@litert/core";
 import HttpException = require("./Exception");
 import ServerError = require("./Errors");
@@ -19,9 +20,11 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _status: Core.ServerStatus;
 
-    protected _server: http.Server;
+    protected _server: http.Server | https.Server;
 
     protected _router: Core.RequestRouter;
+
+    protected _ssl: Core.SSLConfiguration;
 
     public constructor(opts: Core.CreateServerOptions) {
 
@@ -31,6 +34,11 @@ class Server extends events.EventEmitter implements Core.Server {
         this._host = opts.host || Core.DEFAULT_HOST;
         this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
         this._router = opts.router;
+
+        if (opts.ssl) {
+
+            this._ssl = opts.ssl;
+        }
 
         this._status = Core.ServerStatus.READY;
     }
@@ -66,7 +74,22 @@ class Server extends events.EventEmitter implements Core.Server {
 
         this._status = Core.ServerStatus.STARTING;
 
-        this._server = http.createServer(this.__requestCallback.bind(this));
+        if (this._ssl) {
+
+            this._server = https.createServer({
+
+                "key": this._ssl.key,
+
+                "cert": this._ssl.certificate,
+
+                "passphrase": this._ssl.passphrase
+
+            }, this.__requestCallback.bind(this));
+        }
+        else {
+
+            this._server = http.createServer(this.__requestCallback.bind(this));
+        }
 
         this._server.listen(
             this._port,
@@ -95,7 +118,7 @@ class Server extends events.EventEmitter implements Core.Server {
         return ret.promise;
     }
 
-    protected _initializeRequest(
+    protected __initializeRequest(
         request: Core.ServerRequest,
         url: libUrl.Url
     ): void {
@@ -104,6 +127,22 @@ class Server extends events.EventEmitter implements Core.Server {
         request.path = url.path;
         request.queryString = url.query;
         request.query = url.query ? queryString.parse(url.query) : {};
+
+        request.getBodyAsJSON = async function(
+            maxLength: number = 0
+        ): Promise<any> {
+
+            try {
+
+                return JSON.parse(
+                    (await this.getBody(maxLength)).toString()
+                );
+            }
+            catch (e) {
+
+                return Promise.reject(e);
+            }
+        };
 
         request.getBody = async function(
             maxLength: number = 0
@@ -157,14 +196,14 @@ class Server extends events.EventEmitter implements Core.Server {
         };
     }
 
-    protected _initializeResponse(
+    protected __initializeResponse(
         response: Core.ServerResponse
     ): void {
 
-        response.sendRedirection = function(
+        response.redirect = function(
             target: string,
             statusCode: number = Core.HTTPStatus.TEMPORARY_REDIRECT
-        ): void {
+        ): Core.ServerResponse {
 
             if (this.headersSent) {
 
@@ -175,6 +214,33 @@ class Server extends events.EventEmitter implements Core.Server {
             }
 
             this.writeHead(statusCode, {"Location": target});
+
+            return this;
+        };
+
+        response.sendJSON = function(
+            data: any
+        ): Core.ServerResponse {
+
+            if (this.finished) {
+
+                throw new HttpException(
+                    ServerError.RESPONSE_ALREADY_CLOSED,
+                    "Response has been closed"
+                );
+            }
+
+            data = JSON.stringify(data);
+
+            if (!this.headersSent) {
+
+                this.setHeader("Content-Type", "application/json");
+                this.setHeader("Content-Length", data.length);
+            }
+
+            this.end(data);
+
+            return this;
         };
     }
 
@@ -187,8 +253,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
         let path = <string> url.pathname;
 
-        this._initializeRequest(request, url);
-        this._initializeResponse(response);
+        this.__initializeRequest(request, url);
+        this.__initializeResponse(response);
 
         // @ts-ignore
         url = null;
@@ -272,7 +338,27 @@ class Server extends events.EventEmitter implements Core.Server {
 
     public shutdown(): Promise<void> {
 
-        return Promise.resolve();
+        if (this._status !== Core.ServerStatus.WORKING) {
+
+            return Promise.reject(new HttpException(
+                ServerError.SERVER_NOT_WORKING,
+                "Server is not started."
+            ));
+        }
+
+        this._status = Core.ServerStatus.CLOSING;
+
+        let ret = new RawPromise<void, HttpException>();
+
+        this._server.close(() => {
+
+            delete this._server;
+            this._status = Core.ServerStatus.READY;
+
+            ret.resolve();
+        });
+
+        return ret.promise;
     }
 }
 

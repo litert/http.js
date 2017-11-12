@@ -10,12 +10,31 @@ export interface ServerRequest extends http.IncomingMessage {
 
     "queryString": string;
 
+    "server": Server;
+
+    /**
+     * Get HTTP request body as raw stream.
+     *
+     * @param maxLength (uint) Limit the max length of body.
+     */
     getBody(maxLength?: number): Promise<Buffer>;
+
+    /**
+     * Get HTTP request body as JSON encoded data.
+     *
+     * @param maxLength (uint) Limit the max length of body.
+     */
+    getBodyAsJSON(maxLength?: number): Promise<any>;
 }
 
 export interface ServerResponse extends http.ServerResponse {
 
-    sendRedirection(target: string, statusCode?: number): void;
+    /**
+     * Send a redirection to client.
+     */
+    redirect(target: string, statusCode?: number): ServerResponse;
+
+    sendJSON(data: any): ServerResponse;
 }
 
 export type RequestHandler = (
@@ -82,6 +101,24 @@ export const HTTP_METHODS: HTTPMethod[] = [
     "NOTIFY", "SUBSCRIBE", "UNSUBSCRIBE"
 ];
 
+export interface SSLConfiguration {
+
+    /**
+     * The content of private key for SSL
+     */
+    "key": string | Buffer;
+
+    /**
+     * The content of certificate for SSL.
+     */
+    "certificate": string | Buffer;
+
+    /**
+     * Optional passphrase for the private key.
+     */
+    "passphrase"?: string;
+}
+
 /**
  * The options for creating HTTP server object.
  */
@@ -112,6 +149,8 @@ export interface CreateServerOptions {
      * The router object.
      */
     "router": RequestRouter;
+
+    "ssl"?: SSLConfiguration;
 }
 
 export enum HTTPMethods {
@@ -143,12 +182,7 @@ export enum ServerStatus {
     /**
      * Server is closing.
      */
-    CLOSING,
-
-    /**
-     * Server is closed.
-     */
-    CLOSED
+    CLOSING
 
 }
 

@@ -16,6 +16,19 @@ router.use("GET", async function (context, next) {
     else {
         await next();
     }
+}).use("GET", async function (context, next) {
+    if (context.request.path.startsWith("/users/")) {
+        try {
+            await next(true);
+            console.log("responsed");
+        }
+        catch (e) {
+            return Promise.reject(e);
+        }
+    }
+    else {
+        await next();
+    }
 }).notFound(async function (ctx) {
     ctx.response.statusCode = 404;
     ctx.response.end("NOT FOUND");
@@ -27,7 +40,7 @@ router.use("GET", async function (context, next) {
 }).register("GET", "/test", async function (context) {
     context.response.write("test");
 }).register("GET", "/users/{user:int}", async function (context) {
-    context.response.write(JSON.stringify(context.params));
+    context.response.sendJSON(context.params);
 }).register("GET", "/redirection", async function (context) {
     context.response.redirect("/");
 });
@@ -39,4 +52,4 @@ server.on("error", function (err) {
     console.log(err);
 });
 server.start();
-//# sourceMappingURL=simple.js.map
+//# sourceMappingURL=http-1.1.js.map
