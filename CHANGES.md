@@ -8,6 +8,7 @@
 - Added supports for all WebDav methods.
 - Added method redirect for ServerResponse object.
 - Added method sendJSON for ServerResponse object.
+- Added method send for ServerResponse object.
 - Added method getBodyAsJSON for ServerRequest object.
 - Added method getBody for ServerRequest object.
 - Allowed binding data with a router rule.

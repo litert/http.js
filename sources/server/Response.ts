@@ -13,8 +13,37 @@ declare module "http" {
             target: string,
             statusCode?: number
         ): ServerResponse;
+
+        public send(data: string | Buffer): ServerResponse;
     }
 }
+
+http.ServerResponse.prototype.send = function(
+    data: string | Buffer
+): Core.ServerResponse {
+
+    if (this.finished) {
+
+        throw new HttpException(
+            ServerError.RESPONSE_ALREADY_CLOSED,
+            "Response has been closed"
+        );
+    }
+
+    data = data instanceof Buffer ? data : Buffer.from(data);
+
+    if (!this.headersSent) {
+
+        this.setHeader(
+            "Content-Length",
+            data.byteLength.toString()
+        );
+    }
+
+    this.end(data);
+
+    return this;
+};
 
 http.ServerResponse.prototype.redirect = function(
     target: string,

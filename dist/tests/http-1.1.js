@@ -3,7 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const http = require("../");
 let router = http.createRouter();
-router.use("GET", async function (context, next) {
+router.use(async function (context, next) {
+    const req = context.request;
+    /**
+     * 记录每条访问记录。
+     */
+    console.log(`${req.method} ${req.path}`);
+    await next();
+}).use("GET", async function (context, next) {
     if (context.request.url === "/") {
         try {
             await next(true);
@@ -30,11 +37,8 @@ router.use("GET", async function (context, next) {
         await next();
     }
 }).notFound(async function (ctx) {
-    ctx.response.statusCode = 404;
+    ctx.response.statusCode = http.HTTPStatus.NOT_FOUND;
     ctx.response.end("NOT FOUND");
-}).badMethod(async function (ctx) {
-    ctx.response.statusCode = 405;
-    ctx.response.end("METHOD NOT ALLOWED");
 }).get("/", async function (context) {
     context.response.write(context.request.path);
 }).get("/test", async function (context) {

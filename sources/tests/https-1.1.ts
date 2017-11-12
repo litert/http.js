@@ -28,11 +28,6 @@ router.use("GET", async function(context, next): Promise<void> {
     ctx.response.statusCode = 404;
     ctx.response.end("NOT FOUND");
 
-}).badMethod(async function(ctx) {
-
-    ctx.response.statusCode = 405;
-    ctx.response.end("METHOD NOT ALLOWED");
-
 }).get("/", async function(context) {
 
     context.response.write(context.request.path);

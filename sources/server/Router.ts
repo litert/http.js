@@ -39,8 +39,6 @@ class Router implements RequestRouter {
 
     protected _notFoundRouter: RequestHandler;
 
-    protected _badMethodRouter: RequestHandler;
-
     public constructor() {
 
         /**
@@ -271,7 +269,7 @@ class Router implements RequestRouter {
 
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
 
-            ret.handler = this._badMethodRouter;
+            ret.handler = this._notFoundRouter;
             context.data = {};
 
             return ret;
@@ -334,15 +332,6 @@ class Router implements RequestRouter {
     ): RequestRouter {
 
         this._notFoundRouter = handler;
-
-        return this;
-    }
-
-    public badMethod(
-        handler: RequestHandler
-    ): RequestRouter {
-
-        this._badMethodRouter = handler;
 
         return this;
     }

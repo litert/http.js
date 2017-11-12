@@ -116,7 +116,7 @@ class Router {
             "handler": null
         };
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
-            ret.handler = this._badMethodRouter;
+            ret.handler = this._notFoundRouter;
             context.data = {};
             return ret;
         }
@@ -153,10 +153,6 @@ class Router {
     }
     notFound(handler) {
         this._notFoundRouter = handler;
-        return this;
-    }
-    badMethod(handler) {
-        this._badMethodRouter = handler;
         return this;
     }
 }

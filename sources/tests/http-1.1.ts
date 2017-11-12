@@ -3,7 +3,18 @@ import * as http from "../";
 
 let router = http.createRouter();
 
-router.use("GET", async function(context, next): Promise<void> {
+router.use(async function(context, next) {
+
+    const req = context.request;
+
+    /**
+     * 记录每条访问记录。
+     */
+    console.log(`${req.method} ${req.path}`);
+
+    await next();
+
+}).use("GET", async function(context, next): Promise<void> {
 
     if (context.request.url === "/") {
 
@@ -45,13 +56,8 @@ router.use("GET", async function(context, next): Promise<void> {
 
 }).notFound(async function(ctx) {
 
-    ctx.response.statusCode = 404;
+    ctx.response.statusCode = http.HTTPStatus.NOT_FOUND;
     ctx.response.end("NOT FOUND");
-
-}).badMethod(async function(ctx) {
-
-    ctx.response.statusCode = 405;
-    ctx.response.end("METHOD NOT ALLOWED");
 
 }).get("/", async function(context) {
 

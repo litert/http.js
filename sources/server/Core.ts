@@ -53,8 +53,17 @@ export interface ServerResponse extends http.ServerResponse {
 
     /**
      * Encode the data as JSON and send it to client.
+     *
+     * > The response will be closed.
      */
     sendJSON(data: any): ServerResponse;
+
+    /**
+     * Send data to client.
+     *
+     * > The response will be closed.
+     */
+    send(data: string | Buffer): ServerResponse;
 }
 
 export type RequestHandler = (
@@ -316,13 +325,6 @@ export interface RequestRouter {
      * Register the handler for NOT FOUND request.
      */
     notFound(handler: RequestHandler): RequestRouter;
-
-    /**
-     * Register the handler for METHOD NOT ALLOWED request.
-     *
-     * > For those not used method.
-     */
-    badMethod(handler: RequestHandler): RequestRouter;
 
     /**
      * Bind a handler with a HTTP GET request.
