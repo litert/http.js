@@ -1,0 +1,189 @@
+# 使用路由器
+
+> [上一节：快速上手](./01-quick-start.md) | [返回目录](./index.md)
+
+## 0. 简介
+
+路由器是一个规则集合体，它负责根据请求的 URL 指定由哪个处理器来处理这个请求。
+
+> 路由器也负责设置中间件，这将在下一节中讨论。
+
+LireRT/HTTP 提供的路由机制支持 3 种类型的 URI 匹配规则，以及完整的 HTTP 方法支持。
+
+> 注意：此处的 URI 是指 URI 的 Path 部分，不包含 Query String。
+
+## 1. 通过字符串匹配
+
+直接使用一个裸字符串作为 URI 匹配规则。
+
+```ts
+router.get("/", async function(ctx) {
+
+    ctx.response.send("welcome to home page");
+});
+```
+
+如上规则，可以适配一个 `GET /?a=xx&b=xx` 请求类似的请求，但是不能适配 `GET //?a=xx`
+之类的请求。
+
+字符串匹配是大小写敏感的，因此 `GET /a` 和 `GET /A` 不被当成同一个请求，须写成
+
+```ts
+router.get("/a", async function(ctx) {
+
+    ctx.response.send("welcome to page a");
+
+}).get("/A", async function(ctx) {
+
+    ctx.response.send("welcome to page A");
+});
+```
+
+> 注：对于 URI 尾部的反斜杠 "/"，路由会自动去除，因此在编写路由规则的时候不需要
+> 填写尾部反斜杠，下同。
+
+## 2. 通过正则表达式匹配
+
+与字符串匹配类似，只需将字符串替换成正则表达式即可，例如：
+
+```ts
+router.get(/^\/\d+$/, async function(ctx) {
+
+    ctx.response.send("You are visiting a number page.");
+})
+```
+
+> 使用正则表达式需要注意转义特殊字符。
+
+这个规则可以匹配任何 `GET /123` （123可替换为任何正整数）的请求。
+
+考虑到在 JavaScript 的正则表达式里面，`/` 是作为正则定界符的，书写的时候需要转义，
+因此建议使用 RegExp 构造式，上面的例子可改写如下：
+
+```ts
+router.get(new RegExp("^/\\d+$"), async function(ctx) {
+
+    ctx.response.send("You are visiting a number page.");
+})
+```
+
+如果正则表达式内有子表达式（被括号括起来的部分），这部分子表达式的匹配结果可以通过
+`context.params` 读取出来，此时的 `context.params` 是一个数组，例如：
+
+```ts
+router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
+
+    ctx.response.send(`Your ID is ${ctx.params[0]}`);
+})
+```
+
+> 此时 `context.params` 元素的下标从 0 开始，与 String.prototype.match 结果不同。
+
+## 3. 通过参数表达式匹配
+
+很多时候，如果只用正则表达式或字符串，不能快捷地提取 URI 中的参数，因此 LiteRT/HTTP 
+提供了一种简单的匹配方式，叫参数表达式。例如要匹配 `GET /users/123` 并提取其中的 123
+作为参数 `id`，就可以使用参数表达式了：
+
+> 虽然参数表达式也是字符串，但是路由器会自动判断是否包含参数规则。
+
+```ts
+router.get("/users/{id:uint}", async function(ctx) {
+
+    ctx.response.send(`Your ID is ${ctx.params.id}.`);
+});
+
+router.get("/users/{name:string}", async function(ctx) {
+
+    ctx.response.send(`Your name is ${ctx.params.name}.`);
+});
+```
+
+参数表达式统一格式为 `{变量名:类型}`，里面不能包含空格，支持如下类型：
+
+类型表达式     | 匹配内容                          | 结果类型
+--------------|----------------------------------|-----------
+number        | 任何数值                          | number
+int           | 任何整数                          | number
+uint          | 任何非负整数                       | number
+string        | 不包含"/"的字符串                  | string
+hex-string    | 只包含十六进制字符的字符串          | string
+hex-uint      | 十六进制字符                       | number
+any           | 任意长度字符串                     | string
+string[x]     | 长度为x，不包含"/"的字符串          | string
+hex-string[x] | 长度为x，只包含十六进制字符的字符串  | string
+
+## 4. 使用不同的 HTTP 方法
+
+前面我们都只使用了 HTTP GET 方法，其实还有很多 HTTP 方法可以使用，包括：
+
+- GET
+- POST
+- PUT
+- TRACE
+- DELETE
+- OPTIONS
+- HEAD
+- PATCH
+- COPY
+- LOCK
+- UNLOCK
+- MOVE
+- MKCOL
+- PROPFIND
+- PROPPATCH
+- REPORT
+- MKACTIVITY
+- CHECKOUT
+- MERGE
+- M-SEARCH
+- NOTIFY
+- SUBSCRIBE
+- UNSUBSCRIBE
+
+正确的注册方法是：
+
+```ts
+router.register("DELETE", "/users", async function(ctx) {
+
+    // do something
+});
+
+router.register("NOTIFY", "/users", async function(ctx) {
+
+    // do something
+});
+```
+
+上面的 GET/POST/PUT/TRACE/DELETE/OPTIONS/HEAD 是 HTTP/1.1 的标准方法（其他均是
+WebDAV 的扩展方法），因此他们可以通过快捷函数（以方法的小写名称作为函数名）注册，
+例如：
+
+```ts
+router.get("/users", async function(ctx) {
+
+    // do something
+});
+
+router.put("/users/{id:uint}", async function(ctx) {
+
+    // do something
+});
+
+router.delete("/users/{id:uint}", async function(ctx) {
+
+    // do something
+});
+
+router.patch("/users/{id:uint}", async function(ctx) {
+
+    // do something
+});
+```
+
+> 由于 HTTP/1.1 的标准方法 CONNECT 无法用于通用请求，于是将比较常用的 WebDav 方法
+> PATCH 补充进去，因此 PATCH 也有快捷方法。
+
+
+
+> [下一节：使用中间件](./03-middlewares.md) | [返回目录](./index.md)

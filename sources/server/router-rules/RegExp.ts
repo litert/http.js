@@ -28,7 +28,15 @@ class RegExpRouteRule<T> implements Core.RouteRule<T> {
 
     public route(path: string, context: Core.RequestContext): boolean {
 
-        return this._path.test(path);
+        let data = path.match(this._path);
+
+        if (data) {
+
+            context.params = data.slice(1);
+            return true;
+        }
+
+        return false;
     }
 }
 

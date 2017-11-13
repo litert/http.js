@@ -3,9 +3,18 @@ import HttpException = require("../Exception");
 import ServerError = require("../Errors");
 import { IDictionary } from "@litert/core";
 
+enum VarType {
+    STRING,
+    NUMERIC,
+    INT,
+    HEX_UINT
+}
+
 class SmartRouteRule<T> implements Core.RouteRule<T> {
 
     private keys: string[];
+
+    private varTypes: VarType[];
 
     private expr: RegExp;
 
@@ -36,47 +45,84 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
 
         let keys: string[] = [];
         let replacement: string[] = [];
+        let types: VarType[] = [];
 
-        path = path.replace(/\{\s*\w+\s*:\s*\w+\s*\}/g, function(el: string): string {
+        path = path.replace(/\{.+?:.+?\}/g, function(el: string): string {
 
-            let matchResult: RegExpMatchArray = <any> el.match(/\{\s*(\w+)\s*:\s*(\w+)\s*\}/);
+            let matchResult: RegExpMatchArray = <any> el.match(/\{(.+?):(.+?)\}/);
 
             switch (matchResult[2]) {
             case "int":
 
                 replacement.push("([-\\+]?\\d+)");
+                types.push(VarType.INT);
 
                 break;
 
             case "uint":
 
                 replacement.push("(\\d+)");
+                types.push(VarType.INT);
 
                 break;
 
-            case "hex":
+            case "hex-uint":
+
+                replacement.push("(\\d+)");
+                types.push(VarType.HEX_UINT);
+
+                break;
+
+            case "hex-string":
 
                 replacement.push("([\\dA-fa-f]+)");
+                types.push(VarType.STRING);
 
                 break;
 
             case "string":
 
                 replacement.push("([^\\/]+)");
+                types.push(VarType.STRING);
 
                 break;
 
             case "any":
 
                 replacement.push("(.+)");
+                types.push(VarType.STRING);
+
+                break;
+
+            case "number":
+
+                replacement.push("(\\+?\\d+\\.\\d+|-\\d+\\.\\d+|\\+?\\d+|-\\d+)");
+                types.push(VarType.NUMERIC);
 
                 break;
 
             default:
 
+                let mat = matchResult[2].match(/^string\[(\d+)\]$/);
+
+                if (mat) {
+
+                    replacement.push(`([^\\/]{${mat[1]}})`);
+                    types.push(VarType.STRING);
+
+                    break;
+                }
+                else if (mat = matchResult[2].match(/^hex-string\[(\d+)\]$/)) {
+
+                    replacement.push(`([a-fA-F0-9]{${mat[1]}})`);
+                    types.push(VarType.STRING);
+
+                    break;
+                }
+
                 throw new HttpException(
                     ServerError.INVALID_VARIABLE_TYPE,
-                    "Invalid type of variable in routing rule."
+                    `Invalid type ${matchResult[2]} of variable.`
                 );
             }
 
@@ -94,6 +140,8 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
         this.expr = new RegExp(`^${path}$`);
 
         this.keys = keys;
+
+        this.varTypes = types;
     }
 
     public route(path: string, context: Core.RequestContext): boolean {
@@ -104,7 +152,19 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
 
             for (let x = 1; x < ms.length; x++) {
 
-                context.params[this.keys[x - 1]] = ms[x];
+                let val: any = ms[x];
+
+                switch (this.varTypes[x - 1]) {
+                case VarType.HEX_UINT:
+                    val = parseInt(val, 16);
+                    break;
+                case VarType.INT:
+                    val = parseInt(val);
+                case VarType.NUMERIC:
+                    val = parseFloat(val);
+                }
+
+                context.params[this.keys[x - 1]] = val;
             }
 
             return true;

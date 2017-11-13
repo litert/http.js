@@ -21,13 +21,11 @@ extend(http.ServerResponse.prototype, "send", function(
         );
     }
 
-    data = data instanceof Buffer ? data : Buffer.from(data);
-
     if (!this.headersSent) {
 
         this.setHeader(
             "Content-Length",
-            data.byteLength.toString()
+            Buffer.byteLength(data)
         );
     }
 
@@ -73,7 +71,7 @@ extend(http.ServerResponse.prototype, "sendJSON", function(
     if (!this.headersSent) {
 
         this.setHeader("Content-Type", "application/json");
-        this.setHeader("Content-Length", data.length);
+        this.setHeader("Content-Length", Buffer.byteLength(data));
     }
 
     this.end(data);

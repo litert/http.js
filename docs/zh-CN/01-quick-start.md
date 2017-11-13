@@ -174,6 +174,72 @@ server.start().then(() => {
 - http://127.0.0.1/hello
 - http://127.0.0.1/world/
 
-(未完待续)
+## Demo III: 创建 HTTPS 服务器
 
-> [下一节：使用路由](./02-router.md) | [返回目录](./index.md)
+创建 HTTPS 服务器也非常简单，直接在 Demo I 的基础上，往 createServer 方法的 `ssl`
+选项里指定两个字段：
+
+- `key` SSL 私钥内容
+- `certificate` SSL 证书内容
+
+> 如果私钥是加密的，那么可以通过字段 `passphrase` 指定私钥的密码。
+
+```ts
+// File: demo-02-https-server.ts
+import * as http from "@litert/http";
+import fs = require("fs");
+
+/**
+ * 创建路由器对象
+ */
+let router = http.createRouter();
+
+/**
+ * 添加一个处理器，对 URL == "/" 的请求进行处理。
+ */
+router.get("/", async function(context) {
+
+    context.response.send("Hello world");
+
+}).notFound(async function(context) {
+
+    /**
+     * 添加一个处理器，对所有未注册的请求进行处理。
+     */
+
+    // 设置 HTTP 状态码为 404 NOT FOUND
+    context.response.writeHead(
+        http.HTTPStatus.NOT_FOUND,
+        "NOT FOUND"
+    );
+
+    // 输出 NOT FOUND
+    context.response.send("NOT FOUND");
+});
+
+/**
+ * 创建一个监听 0.0.0.0:8080 端口的 HTTPS 服务器，并指定使用 router 对象作为路由器。
+ */
+let server = http.createServer({
+    "port": 8080,
+    "router": router,
+    "ssl": {
+        // "passphrase": "password", // 指定 SSL 私钥的密码
+        "key": fs.readFileSync("/path/to/private-key.pem"),
+        "certificate": fs.readFileSync("/path/to/cert.pem")
+    }
+});
+
+// 启动服务器
+server.start().then(() => {
+
+    console.log("服务器成功启动");
+
+}).catch((e) => {
+
+    console.error(e);
+
+});
+```
+
+> [下一节：使用路由器](./02-router.md) | [返回目录](./index.md)

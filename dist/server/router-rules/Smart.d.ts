@@ -2,6 +2,7 @@ import * as Core from "../Core";
 import { IDictionary } from "@litert/core";
 declare class SmartRouteRule<T> implements Core.RouteRule<T> {
     private keys;
+    private varTypes;
     private expr;
     protected _handler: T;
     protected _data: IDictionary<any>;

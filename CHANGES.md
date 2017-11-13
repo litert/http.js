@@ -17,6 +17,7 @@
 - Added shorcut methods for HTTP/1.1 standard methods in router, e.g. get, 
 post, put, etc.
 - Added detection for NOT CALLING NEXT CALLBACK.
+- Improved the smart router and RegExp router.
 
 ## v0.1.0-b1
 

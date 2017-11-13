@@ -23,7 +23,9 @@
         "no-namespace": false,
         "no-internal-module": false,
         "unified-signatures": false,
-        "ban-types": false
+        "ban-types": false,
+        "no-conditional-assignment": false,
+        "radix": false
     },
     "rulesDirectory": []
 }

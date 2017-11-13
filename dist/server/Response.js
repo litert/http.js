@@ -11,9 +11,8 @@ extend(http.ServerResponse.prototype, "send", function (data) {
     if (this.finished) {
         throw new HttpException(ServerError.RESPONSE_ALREADY_CLOSED, "Response has been closed");
     }
-    data = data instanceof Buffer ? data : Buffer.from(data);
     if (!this.headersSent) {
-        this.setHeader("Content-Length", data.byteLength.toString());
+        this.setHeader("Content-Length", Buffer.byteLength(data));
     }
     this.end(data);
     return this;
@@ -32,7 +31,7 @@ extend(http.ServerResponse.prototype, "sendJSON", function (data) {
     data = JSON.stringify(data);
     if (!this.headersSent) {
         this.setHeader("Content-Type", "application/json");
-        this.setHeader("Content-Length", data.length);
+        this.setHeader("Content-Length", Buffer.byteLength(data));
     }
     this.end(data);
     return this;

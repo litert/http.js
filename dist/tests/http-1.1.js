@@ -26,7 +26,7 @@ router.use(async function (context, next) {
 }).use("GET", async function (context, next) {
     if (context.request.path.startsWith("/users/")) {
         try {
-            console.log("xxx");
+            console.log(`Requesting user ${context.params.id}`);
             await next();
             console.log("responsed");
         }
@@ -47,7 +47,9 @@ router.use(async function (context, next) {
     context.response.write(context.request.path);
 }).get("/test", async function (context) {
     context.response.write(`Requested at ${new Date(context.request.time)}`);
-}).get("/users/{user:int}", async function (context) {
+}).get("/users/{id:hex-string[5]}", async function (context) {
+    context.response.sendJSON(context.params);
+}).get(new RegExp("^/article/(.+)$"), async function (context) {
     context.response.sendJSON(context.params);
 }).get("/redirection", async function (context) {
     context.response.redirect("/");
