@@ -17,6 +17,10 @@ class Router {
         // @ts-ignore
         this._stringRouter = {};
         this._middlewares = [];
+        this._notFoundHandler = async (ctx) => {
+            ctx.response.writeHead(Core_1.HTTPStatus.NOT_FOUND, "FILE NOT FOUND");
+            ctx.response.end();
+        };
     }
     use() {
         let middleware = new Middleware();
@@ -116,7 +120,7 @@ class Router {
             "handler": null
         };
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
-            ret.handler = this._notFoundRouter;
+            ret.handler = this._notFoundHandler;
             context.data = {};
             return ret;
         }
@@ -134,7 +138,7 @@ class Router {
                 }
             }
         }
-        ret.handler = this._notFoundRouter;
+        ret.handler = this._notFoundHandler;
         context.data = {};
         return ret;
     }
@@ -152,7 +156,7 @@ class Router {
         return ret;
     }
     notFound(handler) {
-        this._notFoundRouter = handler;
+        this._notFoundHandler = handler;
         return this;
     }
 }

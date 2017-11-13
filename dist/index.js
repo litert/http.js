@@ -13,4 +13,5 @@ exports.HTTPStatus = Core_1.HTTPStatus;
 exports.createRouter = require("./server/Router");
 exports.createServer = require("./server/Server");
 exports.ServerError = require("./server/Errors");
+exports.Exception = require("./server/Exception");
 //# sourceMappingURL=index.js.map

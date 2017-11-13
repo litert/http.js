@@ -22,7 +22,6 @@ router.use(async function(context, next) {
 
             await next();
             context.response.write("<br>bye bye");
-
         }
         catch (e) {
 
@@ -77,6 +76,24 @@ router.use(async function(context, next) {
 
 }).get("/users/{id:hex-string[5]}", async function(context) {
 
+    context.response.writeHead(200, {
+        "Test": "hello",
+        "TTTT": ["a", "b"]
+    });
+
+    context.response.sendJSON(context.params);
+
+}).post("/users/{id:uint}", async function(context) {
+
+    try {
+
+        console.log((await context.request.getBody()).toString());
+    }
+    catch (e) {
+
+        console.error(e);
+    }
+
     context.response.sendJSON(context.params);
 
 }).get(new RegExp("^/article/(.+)$"), async function(context) {
@@ -98,4 +115,11 @@ server.on("error", function(err: Error) {
     console.log(err);
 });
 
-server.start();
+server.start().then(() => {
+
+    console.log("Server started.");
+
+}).catch((e) => {
+
+    console.error(e.toString());
+});

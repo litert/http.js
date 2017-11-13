@@ -62,6 +62,7 @@ class Server extends events.EventEmitter {
             this.on("checkContinue", this.__requestCallback.bind(this));
             this.on("checkExpectation", this.__requestCallback.bind(this));
         }
+        this._server.setTimeout(30000);
         this._server.keepAliveTimeout = this._keepAlive;
         this._server.listen(this._port, this._host, this._backlog, () => {
             this._status = Core.ServerStatus.WORKING;
@@ -95,6 +96,11 @@ class Server extends events.EventEmitter {
         else {
             request.host = this._host;
         }
+        request.on("aborted", function () {
+            this.aborted = true;
+        }).on("close", function () {
+            this.closed = true;
+        });
     }
     async __requestCallback(request, response) {
         this.__initializeRequest(request);

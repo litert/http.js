@@ -8,7 +8,8 @@ import {
     HTTPMethodDictionary,
     RouteResult,
     RequestContext,
-    HTTP_METHODS
+    HTTP_METHODS,
+    HTTPStatus
 } from "./Core";
 import HttpException = require("./Exception");
 import ServerError = require("./Errors");
@@ -37,7 +38,7 @@ class Router implements RequestRouter {
 
     protected _middlewares: Middleware[];
 
-    protected _notFoundRouter: RequestHandler;
+    protected _notFoundHandler: RequestHandler;
 
     public constructor() {
 
@@ -52,6 +53,16 @@ class Router implements RequestRouter {
         this._stringRouter = {};
 
         this._middlewares = [];
+
+        this._notFoundHandler = async (ctx) => {
+
+            ctx.response.writeHead(
+                HTTPStatus.NOT_FOUND,
+                "FILE NOT FOUND"
+            );
+
+            ctx.response.end();
+        };
     }
 
     public use(): RequestRouter {
@@ -269,7 +280,7 @@ class Router implements RequestRouter {
 
         if (!this._stringRouter[method] && !this._regexpRouter[method]) {
 
-            ret.handler = this._notFoundRouter;
+            ret.handler = this._notFoundHandler;
             context.data = {};
 
             return ret;
@@ -295,7 +306,7 @@ class Router implements RequestRouter {
             }
         }
 
-        ret.handler = this._notFoundRouter;
+        ret.handler = this._notFoundHandler;
         context.data = {};
 
         return ret;
@@ -331,7 +342,7 @@ class Router implements RequestRouter {
         handler: RequestHandler
     ): RequestRouter {
 
-        this._notFoundRouter = handler;
+        this._notFoundHandler = handler;
 
         return this;
     }

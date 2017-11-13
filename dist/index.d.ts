@@ -2,3 +2,4 @@ export { RequestContext, RequestHandler, RequestMiddleware, RequestRouter, Serve
 export import createRouter = require("./server/Router");
 export import createServer = require("./server/Server");
 export import ServerError = require("./server/Errors");
+export import Exception = require("./server/Exception");

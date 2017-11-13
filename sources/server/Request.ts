@@ -35,18 +35,31 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
 
     let buf: Buffer[] = [];
 
+    let onData: any;
+    let onEnd: any;
+    let onClose: any;
+    let onTimeout: any;
+
+    let doCleanEvents = () => {
+
+        this.removeListener("data", onData);
+        this.removeListener("end", onEnd);
+        this.removeListener("close", onClose);
+        this.removeListener("timeout", onTimeout);
+    };
+
     if (maxLength) {
 
         let length: number = 0;
 
-        this.on("data", (d: Buffer) => {
+        onData = (d: Buffer) => {
 
             length += d.byteLength;
 
             if (length > maxLength) {
 
-                this.removeAllListeners("end");
-                this.removeAllListeners("data");
+                this.removeListener("end", onEnd);
+                this.removeListener("data", onData);
 
                 return ret.reject(new HttpException(
                     ServerError.EXCEED_MAX_BODY_LENGTH,
@@ -55,25 +68,52 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
             }
 
             buf.push(d);
-        });
+        };
     }
     else {
 
-        this.on("data", (d: Buffer) => {
+        onData = (d: Buffer) => {
 
             buf.push(d);
-        });
+        };
     }
 
-    this.on("end", () => {
+    onEnd = () => {
 
         let data = Buffer.concat(buf);
 
         // @ts-ignore
         buf = undefined;
 
+        doCleanEvents();
+
         ret.resolve(data);
-    });
+    };
+
+    onClose = () => {
+
+        doCleanEvents();
+
+        return ret.reject(new HttpException(
+            ServerError.CONNECTION_CLOESD,
+            "The connection was closed."
+        ));
+    };
+
+    onTimeout = () => {
+
+        doCleanEvents();
+
+        return ret.reject(new HttpException(
+            ServerError.READING_DATA_TIMEOUT,
+            "Timeout when reading data from request."
+        ));
+    };
+
+    this.on("data", onData)
+    .on("end", onEnd)
+    .on("close", onClose)
+    .on("timeout", onTimeout);
 
     return ret.promise;
 });

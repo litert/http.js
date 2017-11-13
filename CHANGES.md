@@ -18,6 +18,8 @@
 post, put, etc.
 - Added detection for NOT CALLING NEXT CALLBACK.
 - Improved the smart router and RegExp router.
+- Added detection for client closing connection.
+- Added detection for timeout when reading data from client.
 
 ## v0.1.0-b1
 

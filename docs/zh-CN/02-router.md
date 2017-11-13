@@ -88,8 +88,8 @@ router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
 >
 > 那么对于请求 GET /users/123 ，是执行 handler1 还是 handler2 呢？
 >
-> 在 LiteRT/HTTP 中，对于每个请求可以有多个中间件，但是只有一个处理器。
-> 于是注定只有处理器 handler1 和 handler2 中只有一个会被执行，这个就取决于匹配顺序。
+> 在 LiteRT/HTTP 中，对于每个请求可以有多个中间件，但是只有一个处理器函数。因此
+> 处理器函数 handler1 和 handler2 中肯定只有一个会被执行，这个就取决于匹配顺序。
 >
 > **对于正则表达式和参数表达式，先添加的规则优先匹配。**
 >
@@ -204,4 +204,20 @@ router.patch("/users/{id:uint}", async function(ctx) {
 >
 > 其他 WebDAV 方法则必须使用 register 函数注册。
 
-> [下一节：使用中间件](./03-middlewares.md) | [返回目录](./index.md)
+## 5. 处理 NOT FOUND
+
+对于其他不想处理的请求，可以将他们全部由一个处理器函数来处理：
+
+```ts
+router.notFound(async function(ctx) {
+
+    ctx.response.writeHead(
+        http.HTTPStatus.NOT_FOUND,
+        "FILE NOT FOUND"
+    );
+
+    ctx.response.end();
+});
+```
+
+> [下一节：处理器函数](./03-handlers.md) | [返回目录](./index.md)

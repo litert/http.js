@@ -48,6 +48,18 @@ router.use(async function (context, next) {
 }).get("/test", async function (context) {
     context.response.write(`Requested at ${new Date(context.request.time)}`);
 }).get("/users/{id:hex-string[5]}", async function (context) {
+    context.response.writeHead(200, {
+        "Test": "hello",
+        "TTTT": ["a", "b"]
+    });
+    context.response.sendJSON(context.params);
+}).post("/users/{id:uint}", async function (context) {
+    try {
+        console.log((await context.request.getBody()).toString());
+    }
+    catch (e) {
+        console.error(e);
+    }
     context.response.sendJSON(context.params);
 }).get(new RegExp("^/article/(.+)$"), async function (context) {
     context.response.sendJSON(context.params);
@@ -61,5 +73,9 @@ let server = http.createServer({
 server.on("error", function (err) {
     console.log(err);
 });
-server.start();
+server.start().then(() => {
+    console.log("Server started.");
+}).catch((e) => {
+    console.error(e.toString());
+});
 //# sourceMappingURL=http-1.1.js.map

@@ -13,6 +13,13 @@ LiteRT/HTTP.js 是一个基于 Node.js HTTP(S) API 实现的轻量级框架，�
 - 智能路由，实现 API 更方便。
 - 提供 HTTP/2 支持（开发中）
 
+## 使用要求
+
+| 依赖部件      | 最低版本          |
+|--------------|-------------------|
+| Node.js      | v8.0.0            |
+| TypeScript   | v2.6.1            |
+
 ## 安装
 
 LiteRT/HTTP.js 目前不会发布到 npmjs.org，因此请通过以下方法安装：

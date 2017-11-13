@@ -15,6 +15,16 @@ export interface ServerRequest extends http.IncomingMessage {
     "query": IDictionary<any>;
 
     /**
+     * The flag determining whether connection is closed by client.
+     */
+    "aborted": boolean;
+
+    /**
+     * The flag determining whether connection is closed.
+     */
+    "closed": boolean;
+
+    /**
      * The query-string of request.
      */
     "queryString": string;

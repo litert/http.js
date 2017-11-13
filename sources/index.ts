@@ -22,3 +22,4 @@ export {
 export import createRouter = require("./server/Router");
 export import createServer = require("./server/Server");
 export import ServerError = require("./server/Errors");
+export import Exception = require("./server/Exception");
