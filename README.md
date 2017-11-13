@@ -2,6 +2,11 @@
 
 A simple HTTP server based on LiteRT framework.
 
+## Requirement
+
+- TypeScript v2.6.1 (or newer)
+- Node.js v8.0.0 (or newer)
+
 ## Document
 
 - [简体中文版](./docs/zh-CN/index.md)

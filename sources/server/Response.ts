@@ -3,22 +3,13 @@ import HttpException = require("./Exception");
 import ServerError = require("./Errors");
 import * as Core from "./Core";
 
-declare module "http" {
+function extend(obj: any, name: string, fn: Function) {
 
-    export class ServerResponse implements ServerResponse {
-
-        public sendJSON(data: any): ServerResponse;
-
-        public redirect(
-            target: string,
-            statusCode?: number
-        ): ServerResponse;
-
-        public send(data: string | Buffer): ServerResponse;
-    }
+    obj[name] = fn;
 }
 
-http.ServerResponse.prototype.send = function(
+extend(http.ServerResponse.prototype, "send", function(
+    this: Core.ServerResponse,
     data: string | Buffer
 ): Core.ServerResponse {
 
@@ -43,9 +34,10 @@ http.ServerResponse.prototype.send = function(
     this.end(data);
 
     return this;
-};
+});
 
-http.ServerResponse.prototype.redirect = function(
+extend(http.ServerResponse.prototype, "redirect", function(
+    this: Core.ServerResponse,
     target: string,
     statusCode: number = Core.HTTPStatus.TEMPORARY_REDIRECT
 ): Core.ServerResponse {
@@ -61,9 +53,10 @@ http.ServerResponse.prototype.redirect = function(
     this.writeHead(statusCode, {"Location": target});
 
     return this;
-};
+});
 
-http.ServerResponse.prototype.sendJSON = function(
+extend(http.ServerResponse.prototype, "sendJSON", function(
+    this: Core.ServerResponse,
     data: any
 ): http.ServerResponse {
 
@@ -86,4 +79,4 @@ http.ServerResponse.prototype.sendJSON = function(
     this.end(data);
 
     return this;
-};
+});

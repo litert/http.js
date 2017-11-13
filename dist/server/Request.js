@@ -4,15 +4,18 @@ const http = require("http");
 const HttpException = require("./Exception");
 const ServerError = require("./Errors");
 const core_1 = require("@litert/core");
-http.IncomingMessage.prototype.getBody = async function (maxLength = 0) {
+function extend(obj, name, fn) {
+    obj[name] = fn;
+}
+extend(http.IncomingMessage.prototype, "getBody", async function (maxLength = 0) {
     try {
         return JSON.parse((await this.getBody(maxLength)).toString());
     }
     catch (e) {
         return Promise.reject(e);
     }
-};
-http.IncomingMessage.prototype.getBody = async function (maxLength = 0) {
+});
+extend(http.IncomingMessage.prototype, "getBody", async function (maxLength = 0) {
     let ret = new core_1.RawPromise();
     let buf = [];
     if (maxLength) {
@@ -39,5 +42,5 @@ http.IncomingMessage.prototype.getBody = async function (maxLength = 0) {
         ret.resolve(data);
     });
     return ret.promise;
-};
+});
 //# sourceMappingURL=Request.js.map

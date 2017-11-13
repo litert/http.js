@@ -18,6 +18,8 @@ class Server extends events.EventEmitter {
         this._host = opts.host || Core.DEFAULT_HOST;
         this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
         this._router = opts.router;
+        this._expectRequest = opts.expectRequest || Core.DEFAULT_EXPECT_REQUEST;
+        this._keepAlive = opts.keeyAlive || Core.DEFAULT_KEEP_ALIVE;
         if (opts.ssl) {
             this._ssl = opts.ssl;
         }
@@ -46,18 +48,24 @@ class Server extends events.EventEmitter {
                 "key": this._ssl.key,
                 "cert": this._ssl.certificate,
                 "passphrase": this._ssl.passphrase
-            }, this.__requestCallback.bind(this));
+            });
         }
         else {
-            this._server = http.createServer(this.__requestCallback.bind(this));
+            this._server = http.createServer();
         }
-        this._server.listen(this._port, this._host, this._backlog, () => {
-            this._status = Core.ServerStatus.WORKING;
-            ret.resolve();
-        }).on("error", function (err) {
+        this._server.on("error", function (err) {
             ret.reject(new HttpException(ServerError.FAILED_TO_START, err.message));
         }).on("connect", function (req, socket) {
             socket.write("HTTP/1.1 405 METHOD NOW ALLOWED\r\nConnection: Close\r\n\r\n");
+        }).on("request", this.__requestCallback.bind(this));
+        if (this._expectRequest) {
+            this.on("checkContinue", this.__requestCallback.bind(this));
+            this.on("checkExpectation", this.__requestCallback.bind(this));
+        }
+        this._server.keepAliveTimeout = this._keepAlive;
+        this._server.listen(this._port, this._host, this._backlog, () => {
+            this._status = Core.ServerStatus.WORKING;
+            ret.resolve();
         });
         return ret.promise;
     }
@@ -65,10 +73,28 @@ class Server extends events.EventEmitter {
         let url = libUrl.parse(request.url);
         // @ts-ignore
         request.path = url.pathname;
-        request.queryString = url.query;
-        request.query = url.query ? queryString.parse(url.query) : {};
+        // @ts-ignore
+        request.queryString = url.search;
+        if (typeof url.query === "string") {
+            request.query = queryString.parse(url.query);
+        }
+        else {
+            request.query = url.query || {};
+        }
         request.server = this;
         request.time = Date.now();
+        if (request.headers["host"]) {
+            if (typeof request.headers["host"] === "string") {
+                // @ts-ignore
+                request.host = request.headers["host"];
+            }
+            else {
+                request.host = request.headers["host"][0];
+            }
+        }
+        else {
+            request.host = this._host;
+        }
     }
     async __requestCallback(request, response) {
         this.__initializeRequest(request);

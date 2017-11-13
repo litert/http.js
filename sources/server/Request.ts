@@ -2,22 +2,15 @@ import http = require("http");
 import HttpException = require("./Exception");
 import ServerError = require("./Errors");
 import { RawPromise } from "@litert/core";
+import * as Core from "./Core";
 
-declare module "http" {
+function extend(obj: any, name: string, fn: Function) {
 
-    export class IncomingMessage implements IncomingMessage {
-
-        public getBody(
-            maxLength?: number
-        ): Promise<Buffer>;
-
-        public getBodyAsJSON(
-            maxLength?: number
-        ): Promise<any>;
-    }
+    obj[name] = fn;
 }
 
-http.IncomingMessage.prototype.getBody = async function(
+extend(http.IncomingMessage.prototype, "getBody", async function(
+    this: Core.ServerRequest,
     maxLength: number = 0
 ): Promise<any> {
 
@@ -31,9 +24,10 @@ http.IncomingMessage.prototype.getBody = async function(
 
         return Promise.reject(e);
     }
-};
+});
 
-http.IncomingMessage.prototype.getBody = async function(
+extend(http.IncomingMessage.prototype, "getBody", async function(
+    this: Core.ServerRequest,
     maxLength: number = 0
 ): Promise<Buffer> {
 
@@ -82,4 +76,4 @@ http.IncomingMessage.prototype.getBody = async function(
     });
 
     return ret.promise;
-};
+});

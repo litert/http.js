@@ -22,7 +22,8 @@
         "only-arrow-functions": false,
         "no-namespace": false,
         "no-internal-module": false,
-        "unified-signatures": false
+        "unified-signatures": false,
+        "ban-types": false
     },
     "rulesDirectory": []
 }

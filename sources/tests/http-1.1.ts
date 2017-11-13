@@ -16,7 +16,7 @@ router.use(async function(context, next) {
 
 }).use("GET", async function(context, next): Promise<void> {
 
-    if (context.request.url === "/") {
+    if (context.request.path === "/") {
 
         try {
 
@@ -62,6 +62,13 @@ router.use(async function(context, next) {
 
 }).get("/", async function(context) {
 
+    context.response.setHeader(
+        "Context-Type",
+        "text/plain"
+    );
+
+    context.response.write(context.request.host);
+    context.response.write(JSON.stringify(context.request.query));
     context.response.write(context.request.path);
 
 }).get("/test", async function(context) {

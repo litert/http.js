@@ -11,7 +11,7 @@ router.use(async function (context, next) {
     console.log(`${req.method} ${req.url}`);
     await next();
 }).use("GET", async function (context, next) {
-    if (context.request.url === "/") {
+    if (context.request.path === "/") {
         try {
             await next();
             context.response.write("<br>bye bye");
@@ -41,6 +41,9 @@ router.use(async function (context, next) {
     ctx.response.statusCode = http.HTTPStatus.NOT_FOUND;
     ctx.response.end("NOT FOUND");
 }).get("/", async function (context) {
+    context.response.setHeader("Context-Type", "text/plain");
+    context.response.write(context.request.host);
+    context.response.write(JSON.stringify(context.request.query));
     context.response.write(context.request.path);
 }).get("/test", async function (context) {
     context.response.write(`Requested at ${new Date(context.request.time)}`);

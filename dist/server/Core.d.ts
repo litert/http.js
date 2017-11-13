@@ -16,6 +16,10 @@ export interface ServerRequest extends http.IncomingMessage {
      */
     "queryString": string;
     /**
+     * The host of request visited.
+     */
+    "host": string;
+    /**
      * The server object.
      */
     "server": Server;
@@ -135,6 +139,20 @@ export interface CreateServerOptions {
      * Default: 80
      */
     "port"?: number;
+    /**
+     * Enable to receive the Expect: xxx-MESSAGE request.
+     *
+     * Default: false
+     */
+    "expectRequest"?: boolean;
+    /**
+     * How long can a connection keep alive.
+     *
+     * Set to 0 so that keep-alive will be disabled.
+     *
+     * Default: 5000 (ms)
+     */
+    "keeyAlive"?: number;
     /**
      * The backlog to listen.
      *
@@ -310,6 +328,8 @@ export interface RouteRule<T> {
 export declare const DEFAULT_PORT: number;
 export declare const DEFAULT_HOST: string;
 export declare const DEFAULT_BACKLOG: number;
+export declare const DEFAULT_KEEP_ALIVE: number;
+export declare const DEFAULT_EXPECT_REQUEST: boolean;
 export declare const EXCEPTION_TYPE: string;
 export declare enum HTTPStatus {
     CONTINUE = 100,

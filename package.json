@@ -26,11 +26,10 @@
   "types": "./dist/index.d.ts",
   "typings": "./dist/index.d.ts",
   "dependencies": {
-    "@litert/core": "git+https://github.com/litert/core.js.git#v0.2.0",
-    "langext": "^1.2.1-rc-2"
+    "@litert/core": "git+https://github.com/litert/core.js.git#v0.2.0"
   },
   "devDependencies": {
-    "@types/node": "^7.0.46",
+    "@types/node": "^8.0.51",
     "typescript": "^2.6.1"
   }
 }

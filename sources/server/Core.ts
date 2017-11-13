@@ -20,6 +20,11 @@ export interface ServerRequest extends http.IncomingMessage {
     "queryString": string;
 
     /**
+     * The host of request visited.
+     */
+    "host": string;
+
+    /**
      * The server object.
      */
     "server": Server;
@@ -178,6 +183,22 @@ export interface CreateServerOptions {
      * Default: 80
      */
     "port"?: number;
+
+    /**
+     * Enable to receive the Expect: xxx-MESSAGE request.
+     *
+     * Default: false
+     */
+    "expectRequest"?: boolean;
+
+    /**
+     * How long can a connection keep alive.
+     *
+     * Set to 0 so that keep-alive will be disabled.
+     *
+     * Default: 5000 (ms)
+     */
+    "keeyAlive"?: number;
 
     /**
      * The backlog to listen.
@@ -445,6 +466,10 @@ export const DEFAULT_PORT: number = 80;
 export const DEFAULT_HOST: string = "0.0.0.0";
 
 export const DEFAULT_BACKLOG: number = 512;
+
+export const DEFAULT_KEEP_ALIVE: number = 5000;
+
+export const DEFAULT_EXPECT_REQUEST: boolean = false;
 
 export const EXCEPTION_TYPE: string = "litert/http";
 

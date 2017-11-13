@@ -30,6 +30,8 @@ var ServerStatus;
 exports.DEFAULT_PORT = 80;
 exports.DEFAULT_HOST = "0.0.0.0";
 exports.DEFAULT_BACKLOG = 512;
+exports.DEFAULT_KEEP_ALIVE = 5000;
+exports.DEFAULT_EXPECT_REQUEST = false;
 exports.EXCEPTION_TYPE = "litert/http";
 var HTTPStatus;
 (function (HTTPStatus) {

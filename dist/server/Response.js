@@ -4,7 +4,10 @@ const http = require("http");
 const HttpException = require("./Exception");
 const ServerError = require("./Errors");
 const Core = require("./Core");
-http.ServerResponse.prototype.send = function (data) {
+function extend(obj, name, fn) {
+    obj[name] = fn;
+}
+extend(http.ServerResponse.prototype, "send", function (data) {
     if (this.finished) {
         throw new HttpException(ServerError.RESPONSE_ALREADY_CLOSED, "Response has been closed");
     }
@@ -14,15 +17,15 @@ http.ServerResponse.prototype.send = function (data) {
     }
     this.end(data);
     return this;
-};
-http.ServerResponse.prototype.redirect = function (target, statusCode = Core.HTTPStatus.TEMPORARY_REDIRECT) {
+});
+extend(http.ServerResponse.prototype, "redirect", function (target, statusCode = Core.HTTPStatus.TEMPORARY_REDIRECT) {
     if (this.headersSent) {
         throw new HttpException(ServerError.HEADERS_ALREADY_SENT, "Response headers were already sent.");
     }
     this.writeHead(statusCode, { "Location": target });
     return this;
-};
-http.ServerResponse.prototype.sendJSON = function (data) {
+});
+extend(http.ServerResponse.prototype, "sendJSON", function (data) {
     if (this.finished) {
         throw new HttpException(ServerError.RESPONSE_ALREADY_CLOSED, "Response has been closed");
     }
@@ -33,5 +36,5 @@ http.ServerResponse.prototype.sendJSON = function (data) {
     }
     this.end(data);
     return this;
-};
+});
 //# sourceMappingURL=Response.js.map
