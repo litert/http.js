@@ -7,7 +7,7 @@ const core_1 = require("@litert/core");
 function extend(obj, name, fn) {
     obj[name] = fn;
 }
-extend(http.IncomingMessage.prototype, "getBody", async function (maxLength = 0) {
+extend(http.IncomingMessage.prototype, "getBodyAsJSON", async function (maxLength = 0) {
     try {
         return JSON.parse((await this.getBody(maxLength)).toString());
     }

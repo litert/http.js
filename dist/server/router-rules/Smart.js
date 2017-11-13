@@ -67,7 +67,7 @@ class SmartRouteRule {
                         types.push(VarType.STRING);
                         break;
                     }
-                    throw new HttpException(ServerError.INVALID_VARIABLE_TYPE, `Invalid type ${matchResult[2]} of variable.`);
+                    throw new HttpException(ServerError.INVALID_VARIABLE_TYPE, `Invalid expression ${el} of variable.`);
             }
             keys.push(matchResult[1]);
             return `@::#${replacement.length - 1}#`;

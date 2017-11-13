@@ -122,7 +122,7 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
 
                 throw new HttpException(
                     ServerError.INVALID_VARIABLE_TYPE,
-                    `Invalid type ${matchResult[2]} of variable.`
+                    `Invalid expression ${el} of variable.`
                 );
             }
 

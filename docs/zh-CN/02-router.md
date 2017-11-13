@@ -79,6 +79,24 @@ router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
 
 > 此时 `context.params` 元素的下标从 0 开始，与 String.prototype.match 结果不同。
 
+> **路由的先入优先原则**
+>
+> 如果存在两个这样的正则匹配规则：
+>
+> - `router.get(new RegExp("^/users/\\d+$"), handler1);`
+> - `router.get(new RegExp("^/users/\\w+$"), handler2);`
+>
+> 那么对于请求 GET /users/123 ，是执行 handler1 还是 handler2 呢？
+>
+> 在 LiteRT/HTTP 中，对于每个请求可以有多个中间件，但是只有一个处理器。
+> 于是注定只有处理器 handler1 和 handler2 中只有一个会被执行，这个就取决于匹配顺序。
+>
+> **对于正则表达式和参数表达式，先添加的规则优先匹配。**
+>
+> 所以上面这个例子， handler1 会被执行。
+>
+> 如果换成是中间件，则两个都会被（按添加顺序）执行。
+
 ## 3. 通过参数表达式匹配
 
 很多时候，如果只用正则表达式或字符串，不能快捷地提取 URI 中的参数，因此 LiteRT/HTTP 
@@ -182,8 +200,8 @@ router.patch("/users/{id:uint}", async function(ctx) {
 ```
 
 > 由于 HTTP/1.1 的标准方法 CONNECT 无法用于通用请求，于是将比较常用的 WebDav 方法
-> PATCH 补充进去，因此 PATCH 也有快捷方法。
-
-
+> PATCH 补充进去，因此 PATCH 也有快捷注册。
+>
+> 其他 WebDAV 方法则必须使用 register 函数注册。
 
 > [下一节：使用中间件](./03-middlewares.md) | [返回目录](./index.md)

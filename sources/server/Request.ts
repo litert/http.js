@@ -9,7 +9,7 @@ function extend(obj: any, name: string, fn: Function) {
     obj[name] = fn;
 }
 
-extend(http.IncomingMessage.prototype, "getBody", async function(
+extend(http.IncomingMessage.prototype, "getBodyAsJSON", async function(
     this: Core.ServerRequest,
     maxLength: number = 0
 ): Promise<any> {
