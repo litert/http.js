@@ -75,7 +75,8 @@ export interface ServerResponse extends http.ServerResponse {
     send(data: string | Buffer): ServerResponse;
 }
 export declare type RequestHandler = (context: RequestContext) => Promise<void>;
-export declare type RequestMiddleware = (context: RequestContext, next: (end?: boolean) => Promise<void>) => Promise<void>;
+export declare type MiddlewareNextCallback = (end?: boolean) => Promise<void>;
+export declare type RequestMiddleware = (context: RequestContext, next: MiddlewareNextCallback) => Promise<void>;
 export interface RequestContext {
     /**
      * The object describes the request.

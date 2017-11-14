@@ -135,6 +135,10 @@ class Server extends events.EventEmitter {
                 throw e;
             }
         }
+        delete context.request;
+        delete context.response;
+        delete context.data;
+        delete context.params;
     }
     async __execute(middlewares, handler, context, index = 0) {
         try {
@@ -148,7 +152,7 @@ class Server extends events.EventEmitter {
                     return Promise.reject(new HttpException(ServerError.MISSING_CALLING_NEXT, "The next callback is not called inside middleware."));
                 }
             }
-            else {
+            else if (index !== -1) {
                 await handler(context);
             }
         }
