@@ -180,6 +180,14 @@ class Server extends events.EventEmitter implements Core.Server {
             request.host = this._host;
         }
 
+        if (this._ssl) {
+
+            request.https = true;
+        }
+
+        // @ts-ignore
+        request.ip = request.connection.remoteAddress;
+
         request.on("aborted", function(this: Core.ServerRequest) {
 
             this.aborted = true;

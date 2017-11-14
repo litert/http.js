@@ -8,11 +8,19 @@ export interface ServerRequest extends http.IncomingMessage {
      */
     "path": string;
     /**
+     * The flag determining whether requested over SSL.
+     */
+    "https": boolean;
+    /**
+     * The remote address.
+     */
+    "ip": string;
+    /**
      * The unseriailized data of query-string of request.
      */
     "query": IDictionary<any>;
     /**
-     * The flag determining whether connection is closed by client.
+     * The flag determining whether connection is aborted.
      */
     "aborted": boolean;
     /**
@@ -67,7 +75,7 @@ export interface ServerResponse extends http.ServerResponse {
     send(data: string | Buffer): ServerResponse;
 }
 export declare type RequestHandler = (context: RequestContext) => Promise<void>;
-export declare type RequestMiddleware = (context: RequestContext, next: (end?: boolean) => Promise<void>) => void;
+export declare type RequestMiddleware = (context: RequestContext, next: (end?: boolean) => Promise<void>) => Promise<void>;
 export interface RequestContext {
     /**
      * The object describes the request.

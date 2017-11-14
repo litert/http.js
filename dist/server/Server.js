@@ -96,6 +96,11 @@ class Server extends events.EventEmitter {
         else {
             request.host = this._host;
         }
+        if (this._ssl) {
+            request.https = true;
+        }
+        // @ts-ignore
+        request.ip = request.connection.remoteAddress;
         request.on("aborted", function () {
             this.aborted = true;
         }).on("close", function () {

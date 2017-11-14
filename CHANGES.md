@@ -20,6 +20,8 @@ post, put, etc.
 - Improved the smart router and RegExp router.
 - Added detection for client closing connection.
 - Added detection for timeout when reading data from client.
+- Added property `host`, `path`, `query`, `queryString`, `https`, `ip`,
+`aborted`, `closed`, etc for ServerRequest object.
 
 ## v0.1.0-b1
 

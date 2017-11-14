@@ -65,6 +65,22 @@ router.use(async function (context, next) {
     context.response.sendJSON(context.params);
 }).get("/redirection", async function (context) {
     context.response.redirect("/");
+}).get("/client", async function (ctx) {
+    ctx.response.statusCode = http.HTTPStatus.OK;
+    ctx.response.statusMessage = "OK";
+    ctx.response.setHeader("Content-Type", "text/plain");
+    let content = `
+IP Address:     ${ctx.request.ip}
+HTTPS:          ${ctx.request.https ? "Yes" : "No"}
+Request Host:   ${ctx.request.host}
+Request URL:    ${ctx.request.url}
+Request Path:   ${ctx.request.path}
+Request Search: ${ctx.request.queryString}
+Request Time:   ${new Date(ctx.request.time)}
+Request Query:  ${JSON.stringify(ctx.request.query)}
+`;
+    ctx.response.setHeader("Content-Length", Buffer.byteLength(content));
+    ctx.response.send(content);
 });
 let server = http.createServer({
     "port": 8080,

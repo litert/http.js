@@ -35,10 +35,12 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
 
     let buf: Buffer[] = [];
 
-    let onData: any;
-    let onEnd: any;
-    let onClose: any;
-    let onTimeout: any;
+    type EventCallback = (...args: any[]) => void;
+
+    let onData: EventCallback;
+    let onEnd: EventCallback;
+    let onClose: EventCallback;
+    let onTimeout: EventCallback;
 
     let doCleanEvents = () => {
 
