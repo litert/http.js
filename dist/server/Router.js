@@ -16,7 +16,11 @@ class Router {
         this._regexpRouter = {};
         // @ts-ignore
         this._stringRouter = {};
-        this._middlewares = [];
+        // @ts-ignore
+        this._middlewares = {};
+        for (let method of Core_1.HTTP_METHODS) {
+            this._middlewares[method] = [];
+        }
         this._notFoundHandler = async (ctx) => {
             ctx.response.writeHead(Core_1.HTTPStatus.NOT_FOUND, "FILE NOT FOUND");
             ctx.response.end();
@@ -46,7 +50,19 @@ class Router {
                 middleware.handler = arg;
             }
         }
-        this._middlewares.push(middleware);
+        if (middleware.method) {
+            this._middlewares[middleware.method].push(middleware);
+        }
+        else {
+            /**
+             * Not limit to specific method.
+             *
+             * Thus adds it to all methods.
+             */
+            for (let method of Core_1.HTTP_METHODS) {
+                this._middlewares[method].push(middleware);
+            }
+        }
         return this;
     }
     get(path, handler, data) {
@@ -144,10 +160,7 @@ class Router {
     }
     _filterMiddlewares(method, path, context) {
         let ret = [];
-        for (let middleware of this._middlewares) {
-            if (middleware.method && method !== middleware.method) {
-                continue;
-            }
+        for (let middleware of this._middlewares[method]) {
             if (middleware.rule && !middleware.rule.route(path, context)) {
                 continue;
             }

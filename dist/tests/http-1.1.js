@@ -14,7 +14,7 @@ router.use(async function (context, next) {
     if (context.request.path === "/") {
         try {
             await next();
-            context.response.write("<br>bye bye");
+            context.response.write("\nbye bye");
         }
         catch (e) {
             return Promise.reject(e);
@@ -42,7 +42,7 @@ router.use(async function (context, next) {
     ctx.response.end("NOT FOUND");
 }).get("/", async function (context) {
     context.response.setHeader("Context-Type", "text/plain");
-    context.response.write(context.request.host);
+    context.response.write(context.request.host + "\n");
     context.response.write(JSON.stringify(context.request.query));
     context.response.write(context.request.path);
 }).get("/test", async function (context) {
@@ -84,6 +84,7 @@ Request Query:  ${JSON.stringify(ctx.request.query)}
 });
 let server = http.createServer({
     "port": 8080,
+    "host": "0.0.0.0",
     "router": router
 });
 server.on("error", function (err) {

@@ -95,9 +95,11 @@ export type RequestHandler = (
     context: RequestContext
 ) => Promise<void>;
 
+export type MiddlewareNextCallback = (end?: boolean) => Promise<void>;
+
 export type RequestMiddleware = (
     context: RequestContext,
-    next: (end?: boolean) => Promise<void>
+    next: MiddlewareNextCallback
 ) => Promise<void>;
 
 export interface RequestContext {
@@ -233,7 +235,16 @@ export interface CreateServerOptions {
     "router": RequestRouter;
 
     /**
+     * The connection timeout.
+     *
+     * Default: 60000 (ms)
+     */
+    "timeout"?: number;
+
+    /**
      * Configure this field to enabled HTTPS.
+     *
+     * Default: none
      */
     "ssl"?: SSLConfiguration;
 }
@@ -490,6 +501,11 @@ export const DEFAULT_BACKLOG: number = 512;
 export const DEFAULT_KEEP_ALIVE: number = 5000;
 
 export const DEFAULT_EXPECT_REQUEST: boolean = false;
+
+/**
+ * The default connection timeout of server.
+ */
+export const DEFAULT_TIMEOUT: number = 60000;
 
 export const EXCEPTION_TYPE: string = "litert/http";
 

@@ -32,6 +32,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _expectRequest: boolean;
 
+    protected _timeout: number;
+
     public constructor(opts: Core.CreateServerOptions) {
 
         super();
@@ -42,6 +44,9 @@ class Server extends events.EventEmitter implements Core.Server {
         this._router = opts.router;
         this._expectRequest = opts.expectRequest || Core.DEFAULT_EXPECT_REQUEST;
         this._keepAlive = opts.keeyAlive || Core.DEFAULT_KEEP_ALIVE;
+        this._timeout = opts.timeout !== undefined ?
+                            opts.timeout :
+                            Core.DEFAULT_TIMEOUT;
 
         if (opts.ssl) {
 
@@ -124,7 +129,7 @@ class Server extends events.EventEmitter implements Core.Server {
             this.on("checkExpectation", this.__requestCallback.bind(this));
         }
 
-        this._server.setTimeout(30000);
+        this._server.setTimeout(this._timeout);
 
         this._server.keepAliveTimeout = this._keepAlive;
 
@@ -150,8 +155,10 @@ class Server extends events.EventEmitter implements Core.Server {
 
         // @ts-ignore
         request.path = url.pathname;
+
         // @ts-ignore
         request.queryString = url.search;
+
         if (typeof url.query === "string") {
 
             request.query = queryString.parse(url.query);
@@ -160,6 +167,10 @@ class Server extends events.EventEmitter implements Core.Server {
 
             request.query = url.query || {};
         }
+
+        // @ts-ignore
+        request.ip = request.connection.remoteAddress;
+
         request.server = this;
         request.time = Date.now();
 
@@ -184,9 +195,6 @@ class Server extends events.EventEmitter implements Core.Server {
 
             request.https = true;
         }
-
-        // @ts-ignore
-        request.ip = request.connection.remoteAddress;
 
         request.on("aborted", function(this: Core.ServerRequest) {
 
@@ -249,6 +257,11 @@ class Server extends events.EventEmitter implements Core.Server {
                 throw e;
             }
         }
+
+        delete context.request;
+        delete context.response;
+        delete context.data;
+        delete context.params;
     }
 
     protected async __execute(
@@ -284,7 +297,7 @@ class Server extends events.EventEmitter implements Core.Server {
                     ));
                 }
             }
-            else {
+            else if (index !== -1) {
 
                 await handler(context);
             }

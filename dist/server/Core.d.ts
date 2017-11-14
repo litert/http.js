@@ -180,7 +180,15 @@ export interface CreateServerOptions {
      */
     "router": RequestRouter;
     /**
+     * The connection timeout.
+     *
+     * Default: 60000 (ms)
+     */
+    "timeout"?: number;
+    /**
      * Configure this field to enabled HTTPS.
+     *
+     * Default: none
      */
     "ssl"?: SSLConfiguration;
 }
@@ -346,6 +354,10 @@ export declare const DEFAULT_HOST: string;
 export declare const DEFAULT_BACKLOG: number;
 export declare const DEFAULT_KEEP_ALIVE: number;
 export declare const DEFAULT_EXPECT_REQUEST: boolean;
+/**
+ * The default connection timeout of server.
+ */
+export declare const DEFAULT_TIMEOUT: number;
 export declare const EXCEPTION_TYPE: string;
 export declare enum HTTPStatus {
     CONTINUE = 100,

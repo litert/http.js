@@ -62,7 +62,8 @@ router.get("/", async function(context) {
  * 创建一个监听 0.0.0.0:8080 端口的 HTTP 服务器，并指定使用 router 对象作为路由器。
  */
 let server = http.createServer({
-    "port": 8080,
+    "port": 8080, // 可选参数，默认 80
+    "host": "0.0.0.0", // 可选参数，默认 0.0.0.0
     "router": router
 });
 
@@ -225,8 +226,8 @@ let server = http.createServer({
     "router": router,
     "ssl": {
         // "passphrase": "password", // 指定 SSL 私钥的密码
-        "key": fs.readFileSync("/path/to/private-key.pem"),
-        "certificate": fs.readFileSync("/path/to/cert.pem")
+        "key": fs.readFileSync("/path/to/private-key.pem"), // 从文件读取私钥
+        "certificate": fs.readFileSync("/path/to/cert.pem") // 从文件读取证书
     }
 });
 

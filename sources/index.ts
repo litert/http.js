@@ -4,6 +4,7 @@ export {
     RequestHandler,
     RequestMiddleware,
     RequestRouter,
+    MiddlewareNextCallback,
     ServerRequest,
     ServerResponse,
     ServerStatus,
@@ -15,7 +16,11 @@ export {
     EXCEPTION_TYPE,
     HTTP_METHODS,
     HTTPMethod,
-    HTTPStatus
+    HTTPStatus,
+    Server,
+    CreateServerOptions,
+    SSLConfiguration,
+    RouteResult
 
 } from "./server/Core";
 

@@ -21,7 +21,7 @@ router.use(async function(context, next) {
         try {
 
             await next();
-            context.response.write("<br>bye bye");
+            context.response.write("\nbye bye");
         }
         catch (e) {
 
@@ -66,7 +66,7 @@ router.use(async function(context, next) {
         "text/plain"
     );
 
-    context.response.write(context.request.host);
+    context.response.write(context.request.host + "\n");
     context.response.write(JSON.stringify(context.request.query));
     context.response.write(context.request.path);
 
@@ -130,6 +130,7 @@ Request Query:  ${JSON.stringify(ctx.request.query)}
 
 let server = http.createServer({
     "port": 8080,
+    "host": "0.0.0.0",
     "router": router
 });
 

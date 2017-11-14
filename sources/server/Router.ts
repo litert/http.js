@@ -36,7 +36,7 @@ class Router implements RequestRouter {
         Array<RouteRule<RequestHandler>>
     >;
 
-    protected _middlewares: Middleware[];
+    protected _middlewares: HTTPMethodDictionary<Middleware[]>;
 
     protected _notFoundHandler: RequestHandler;
 
@@ -52,7 +52,13 @@ class Router implements RequestRouter {
         // @ts-ignore
         this._stringRouter = {};
 
-        this._middlewares = [];
+        // @ts-ignore
+        this._middlewares = {};
+
+        for (let method of HTTP_METHODS) {
+
+            this._middlewares[method] = [];
+        }
 
         this._notFoundHandler = async (ctx) => {
 
@@ -83,11 +89,19 @@ class Router implements RequestRouter {
 
                     if (arg.indexOf("{")) {
 
-                        middleware.rule = new SmartRouteRule<null>(null, arg, {});
+                        middleware.rule = new SmartRouteRule<null>(
+                            null,
+                            arg,
+                            {}
+                        );
                     }
                     else {
 
-                        middleware.rule = new PlainRouteRule<null>(null, arg, {});
+                        middleware.rule = new PlainRouteRule<null>(
+                            null,
+                            arg,
+                            {}
+                        );
                     }
                 }
             }
@@ -101,7 +115,22 @@ class Router implements RequestRouter {
             }
         }
 
-        this._middlewares.push(middleware);
+        if (middleware.method) {
+
+            this._middlewares[middleware.method].push(middleware);
+        }
+        else {
+
+            /**
+             * Not limit to specific method.
+             *
+             * Thus adds it to all methods.
+             */
+            for (let method of HTTP_METHODS) {
+
+                this._middlewares[method].push(middleware);
+            }
+        }
 
         return this;
     }
@@ -320,12 +349,7 @@ class Router implements RequestRouter {
 
         let ret: RequestMiddleware[] = [];
 
-        for (let middleware of this._middlewares) {
-
-            if (middleware.method && method !== middleware.method) {
-
-                continue;
-            }
+        for (let middleware of this._middlewares[method]) {
 
             if (middleware.rule && !middleware.rule.route(path, context)) {
 

@@ -159,7 +159,18 @@ hex-string[x] | 长度为x，只包含十六进制字符的字符串  | string
 - SUBSCRIBE
 - UNSUBSCRIBE
 
-正确的注册方法是：
+正确的注册方法是用处理器规则注册函数 `RequestRouter.register`，该函数的签名为：
+
+```ts
+type RegisterMethod = (
+    method: HTTPMethod,
+    path: string | RegExp,
+    handler: RequestHandler,
+    data?: IDictionary<any>
+) => RequestRouter;
+```
+
+使用示例：
 
 ```ts
 router.register("DELETE", "/users", async function(ctx) {
@@ -175,7 +186,17 @@ router.register("NOTIFY", "/users", async function(ctx) {
 
 上面的 GET/POST/PUT/TRACE/DELETE/OPTIONS/HEAD 是 HTTP/1.1 的标准方法（其他均是
 WebDAV 的扩展方法），因此他们可以通过快捷函数（以方法的小写名称作为函数名）注册，
-例如：
+签名如下：
+
+```ts
+type RegisterShortcutMethod = (
+    path: string | RegExp,
+    handler: RequestHandler,
+    data?: IDictionary<any>
+) => RequestRouter;
+```
+
+调用示例：
 
 ```ts
 router.get("/users", async function(ctx) {
@@ -203,6 +224,9 @@ router.patch("/users/{id:uint}", async function(ctx) {
 > PATCH 补充进去，因此 PATCH 也有快捷注册。
 >
 > 其他 WebDAV 方法则必须使用 register 函数注册。
+>
+> 这些用于添加请求处理器规则的函数统称为**路由注册函数**
+
 
 ## 5. 处理 NOT FOUND
 

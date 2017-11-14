@@ -20,6 +20,9 @@ class Server extends events.EventEmitter {
         this._router = opts.router;
         this._expectRequest = opts.expectRequest || Core.DEFAULT_EXPECT_REQUEST;
         this._keepAlive = opts.keeyAlive || Core.DEFAULT_KEEP_ALIVE;
+        this._timeout = opts.timeout !== undefined ?
+            opts.timeout :
+            Core.DEFAULT_TIMEOUT;
         if (opts.ssl) {
             this._ssl = opts.ssl;
         }
@@ -62,7 +65,7 @@ class Server extends events.EventEmitter {
             this.on("checkContinue", this.__requestCallback.bind(this));
             this.on("checkExpectation", this.__requestCallback.bind(this));
         }
-        this._server.setTimeout(30000);
+        this._server.setTimeout(this._timeout);
         this._server.keepAliveTimeout = this._keepAlive;
         this._server.listen(this._port, this._host, this._backlog, () => {
             this._status = Core.ServerStatus.WORKING;
@@ -82,6 +85,8 @@ class Server extends events.EventEmitter {
         else {
             request.query = url.query || {};
         }
+        // @ts-ignore
+        request.ip = request.connection.remoteAddress;
         request.server = this;
         request.time = Date.now();
         if (request.headers["host"]) {
@@ -99,8 +104,6 @@ class Server extends events.EventEmitter {
         if (this._ssl) {
             request.https = true;
         }
-        // @ts-ignore
-        request.ip = request.connection.remoteAddress;
         request.on("aborted", function () {
             this.aborted = true;
         }).on("close", function () {

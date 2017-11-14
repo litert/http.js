@@ -18,9 +18,43 @@ type RequestHandler = (
 从签名可以看到，这个处理器函数有一个参数，叫 context，它是一个 http.RequestContext
 类型的对象。整个处理器就是通过控制 context 对象来操作这个请求，并输出数据给请求的。
 
-本节将通过几个例子来介绍处理器函数的基本用途。
+## 0. 上下文对象
 
-## 1. 读取 HTTP Body 数据
+每个请求中都有一个 `context` 对象，它贯穿一个请求的整个生命周期。因为它包含的内容就是
+请求的完整上下文，因此也称为**请求上下文对象**。它的结构如下：
+
+```ts
+export interface RequestContext {
+
+    /**
+     * 这个字段是一个请求控制对象，内含请求的基本信息。
+     */
+    "request": ServerRequest;
+
+    /**
+     * 这个字段是一个响应控制对象，用于控制和输出响应的数据和 HTTP 头部数据。
+     */
+    "response": ServerResponse;
+
+    /**
+     * 这是一个数据储存空间，用于储存请求过程中，需要在中间件和处理器函数间共享的
+     * 数据。
+     * 
+     * 这里面的数据会在请求结束后被释放。
+     */
+    "data": IDictionary<any>;
+
+    /**
+     * 这个字段储存来自 URL Path 的参数，仅当使用路由器的参数表达式或者正则表达式
+     * 的时候该字段才有数据。
+     */
+    "params": IDictionary<any>;
+}
+```
+
+下面将通过几个例子来介绍处理器函数的基本用法。
+
+## 1. Demo I: 读取 HTTP Body 数据
 
 通过 context.request.getBody 方法，即可读取 HTTP 请求的 Body 数据。如果希望读取并
 解析 JSON，则使用 context.request.getBodyAsJSON 方法。
@@ -54,7 +88,7 @@ router.post("/users/{id:uint}", async function(ctx) {
 
 -------------------------------------------------------------------------------
 
-## 2. 设置 HTTP 响应 Header
+## 2. Demo II: 设置 HTTP 响应 Header
 
 通过 context.response.setHeader 即可设置响应头。也可以通过 writeHead 方法设置
 并发送响应头。
@@ -79,7 +113,7 @@ router.get("/users/{id:uint}", async function(ctx) {
 
 -------------------------------------------------------------------------------
 
-## 3. 获取请求基本信息
+## 3. Demo III: 获取请求基本信息
 
 主要是用过 context.request 对象的各个字段获取请求的信息：
 
@@ -124,4 +158,20 @@ Request Query:  ${JSON.stringify(ctx.request.query)}
 
 - HTTP.ServerResponse
 
-> [下一节：中间件](./04-middlewares.md) | [返回目录](./index.md)
+-------------------------------------------------------------------------------
+
+## 4. 错误处理
+
+在 JavaScript 中，可以通过 throw 抛出异常。而在 async function 中。如果你想往上抛出
+异常，交由中间件去处理，可以写作如下：
+
+```ts
+router.get("/error", async function(ctx) {
+
+    // 在 async function 中，返回一个 Rejected Promise 就是向上抛出异常。
+
+    return Promise.reject(new Error("Test"));
+});
+```
+
+> [下一节：中间件函数](./04-middlewares.md) | [返回目录](./index.md)
