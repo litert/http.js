@@ -60,8 +60,7 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
 
             if (length > maxLength) {
 
-                this.removeListener("end", onEnd);
-                this.removeListener("data", onData);
+                doCleanEvents();
 
                 return ret.reject(new HttpException(
                     ServerError.EXCEED_MAX_BODY_LENGTH,

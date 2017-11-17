@@ -81,7 +81,7 @@ router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
 
 > 此时 `context.params` 元素的下标从 0 开始，与 String.prototype.match 结果不同。
 
-> **路由的先入优先原则**
+> ### **路由的先入优先原则**
 >
 > 如果存在两个这样的正则匹配规则：
 >
@@ -119,11 +119,9 @@ router.get("/users/{name:string}", async function(ctx) {
 });
 ```
 
-
 [参数表达式匹配]: ../apis/types/StandardRouter.md#参数表达式匹配
 
 具体请参考[路由器：参数表达式匹配][参数表达式匹配]。
-
 
 ## 4. 使用不同的 HTTP 方法
 

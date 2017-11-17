@@ -33,8 +33,7 @@ extend(http.IncomingMessage.prototype, "getBody", async function (maxLength = 0)
         onData = (d) => {
             length += d.byteLength;
             if (length > maxLength) {
-                this.removeListener("end", onEnd);
-                this.removeListener("data", onData);
+                doCleanEvents();
                 return ret.reject(new HttpException(ServerError.EXCEED_MAX_BODY_LENGTH, "The received body exceed max length restriction."));
             }
             buf.push(d);
