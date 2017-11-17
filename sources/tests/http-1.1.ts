@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 import * as http from "../";
 
-let router = http.createRouter();
+let router = http.createStandardRouter();
 
 router.use(async function(context, next) {
 

@@ -28,6 +28,7 @@ var ServerStatus;
     ServerStatus[ServerStatus["CLOSING"] = 3] = "CLOSING";
 })(ServerStatus = exports.ServerStatus || (exports.ServerStatus = {}));
 exports.DEFAULT_PORT = 80;
+exports.DEFAULT_SSL_PORT = 443;
 exports.DEFAULT_HOST = "0.0.0.0";
 exports.DEFAULT_BACKLOG = 512;
 exports.DEFAULT_KEEP_ALIVE = 5000;

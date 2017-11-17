@@ -176,4 +176,4 @@ class Router {
 module.exports = function () {
     return new Router();
 };
-//# sourceMappingURL=Router.js.map
+//# sourceMappingURL=StandardRouter.js.map

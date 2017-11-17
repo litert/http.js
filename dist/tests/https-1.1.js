@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const http = require("../");
 const fs = require("fs");
-let router = http.createRouter();
+let router = http.createStandardRouter();
 router.use("GET", async function (context, next) {
     if (context.request.url === "/") {
         try {

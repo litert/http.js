@@ -1,7 +1,7 @@
 import { IDictionary } from "@litert/core";
 import {
     RequestMiddleware,
-    RequestRouter,
+    StandardRouter,
     RouteRule,
     HTTPMethod,
     RequestHandler,
@@ -26,7 +26,7 @@ class Middleware {
     public handler: RequestMiddleware;
 }
 
-class Router implements RequestRouter {
+class Router implements StandardRouter {
 
     protected _stringRouter: HTTPMethodDictionary<
         IDictionary<RouteRule<RequestHandler>>
@@ -71,7 +71,7 @@ class Router implements RequestRouter {
         };
     }
 
-    public use(): RequestRouter {
+    public use(): StandardRouter {
 
         let middleware = new Middleware();
 
@@ -139,7 +139,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("GET", path, handler, data);
 
@@ -150,7 +150,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("POST", path, handler, data);
 
@@ -161,7 +161,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("PUT", path, handler, data);
 
@@ -172,7 +172,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("PATCH", path, handler, data);
 
@@ -183,7 +183,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("DELETE", path, handler, data);
 
@@ -194,7 +194,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("OPTIONS", path, handler, data);
 
@@ -205,7 +205,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("HEAD", path, handler, data);
 
@@ -216,7 +216,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter {
+    ): StandardRouter {
 
         this.register("TRACE", path, handler, data);
 
@@ -243,7 +243,7 @@ class Router implements RequestRouter {
         path: string | RegExp,
         handler: RequestHandler,
         data: IDictionary<any> = {}
-    ): RequestRouter {
+    ): StandardRouter {
 
         if (path instanceof RegExp) {
 
@@ -364,7 +364,7 @@ class Router implements RequestRouter {
 
     public notFound(
         handler: RequestHandler
-    ): RequestRouter {
+    ): StandardRouter {
 
         this._notFoundHandler = handler;
 
@@ -372,7 +372,7 @@ class Router implements RequestRouter {
     }
 }
 
-export = function(): RequestRouter {
+export = function(): StandardRouter {
 
     return new Router();
 };

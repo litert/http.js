@@ -202,7 +202,7 @@ export interface CreateServerOptions {
     /**
      * The port to listen.
      *
-     * Default: 80
+     * Default: 80 (or 443 if SSL is enabled)
      */
     "port"?: number;
 
@@ -232,7 +232,7 @@ export interface CreateServerOptions {
     /**
      * The router object.
      */
-    "router": RequestRouter;
+    "router": Router;
 
     /**
      * The connection timeout.
@@ -306,7 +306,16 @@ export interface Server extends EventEmitter {
     shutdown(): Promise<void>;
 }
 
-export interface RequestRouter {
+export interface Router {
+
+    route(
+        method: HTTPMethod,
+        path: string,
+        context: RequestContext
+    ): RouteResult;
+}
+
+export interface StandardRouter extends Router {
 
     /**
      * Use a middleware, without PATH and METHOD filter.
@@ -319,7 +328,7 @@ export interface RequestRouter {
         method: HTTPMethod,
         path: string | RegExp,
         middleware: RequestMiddleware
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Use a middleware, with a METHOD filter.
@@ -330,7 +339,7 @@ export interface RequestRouter {
     use(
         method: HTTPMethod,
         middleware: RequestMiddleware
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Use a middleware, with a PATH filter.
@@ -341,7 +350,7 @@ export interface RequestRouter {
     use(
         path: string | RegExp,
         middleware: RequestMiddleware
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Use a middleware, without any filter.
@@ -350,7 +359,7 @@ export interface RequestRouter {
      */
     use(
         middleware: RequestMiddleware
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP request.
@@ -359,24 +368,20 @@ export interface RequestRouter {
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     register(
         method: HTTPMethod,
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
-
-    route(
-        method: HTTPMethod,
-        path: string,
-        context: RequestContext
-    ): RouteResult;
+    ): StandardRouter;
 
     /**
      * Register the handler for NOT FOUND request.
      */
-    notFound(handler: RequestHandler): RequestRouter;
+    notFound(handler: RequestHandler): StandardRouter;
 
     /**
      * Bind a handler with a HTTP GET request.
@@ -384,103 +389,133 @@ export interface RequestRouter {
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     get(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP POST request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     post(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP PUT request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     put(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP PATCH request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     patch(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP DELETE request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     delete(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP OPTIONS request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     options(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP HEAD request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     head(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 
     /**
      * Bind a handler with a HTTP TRACE request.
      *
+     * > This is a shortcut of register method.
+     *
      * @param path The requested path to be handled.
      * @param handler The handler of request.
      * @param data (Optional) The data bound with handler.
+     *
+     * @throws Exception
      */
     trace(
         path: string | RegExp,
         handler: RequestHandler,
         data?: IDictionary<any>
-    ): RequestRouter;
+    ): StandardRouter;
 }
 
 export interface RouteRule<T> {
@@ -493,6 +528,8 @@ export interface RouteRule<T> {
 }
 
 export const DEFAULT_PORT: number = 80;
+
+export const DEFAULT_SSL_PORT: number = 443;
 
 export const DEFAULT_HOST: string = "0.0.0.0";
 

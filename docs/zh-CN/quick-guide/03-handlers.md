@@ -1,6 +1,6 @@
 # 处理器函数
 
-> [上一节：使用路由器](./02-router.md) | [返回目录](./index.md)
+> [上一节：使用路由器](./02-router.md) | [返回目录](../index.md)
 
 处理器函数是用于处理 HTTP 请求的一个函数，它的签名如下：
 
@@ -174,4 +174,4 @@ router.get("/error", async function(ctx) {
 });
 ```
 
-> [下一节：中间件函数](./04-middlewares.md) | [返回目录](./index.md)
+> [下一节：中间件函数](./04-middlewares.md) | [返回目录](../index.md)

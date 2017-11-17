@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const http = require("../");
-let router = http.createRouter();
+let router = http.createStandardRouter();
 router.use(async function (context, next) {
     const req = context.request;
     /**

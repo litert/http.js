@@ -26,7 +26,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _server: http.Server | https.Server;
 
-    protected _router: Core.RequestRouter;
+    protected _router: Core.Router;
 
     protected _ssl: Core.SSLConfiguration;
 
@@ -38,7 +38,6 @@ class Server extends events.EventEmitter implements Core.Server {
 
         super();
 
-        this._port = opts.port || Core.DEFAULT_PORT;
         this._host = opts.host || Core.DEFAULT_HOST;
         this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
         this._router = opts.router;
@@ -50,7 +49,12 @@ class Server extends events.EventEmitter implements Core.Server {
 
         if (opts.ssl) {
 
+            this._port = opts.port || Core.DEFAULT_SSL_PORT;
             this._ssl = opts.ssl;
+        }
+        else {
+
+            this._port = opts.port || Core.DEFAULT_PORT;
         }
 
         this._status = Core.ServerStatus.READY;

@@ -1,6 +1,6 @@
 # 使用路由器
 
-> [上一节：快速上手](./01-quick-start.md) | [返回目录](./index.md)
+> [上一节：快速上手](./01-quick-start.md) | [返回目录](../index.md)
 
 ## 0. 简介
 
@@ -41,6 +41,8 @@ router.get("/a", async function(ctx) {
 
 > 注：对于 URI 尾部的反斜杠 "/"，路由会自动去除，因此在编写路由规则的时候不需要
 > 填写尾部反斜杠，下同。
+>
+> **但是直接请求 `/` 除外。**
 
 ## 2. 通过正则表达式匹配
 
@@ -117,19 +119,11 @@ router.get("/users/{name:string}", async function(ctx) {
 });
 ```
 
-参数表达式统一格式为 `{变量名:类型}`，里面不能包含空格，支持如下类型：
 
-类型表达式     | 匹配内容                          | 结果类型
---------------|----------------------------------|-----------
-number        | 任何数值                          | number
-int           | 任何整数                          | number
-uint          | 任何非负整数                       | number
-string        | 不包含"/"的字符串                  | string
-hex-string    | 只包含十六进制字符的字符串          | string
-hex-uint      | 十六进制字符                       | number
-any           | 任意长度字符串                     | string
-string[x]     | 长度为x，不包含"/"的字符串          | string
-hex-string[x] | 长度为x，只包含十六进制字符的字符串  | string
+[参数表达式匹配]: ../apis/types/StandardRouter.md#参数表达式匹配
+
+具体请参考[路由器：参数表达式匹配][参数表达式匹配]。
+
 
 ## 4. 使用不同的 HTTP 方法
 
@@ -159,7 +153,7 @@ hex-string[x] | 长度为x，只包含十六进制字符的字符串  | string
 - SUBSCRIBE
 - UNSUBSCRIBE
 
-正确的注册方法是用处理器规则注册函数 `RequestRouter.register`，该函数的签名为：
+正确的注册方法是用处理器规则注册函数 `StandardRouter.register`，该函数的签名为：
 
 ```ts
 type RegisterMethod = (
@@ -167,7 +161,7 @@ type RegisterMethod = (
     path: string | RegExp,
     handler: RequestHandler,
     data?: IDictionary<any>
-) => RequestRouter;
+) => StandardRouter;
 ```
 
 使用示例：
@@ -193,7 +187,7 @@ type RegisterShortcutMethod = (
     path: string | RegExp,
     handler: RequestHandler,
     data?: IDictionary<any>
-) => RequestRouter;
+) => StandardRouter;
 ```
 
 调用示例：
@@ -244,4 +238,10 @@ router.notFound(async function(ctx) {
 });
 ```
 
-> [下一节：处理器函数](./03-handlers.md) | [返回目录](./index.md)
+## 小结
+
+[路径规则]: ../apis/types/StandardRouter.md#路径匹配规则
+
+以上即为路由器的实用示例，更多请参考[路由器路径匹配规则][路径规则]。
+
+> [下一节：处理器函数](./03-handlers.md) | [返回目录](../index.md)

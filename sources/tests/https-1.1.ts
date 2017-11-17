@@ -2,7 +2,7 @@
 import * as http from "../";
 import fs = require("fs");
 
-let router = http.createRouter();
+let router = http.createStandardRouter();
 
 router.use("GET", async function(context, next): Promise<void> {
 

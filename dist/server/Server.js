@@ -14,7 +14,6 @@ require("./Request");
 class Server extends events.EventEmitter {
     constructor(opts) {
         super();
-        this._port = opts.port || Core.DEFAULT_PORT;
         this._host = opts.host || Core.DEFAULT_HOST;
         this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
         this._router = opts.router;
@@ -24,7 +23,11 @@ class Server extends events.EventEmitter {
             opts.timeout :
             Core.DEFAULT_TIMEOUT;
         if (opts.ssl) {
+            this._port = opts.port || Core.DEFAULT_SSL_PORT;
             this._ssl = opts.ssl;
+        }
+        else {
+            this._port = opts.port || Core.DEFAULT_PORT;
         }
         this._status = Core.ServerStatus.READY;
     }

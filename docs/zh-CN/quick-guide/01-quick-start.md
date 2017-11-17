@@ -1,6 +1,6 @@
 # LiteRT/HTTP.js 快速上手
 
-> [上一节：概述](./00-overview.md) | [返回目录](./index.md)
+> [上一节：概述](./00-overview.md) | [返回目录](../index.md)
 
 ## 基本概念
 
@@ -33,7 +33,7 @@ import * as http from "@litert/http";
 /**
  * 创建路由器对象
  */
-let router = http.createRouter();
+let router = http.createStandardRouter();
 
 /**
  * 添加一个处理器，对 URL == "/" 的请求进行处理。
@@ -95,7 +95,7 @@ import * as http from "@litert/http";
 /**
  * 创建路由器对象
  */
-let router = http.createRouter();
+let router = http.createStandardRouter();
 
 /**
  * 添加一个中间件，用于记录每一条请求。
@@ -193,7 +193,7 @@ import fs = require("fs");
 /**
  * 创建路由器对象
  */
-let router = http.createRouter();
+let router = http.createStandardRouter();
 
 /**
  * 添加一个处理器，对 URL == "/" 的请求进行处理。
@@ -247,4 +247,4 @@ server.start().then(() => {
 
 > 如果你的证书是自签名证书，那么浏览器可能会报警，选择“仍然访问”即可。
 
-> [下一节：使用路由器](./02-router.md) | [返回目录](./index.md)
+> [下一节：使用路由器](./02-router.md) | [返回目录](../index.md)
