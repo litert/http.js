@@ -187,6 +187,7 @@ class Server extends events.EventEmitter implements Core.Server {
             }
             else {
 
+                // @ts-ignore
                 request.host = request.headers["host"][0];
             }
         }

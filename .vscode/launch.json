@@ -10,8 +10,8 @@
             "name": "HTTP/1.1 Server",
             "program": "${workspaceRoot}\\sources\\tests\\http-1.1.ts",
             "outFiles": [
-                "${workspaceRoot}\\dist\\*.js",
-                "${workspaceRoot}\\dist\\**\\*.js"
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
             ],
             "sourceMaps": true
         },
@@ -21,8 +21,8 @@
             "name": "HTTPS/1.1 Server",
             "program": "${workspaceRoot}\\sources\\tests\\https-1.1.ts",
             "outFiles": [
-                "${workspaceRoot}\\dist\\*.js",
-                "${workspaceRoot}\\dist\\**\\*.js"
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
             ],
             "sourceMaps": true
         }

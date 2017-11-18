@@ -2,11 +2,10 @@
   "name": "@litert/http",
   "version": "0.2.0",
   "description": "A simple HTTP server based on LiteRT framework.",
-  "main": "./dist/index.js",
+  "main": "./index.js",
   "scripts": {
-    "build": "tsc -p .",
-    "clean": "rm -rf dist",
-    "test": "node ./dist/test.js"
+    "postinstall": "tsc",
+    "test": "node ./test.js"
   },
   "keywords": [
     "litert",
@@ -23,13 +22,13 @@
     "url": "https://github.com/litert/http.js/issues"
   },
   "homepage": "https://github.com/litert/http.js#readme",
-  "types": "./dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
+  "types": "./index.d.ts",
+  "typings": "./index.d.ts",
   "dependencies": {
-    "@litert/core": "git+https://github.com/litert/core.js.git#v0.2.0"
+    "@litert/core": "git+https://github.com/litert/core.js.git#v0.2.0",
+    "@types/node": "^8.0.51"
   },
   "devDependencies": {
-    "@types/node": "^8.0.51",
     "typescript": "^2.6.1"
   },
   "engines": {

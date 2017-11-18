@@ -20,7 +20,7 @@
     "declaration": true,
     "sourceMap": true,
     "rootDir": "sources",
-    "outDir": "dist",
+    "outDir": ".",
     "noImplicitAny": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -60,8 +60,8 @@
     // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include": [
-    "sources/*.ts",
-    "sources/**/*.ts"
+  "exclude": [
+    "./*.d.ts",
+    "./**/*.d.ts"
   ]
 }
