@@ -51,7 +51,7 @@ let defaults: CookieConfiguration = {
 };
 ```
 
-[setCookie]: ../types/ServerResponse.md#方法-setCookie
+[setCookie]: ../types/ServerResponse.md#方法-setcookie
 
 设置 [ServerResponse.setCookie][setCookie] 的默认参数。
 
