@@ -164,7 +164,7 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
                     val = parseFloat(val);
                 }
 
-                context.params[this.keys[x - 1]] = val;
+                context.request.params[this.keys[x - 1]] = val;
             }
 
             return true;

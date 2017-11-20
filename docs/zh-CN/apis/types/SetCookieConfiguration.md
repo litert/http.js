@@ -4,10 +4,12 @@
 
 该抽象接口描述 Cookie 的名称和值。
 
+> 该接口继承自 [CookieConfiguration](./CookieConfiguration.md)。
+
 ## 接口定义
 
 ```ts
-interface SetCookieConfiguration {
+interface SetCookieConfiguration extends CookieConfiguration {
 
     "name": string;
 

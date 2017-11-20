@@ -21,7 +21,7 @@ post, put, etc.
 - Added detection for client closing connection.
 - Added detection for timeout when reading data from client.
 - Added property `host`, `path`, `query`, `queryString`, `https`, `ip`,
-`aborted`, `closed`, etc for ServerRequest object.
+`aborted`, `closed`, `params`, etc for ServerRequest object.
 - Added HTTP Cookies encoder.
 
 ## v0.1.0-b1

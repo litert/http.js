@@ -31,6 +31,8 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "closed": boolean;
 
+    "params": IDictionary<any>;
+
     "queryString": string;
 
     "host": string;
@@ -113,6 +115,18 @@ ip 属性的内容为客户端的 IP 地址。
 
 ```ts
 let ip: string;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 params
+
+params 属性是当前 HTTP 请求的路由解析参数。
+
+> 参考[路由器教程](../../quick-guide/02-router.md)的第2节和第3节。
+
+```ts
+let params: IDictionary<any> | any[];
 ```
 
 ------------------------------------------------------------------------------

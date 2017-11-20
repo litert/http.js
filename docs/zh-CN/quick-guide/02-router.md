@@ -70,16 +70,17 @@ router.get(new RegExp("^/\\d+$"), async function(ctx) {
 ```
 
 如果正则表达式内有子表达式（被括号括起来的部分），这部分子表达式的匹配结果可以通过
-`context.params` 读取出来，此时的 `context.params` 是一个数组，例如：
+`context.request.params` 读取出来，此时的 `context.request.params` 是一个数组，
+例如：
 
 ```ts
 router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
 
-    ctx.response.send(`Your ID is ${ctx.params[0]}`);
+    ctx.response.send(`Your ID is ${ctx.request.params[0]}`);
 })
 ```
 
-> 此时 `context.params` 元素的下标从 0 开始，与 String.prototype.match 结果不同。
+> 此时 `context.request.params` 元素的下标从 0 开始，与 String.prototype.match 结果不同。
 
 > ### **路由的先入优先原则**
 >
@@ -110,12 +111,12 @@ router.get(new RegExp("^/users/(\\d+)$"), async function(ctx) {
 ```ts
 router.get("/users/{id:uint}", async function(ctx) {
 
-    ctx.response.send(`Your ID is ${ctx.params.id}.`);
+    ctx.response.send(`Your ID is ${ctx.request.params.id}.`);
 });
 
 router.get("/users/{name:string}", async function(ctx) {
 
-    ctx.response.send(`Your name is ${ctx.params.name}.`);
+    ctx.response.send(`Your name is ${ctx.request.params.name}.`);
 });
 ```
 

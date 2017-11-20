@@ -164,6 +164,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
         let url = libUrl.parse(<string> request.url);
 
+        request.params = {};
+
         // @ts-ignore
         request.path = url.pathname;
 
@@ -239,16 +241,14 @@ class Server extends events.EventEmitter implements Core.Server {
 
         let context = new Context();
 
-        context.params = {};
+        context.request = request;
+        context.response = response;
 
         let routeResult = this._router.route(
             <Core.HTTPMethod> request.method,
             path,
             context
         );
-
-        context.request = request;
-        context.response = response;
 
         try {
 
@@ -278,7 +278,6 @@ class Server extends events.EventEmitter implements Core.Server {
         delete context.request;
         delete context.response;
         delete context.data;
-        delete context.params;
     }
 
     protected async __execute(

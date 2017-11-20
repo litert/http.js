@@ -57,7 +57,7 @@ router.use(async function(context, next) {
 
         try {
 
-            console.log(`Requesting user ${context.params.id}`);
+            console.log(`Requesting user ${context.request.params.id}`);
             await next();
             console.log("responsed");
 
@@ -99,7 +99,7 @@ router.use(async function(context, next) {
         "TTTT": ["a", "b"]
     });
 
-    context.response.sendJSON(context.params);
+    context.response.sendJSON(context.request.params);
 
 }).post("/users/{id:uint}", async function(context) {
 
@@ -112,11 +112,11 @@ router.use(async function(context, next) {
         console.error(e);
     }
 
-    context.response.sendJSON(context.params);
+    context.response.sendJSON(context.request.params);
 
 }).get(new RegExp("^/article/(.+)$"), async function(context) {
 
-    context.response.sendJSON(context.params);
+    context.response.sendJSON(context.request.params);
 
 }).get("/redirection", async function(context) {
 

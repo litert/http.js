@@ -5,8 +5,6 @@ class Context implements Core.RequestContext {
 
     public data: IDictionary<any>;
 
-    public params: IDictionary<any>;
-
     public request: Core.ServerRequest;
 
     public response: Core.ServerResponse;

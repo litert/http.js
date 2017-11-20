@@ -43,12 +43,6 @@ export interface RequestContext {
      * 这里面的数据会在请求结束后被释放。
      */
     "data": IDictionary<any>;
-
-    /**
-     * 这个字段储存来自 URL Path 的参数，仅当使用路由器的参数表达式或者正则表达式
-     * 的时候该字段才有数据。
-     */
-    "params": IDictionary<any>;
 }
 ```
 

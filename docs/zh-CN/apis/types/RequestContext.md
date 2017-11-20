@@ -14,8 +14,6 @@ interface RequestContext {
     "response": ServerResponse;
 
     "data": IDictionary<any>;
-
-    "params": IDictionary<any>;
 }
 ```
 
@@ -35,18 +33,6 @@ data 属性是当前 HTTP 请求的上下文数据。
 
 ```ts
 let data: IDictionary<any>;
-```
-
-------------------------------------------------------------------------------
-
-### 属性 params
-
-params 属性是当前 HTTP 请求的路由解析参数。
-
-> 参考[路由器教程](../../quick-guide/02-router.md)的第2节和第3节。
-
-```ts
-let params: IDictionary<any> | any[];
 ```
 
 ------------------------------------------------------------------------------

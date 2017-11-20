@@ -38,7 +38,7 @@ router.use("GET", async function(context, next): Promise<void> {
 
 }).get("/users/{user:int}", async function(context) {
 
-    context.response.write(JSON.stringify(context.params));
+    context.response.write(JSON.stringify(context.request.params));
 
 }).get("/redirection", async function(context) {
 

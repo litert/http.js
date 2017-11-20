@@ -32,7 +32,7 @@ class RegExpRouteRule<T> implements Core.RouteRule<T> {
 
         if (data) {
 
-            context.params = data.slice(1);
+            context.request.params = data.slice(1);
             return true;
         }
 

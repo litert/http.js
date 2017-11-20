@@ -40,6 +40,11 @@ export interface ServerRequest extends http.IncomingMessage {
     "queryString": string;
 
     /**
+     * The parameters from request path (currently from Smart router only)
+     */
+    "params": IDictionary<any>;
+
+    /**
      * The host of request visited.
      */
     "host": string;
@@ -213,11 +218,6 @@ export interface RequestContext {
      * The data through out the request.
      */
     "data": IDictionary<any>;
-
-    /**
-     * The parameters from request path (currently from Smart router only)
-     */
-    "params": IDictionary<any>;
 }
 
 export interface RouteResult {
