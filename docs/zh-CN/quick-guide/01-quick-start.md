@@ -169,7 +169,7 @@ server.start().then(() => {
 
 ```
 
-编译并执行，然后在浏览器里一次打开下面三个链接，看看调试控制台显示什么？
+编译并执行，然后在浏览器里依次打开下面三个链接，看看调试控制台显示什么？
 
 - http://127.0.0.1:8080/
 - http://127.0.0.1:8080/hello
@@ -186,7 +186,7 @@ server.start().then(() => {
 > 如果私钥是加密的，那么可以通过字段 `passphrase` 指定私钥的密码。
 
 ```ts
-// File: demo-02-https-server.ts
+// File: demo-03-https-server.ts
 import * as http from "@litert/http";
 import fs = require("fs");
 
@@ -246,5 +246,95 @@ server.start().then(() => {
 现在可以访问 https://127.0.0.1:8080/ 看看效果了。
 
 > 如果你的证书是自签名证书，那么浏览器可能会报警，选择“仍然访问”即可。
+
+## Demo IV: 使用 Cookies
+
+LiteRT/HTTP.js 内置了 Cookies 编解码器，使用方式很简单。
+
+```ts
+// File: demo-04-cookies.ts
+import * as http from "@litert/http";
+
+/**
+ * 创建路由器对象
+ */
+let router = http.createStandardRouter();
+
+/**
+ * 添加一个中间件，用于记录每一条请求。
+ */
+router.use(async function(context, next) {
+
+    const req = context.request;
+
+    // 读取 Cookies
+    req.loadCookies();
+
+    // 将 Cookies 打印出来。
+    console.log(req.cookies);
+
+    await next();
+
+}).get("/", async function(context) {
+
+    /**
+     * 写入一个 age=32 的 Cookie。
+     */
+    context.response.setCookie({
+        "name": "age",
+        "value": "32"
+    });
+
+    /**
+     * 添加一个处理器，对 URL == "/" 的请求进行处理。
+     */
+
+    // 只输出一句 "Hello world"
+    context.response.send("Hello world");
+
+}).notFound(async function(context) {
+
+    /**
+     * 添加一个处理器，对所有未注册的请求进行处理。
+     */
+
+    // 设置 HTTP 状态码为 404 NOT FOUND
+    context.response.writeHead(
+        http.HTTPStatus.NOT_FOUND,
+        "NOT FOUND"
+    );
+
+    // 输出 "NOT FOUND"
+    context.response.send("NOT FOUND");
+});
+
+/**
+ * 创建一个标准 HTTP Cookies 编解码器对象。
+ */
+let cookies = http.createStandardCookiesEncoder();
+
+/**
+ * 创建一个监听 0.0.0.0:8080 端口的 HTTP 服务器，并指定使用 router 对象作为路由器。
+ */
+let server = http.createServer({
+    "port": 8080,
+    "router": router,
+    "cookies": cookies // 将 Cookies 编解码器对象注入到服务器。
+});
+
+// 启动服务器
+server.start().then(() => {
+
+    console.log("服务器成功启动");
+
+}).catch((e) => {
+
+    console.error(e);
+
+});
+
+```
+
+编译并执行，然后在浏览器里打开，看看调试控制台显示什么？
 
 > [下一节：使用路由器](./02-router.md) | [返回目录](../index.md)

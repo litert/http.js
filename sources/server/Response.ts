@@ -78,3 +78,54 @@ extend(http.ServerResponse.prototype, "sendJSON", function(
 
     return this;
 });
+
+extend(http.ServerResponse.prototype, "setCookie", function(
+    this: any,
+    ...args: any[]
+): http.ServerResponse {
+
+    if (this.headersSent) {
+
+        throw new HttpException(
+            ServerError.HEADERS_ALREADY_SENT,
+            "Response headers were already sent."
+        );
+    }
+
+    let cookieText: string;
+
+    if (args.length === 1) {
+
+        cookieText = this._cookiesDecoder.stringify(args[0]);
+    }
+    else {
+
+        cookieText = this._cookiesDecoder.stringify({
+            "name": args[0],
+            "value": args[1],
+            "ttl": args[2],
+            "httpOnly": args[3],
+            "secureOnly": args[4],
+            "path": args[5],
+            "domain": args[6]
+        });
+    }
+
+    if (this.hasHeader("Set-Cookie")) {
+
+        let cookies = this.getHeaders()["set-cookie"];
+
+        cookies.push(cookieText);
+
+        this.setHeader(
+            "Set-Cookie",
+            cookies
+        );
+    }
+    else {
+
+        this.setHeader("Set-Cookie", [cookieText]);
+    }
+
+    return this;
+});

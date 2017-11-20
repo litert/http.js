@@ -17,6 +17,8 @@ import nodeHTTP = require("http");
 
 interface ServerRequest extends nodeHTTP.IncomingMessage {
 
+    "cookies": IDictionary<string>;
+
     "path": string;
 
     "https": boolean;
@@ -40,6 +42,10 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
     getBody(maxLength?: number): Promise<Buffer>;
 
     getBodyAsJSON(maxLength?: number): Promise<any>;
+
+    isCookiesLoaded(): boolean;
+
+    loadCookies(): boolean;
 }
 ```
 
@@ -65,6 +71,18 @@ closed 属性为 true 时，表示链接已经被关闭。
 
 ```ts
 let closed: boolean = false;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 cookies
+
+cookies 属性内储存从客户端请求读取的 Cookies 数据。
+
+> **该字段在调用 loadCookies 方法之前不可用。**
+
+```ts
+let cookies: IDictionary<string>;
 ```
 
 ------------------------------------------------------------------------------
@@ -206,3 +224,35 @@ async function getBodyAsJSON(maxLength?: number): Promise<any>;
 #### 错误处理
 
 通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
+
+------------------------------------------------------------------------------
+
+### 方法 isCookiesLoaded
+
+该方法用于判断是否已经加载 Cookies，即判断 cookies 属性是否可用。
+
+#### 方法声明
+
+```ts
+function isCookiesLoaded(): boolean;
+```
+
+#### 返回值
+
+若 Cookies 已经加载，则返回 true。否则返回 false。
+
+------------------------------------------------------------------------------
+
+### 方法 loadCookies
+
+该方法用于从请求的 HTTP 头部 Cookie 字段里读取 Cookies 数据，并存到 cookies 属性。
+
+#### 方法声明
+
+```ts
+function loadCookies(): boolean;
+```
+
+#### 返回值
+
+如果有 Cookies 数据，则返回 true；否则返回 false。

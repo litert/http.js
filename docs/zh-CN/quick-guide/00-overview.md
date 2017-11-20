@@ -25,6 +25,7 @@ LiteRT/HTTP.js 是一个基于 Node.js HTTP(S) API 实现的轻量级框架，�
 LiteRT/HTTP.js 目前不会发布到 npmjs.org，因此请通过以下方法安装：
 
 ```sh
+npm i typescript -g
 npm i git+https://github.com/litert/http.js.git
 ```
 

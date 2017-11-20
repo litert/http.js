@@ -22,6 +22,20 @@ interface ServerResponse extends nodeHTTP.ServerResponse {
     sendJSON(data: any): ServerResponse;
 
     send(data: string | Buffer): ServerResponse;
+
+    setCookie(
+        name: string,
+        value: string,
+        ttl?: number,
+        httpOnly?: boolean,
+        secureOnly?: boolean,
+        path?: string,
+        domain?: string
+    ): ServerResponse;
+
+    setCookie(
+        cookie: SetCookieConfiguration
+    ): ServerResponse;
 }
 ```
 
@@ -116,3 +130,92 @@ function sendJSON(data: any): ServerResponse;
 #### 错误处理
 
 当请求已经关闭时，方法执行失败，抛出一个 http.Exception 类型的错误。
+
+------------------------------------------------------------------------------
+
+### 方法 setCookie
+
+该方法将指定的 Cookies 添加到 HTTP 响应头中。
+
+如果此时 HTTP 头尚未发送，则该方法会自动设置 Content-Type 头。
+
+[AAA]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+
+> [查看 HTTP Set-Cookie 头参考文档][AAA]
+
+#### 方法声明
+
+```ts
+function setCookie(
+    name: string,
+    value: string,
+    ttl?: number,
+    httpOnly?: boolean,
+    secureOnly?: boolean,
+    path?: string,
+    domain?: string
+): ServerResponse;
+
+function setCookie(
+    cookie: SetCookieConfiguration
+): ServerResponse;
+```
+
+#### 参数说明
+
+> 如果使用 StandardCookiesEncoder，则下列参数的默认值可能会被
+> StandardCookiesEncoder 改写。
+
+- `name: string`
+
+    Cookie 的名称。
+
+- `value: string`
+
+    Cookie 的内容。
+
+- `ttl: number = 0`
+
+    （可选参数）
+
+    Cookie 的有效期。
+
+    > - 设置为负数，则使 Cookie 立即过期。
+    > - 设置为 0，则使 Cookie 在会话期间有效。
+    > - 该字段将同时设置 Cookie 的 Expires 和 Max-Age 属性。
+
+- `httpOnly: boolean = false`
+
+    （可选参数）
+
+    设为 true 则使 Cookie 为 HttpOnly 的。
+
+- `secureOnly: boolean = false`
+
+    （可选参数）
+
+    设为 true 使 Cookie 为 Secure 的。
+
+- `path: string = "/"`
+
+    （可选参数）
+
+    设置 Cookie 的有效路径。
+
+- `domain: string`
+
+    （可选参数）
+
+    设置 Cookie 的有效域名。默认不设置。
+
+- `cookie: SetCookieConfiguration`
+
+    如果使用 cookie 参数，则可以将上述参数打包成 JSON 对象传递。
+
+#### 返回值
+
+返回该对象本身。
+
+#### 错误处理
+
+当请求响应的 HTTP 头已经发送时，方法执行失败，抛出一个 http.Exception 类型的错误。

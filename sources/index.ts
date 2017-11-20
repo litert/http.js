@@ -20,10 +20,18 @@ export {
     HTTPMethod,
     HTTPStatus,
     Server,
-    RouteResult
+    RouteResult,
+
+    // Cookies
+
+    SetCookieConfiguration,
+    CookieConfiguration,
+    CookiesEncoding,
+    CookiesEncoder
 
 } from "./server/Core";
 
+export * from "./server/StandardCookiesEncoder";
 export import createStandardRouter = require("./server/StandardRouter");
 export import createServer = require("./server/Server");
 export import ServerError = require("./server/Errors");

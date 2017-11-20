@@ -28,7 +28,7 @@ interface Router {
 #### 方法声明
 
 ```ts
-route(
+function route(
     method: HTTPMethod,
     path: string,
     context: RequestContext

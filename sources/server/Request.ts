@@ -118,3 +118,45 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
 
     return ret.promise;
 });
+
+extend(http.IncomingMessage.prototype, "loadCookies", function(
+    this: any
+): boolean {
+
+    if (this.isCookiesLoaded()) {
+
+        return true;
+    }
+
+    let cookies: string;
+    let data = this.headers["cookie"];
+
+    if (!data) {
+
+        return false;
+    }
+
+    if (typeof data === "string") {
+
+        cookies = data;
+    }
+    else {
+
+        cookies = data.join(";");
+    }
+
+    this.cookies = this._cookiesEncoder.parse(cookies);
+
+    return true;
+});
+
+extend(
+    http.IncomingMessage.prototype,
+    "isCookiesLoaded",
+    function isCookiesLoaded(
+        this: any
+    ): boolean {
+
+        return this.cookies !== undefined;
+    }
+);

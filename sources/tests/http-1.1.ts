@@ -7,10 +7,14 @@ router.use(async function(context, next) {
 
     const req = context.request;
 
+    req.loadCookies();
+
     /**
      * 记录每条访问记录。
      */
     console.log(`${req.method} ${req.url}`);
+
+    console.log("Cookies", req.cookies);
 
     await next();
 
@@ -34,6 +38,20 @@ router.use(async function(context, next) {
     }
 
 }).use("GET", async function(context, next): Promise<void> {
+
+    context.response.setCookie({
+        "name": "hello",
+        "value": "go",
+        "ttl": 3600,
+        "httpOnly": true,
+        "domain": "127.0.0.1"
+    });
+
+    context.response.setCookie({
+        "name": "user",
+        "value": "yubo",
+        "path": "/我"
+    });
 
     if (context.request.path.startsWith("/users/")) {
 
@@ -128,10 +146,15 @@ Request Query:  ${JSON.stringify(ctx.request.query)}
     ctx.response.send(content);
 });
 
+let cookies = http.createStandardCookiesEncoder({
+    "encoding": http.CookiesEncoding.BASE64
+});
+
 let server = http.createServer({
     "port": 8080,
     "host": "0.0.0.0",
-    "router": router
+    "router": router,
+    "cookies": cookies
 });
 
 server.on("error", function(err: Error) {

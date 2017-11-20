@@ -55,6 +55,26 @@ export interface ServerRequest extends http.IncomingMessage {
     "time": number;
 
     /**
+     * The HTTP Cookies.
+     *
+     * This field would be undefiend by default. To enable this field, just use
+     * the method loadCookies;
+     */
+    "cookies": IDictionary<string>;
+
+    /**
+     * Check if the cookies are already loaded into field cookies.
+     */
+    isCookiesLoaded(): boolean;
+
+    /**
+     * Load the HTTP cookies into field cookies.
+     *
+     * > NOTES: This must be called with setting up cookies for server.
+     */
+    loadCookies(): boolean;
+
+    /**
      * Get HTTP request body as raw stream.
      *
      * @param maxLength (uint) Limit the max length of body.
@@ -67,6 +87,57 @@ export interface ServerRequest extends http.IncomingMessage {
      * @param maxLength (uint) Limit the max length of body.
      */
     getBodyAsJSON(maxLength?: number): Promise<any>;
+}
+
+export interface CookieConfiguration {
+
+    /**
+     * The TTL of expires.
+     *
+     * Default: Session bound.
+     */
+    "ttl"?: number;
+
+    /**
+     * Set cookie sent by SSL only (from client).
+     *
+     * Default: false
+     */
+    "secureOnly"?: boolean;
+
+    /**
+     * Disable reading this cookie item by JavaScript (in browser).
+     *
+     * Default: false
+     */
+    "httpOnly"?: boolean;
+
+    /**
+     * The available path of this cookie item.
+     *
+     * Default: /
+     */
+    "path"?: string;
+
+    /**
+     * The available domain of this cookie item.
+     *
+     * Default: none
+     */
+    "domain"?: string;
+}
+
+export interface SetCookieConfiguration extends CookieConfiguration {
+
+    /**
+     * The name of cookies item.
+     */
+    "name": string;
+
+    /**
+     * The value of cookies item.
+     */
+    "value": string;
 }
 
 export interface ServerResponse extends http.ServerResponse {
@@ -89,6 +160,30 @@ export interface ServerResponse extends http.ServerResponse {
      * > The response will be closed.
      */
     send(data: string | Buffer): ServerResponse;
+
+    /**
+     * Set the cookies of response.
+     *
+     * > NOTES: This must be called with setting up cookies for server.
+     */
+    setCookie(
+        name: string,
+        value: string,
+        ttl?: number,
+        httpOnly?: boolean,
+        secureOnly?: boolean,
+        path?: string,
+        domain?: string
+    ): ServerResponse;
+
+    /**
+     * Set the cookies of response.
+     *
+     * > NOTES: This must be called with setting up cookies for server.
+     */
+    setCookie(
+        cookie: SetCookieConfiguration
+    ): ServerResponse;
 }
 
 export type RequestHandler = (
@@ -247,6 +342,27 @@ export interface CreateServerOptions {
      * Default: none
      */
     "ssl"?: SSLConfiguration;
+
+    /**
+     * Set up the encoder and decoder for cookies.
+     *
+     * Default: none
+     */
+    "cookies"?: CookiesEncoder;
+}
+
+export enum CookiesEncoding {
+    PLAIN,
+    BASE64,
+    HEX,
+    OTHER
+}
+
+export interface CookiesEncoder {
+
+    parse(cookies: string): IDictionary<string>;
+
+    stringify(cookie: SetCookieConfiguration): string;
 }
 
 export enum ServerStatus {

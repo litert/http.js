@@ -34,6 +34,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _timeout: number;
 
+    protected _cookies: Core.CookiesEncoder;
+
     public constructor(opts: Core.CreateServerOptions) {
 
         super();
@@ -58,6 +60,11 @@ class Server extends events.EventEmitter implements Core.Server {
         }
 
         this._status = Core.ServerStatus.READY;
+
+        if (opts.cookies) {
+
+            this._cookies = opts.cookies;
+        }
     }
 
     public get host(): string {
@@ -100,7 +107,6 @@ class Server extends events.EventEmitter implements Core.Server {
                 "cert": this._ssl.certificate,
 
                 "passphrase": this._ssl.passphrase
-
             });
         }
         else {
@@ -152,7 +158,8 @@ class Server extends events.EventEmitter implements Core.Server {
     }
 
     protected __initializeRequest(
-        request: Core.ServerRequest
+        request: Core.ServerRequest,
+        response: Core.ServerResponse
     ): void {
 
         let url = libUrl.parse(<string> request.url);
@@ -209,6 +216,11 @@ class Server extends events.EventEmitter implements Core.Server {
 
             this.closed = true;
         });
+
+        // @ts-ignore
+        request._cookiesEncoder = this._cookies;
+        // @ts-ignore
+        response._cookiesDecoder = this._cookies;
     }
 
     protected async __requestCallback(
@@ -216,7 +228,7 @@ class Server extends events.EventEmitter implements Core.Server {
         response: Core.ServerResponse
     ): Promise<void> {
 
-        this.__initializeRequest(request);
+        this.__initializeRequest(request, response);
 
         let path = <string> request.path;
 

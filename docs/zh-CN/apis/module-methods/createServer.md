@@ -7,7 +7,7 @@
 ### 方法声明
 
 ```ts
-function createServer({
+function createServer(cfg: {
 
     /**
      * 服务器监听的 IP 地址。
@@ -80,6 +80,11 @@ function createServer({
          */
         "passphrase"?: string;
     };
+
+    /**
+     * HTTP Cookies 编码器对象。
+     */
+    "cookies"?: CookiesEncoder;
 
 }): Server;
 ```
@@ -181,6 +186,14 @@ let ssl: {
 ```
 
 ssl 参数用于配置并开启 HTTP 服务器的 SSL 模式。
+
+### 参数 cookies
+
+```ts
+let cookies: CookiesEncoder;
+```
+
+cookies 参数用于配置服务器的 HTTP Cookies 编解码器对象。
 
 ## 使用示例
 
