@@ -22,13 +22,11 @@ routerA.get("/", async function(ctx) {
 });
 
 /**
- * 创建路由器对象 B
+ * 创建路由器对象 B，虽然真实 URI 是以 /admin 开头，但是作为挂载点，前缀会被自动
+ * 去除。因此 /admin 前缀不需要在路由中填写。
  */
 let routerB = http.createStandardRouter();
 
-/**
- * 对于路由B，虽然 URL 都是以 /admin 开头的，但是
- */
 routerB.get("/", async function(ctx) {
 
     const req = ctx.request;
@@ -45,7 +43,8 @@ routerB.get("/", async function(ctx) {
 });
 
 /**
- * 创建路由器对象 C
+ * 创建路由器对象 C，虽然真实 URI 是以 /statics 开头，但是作为挂载点，前缀会被自动
+ * 去除。因此 /statics 前缀不需要在路由中填写。
  */
 let routerC = http.createStandardRouter();
 

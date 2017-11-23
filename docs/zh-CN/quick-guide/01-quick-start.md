@@ -359,59 +359,61 @@ import * as http from "@litert/http";
  */
 let routerA = http.createStandardRouter();
 
-routerA.get("/", function(ctx) {
+routerA.get("/", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system A with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system A ${req.realPath}. (Request Path: ${req.path})`);
 
-}).get("/a", function(ctx) {
+}).get("/a", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system A with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system A ${req.realPath}. (Request Path: ${req.path})`);
 });
 
 /**
- * 创建路由器对象 B
+ * 创建路由器对象 B，虽然真实 URI 是以 /admin 开头，但是作为挂载点，前缀会被自动
+ * 去除。因此 /admin 前缀不需要在路由中填写。
  */
 let routerB = http.createStandardRouter();
 
-routerB.get("/", function(ctx) {
+routerB.get("/", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system B with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system B ${req.realPath}. (Request Path: ${req.path})`);
 
-}).get("/a", function(ctx) {
+}).get("/a", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system B with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system B ${req.realPath}. (Request Path: ${req.path})`);
 });
 
 /**
- * 创建路由器对象 C
+ * 创建路由器对象 C，虽然真实 URI 是以 /statics 开头，但是作为挂载点，前缀会被自动
+ * 去除。因此 /statics 前缀不需要在路由中填写。
  */
 let routerC = http.createStandardRouter();
 
-routerC.get("/", function(ctx) {
+routerC.get("/", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system C with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system C ${req.realPath}. (Request Path: ${req.path})`);
 
-}).get("/a", function(ctx) {
+}).get("/a", async function(ctx) {
 
     const req = ctx.request;
     const resp = ctx.response;
 
-    resp.send(`Visiting system C with path ${req.realPath}. (${req.path})`);
+    resp.send(`Visiting system C ${req.realPath}. (Request Path: ${req.path})`);
 });
 
 let serverC = http.createMountableServer({
@@ -443,9 +445,15 @@ serverA.start().then(() => {
 
     console.error(e);
 });
-
 ```
 
-编译并执行，然后在浏览器里打开，看看调试控制台显示什么？
+编译并执行，然后在浏览器里访问如下链接，看看效果如何？
+
+- http://127.0.0.1:8080/
+- http://127.0.0.1:8080/a
+- http://127.0.0.1:8080/admin
+- http://127.0.0.1:8080/admin/a
+- http://127.0.0.1:8080/statics
+- http://127.0.0.1:8080/statics/a
 
 > [下一节：使用路由器](./02-router.md) | [返回目录](../index.md)
