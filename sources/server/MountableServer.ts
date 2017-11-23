@@ -2,7 +2,7 @@ import * as Core from "./Core";
 import net = require("net");
 import http = require("http");
 import https = require("https");
-import { RawPromise } from "@litert/core";
+import { RawPromise, IDictionary } from "@litert/core";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
 import Context = require("./Context");
@@ -12,7 +12,7 @@ import queryString = require("querystring");
 import "./Response";
 import "./Request";
 
-class Server extends events.EventEmitter implements Core.Server {
+class MountableServer extends events.EventEmitter implements Core.Server {
 
     protected _port: number;
 
@@ -36,7 +36,9 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _cookies: Core.CookiesEncoder;
 
-    public constructor(opts: Core.CreateServerOptions) {
+    protected _mounts: IDictionary<MountableServer>;
+
+    public constructor(opts: Core.CreateMountableServerOptions) {
 
         super();
 
@@ -48,6 +50,8 @@ class Server extends events.EventEmitter implements Core.Server {
         this._timeout = opts.timeout !== undefined ?
                             opts.timeout :
                             Core.DEFAULT_TIMEOUT;
+
+        this._mounts = <IDictionary<MountableServer>> opts.mounts;
 
         if (opts.ssl) {
 
@@ -130,13 +134,13 @@ class Server extends events.EventEmitter implements Core.Server {
 
         }).on(
             "request",
-            this.__requestCallback.bind(this)
+            this._mountPreHandle.bind(this)
         );
 
         if (this._expectRequest) {
 
-            this.on("checkContinue", this.__requestCallback.bind(this));
-            this.on("checkExpectation", this.__requestCallback.bind(this));
+            this.on("checkContinue", this._mountPreHandle.bind(this));
+            this.on("checkExpectation", this._mountPreHandle.bind(this));
         }
 
         this._server.setTimeout(this._timeout);
@@ -172,11 +176,16 @@ class Server extends events.EventEmitter implements Core.Server {
         // @ts-ignore
         request.queryString = url.search;
 
-        request.realPath = request.path;
+        if (request.path.length > 1 && request.path.endsWith("/")) {
 
-        if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
+            request.realPath = request.path.substr(
+                0,
+                request.path.length - 1
+            );
+        }
+        else {
 
-            request.realPath = request.realPath.substr(0, request.realPath.length - 1);
+            request.realPath = request.path;
         }
 
         if (typeof url.query === "string") {
@@ -226,10 +235,23 @@ class Server extends events.EventEmitter implements Core.Server {
             this.closed = true;
         });
 
-        // @ts-ignore
-        request._cookiesEncoder = this._cookies;
-        // @ts-ignore
-        response._cookiesDecoder = this._cookies;
+        if (this._cookies) {
+
+            // @ts-ignore
+            request._cookiesEncoder = this._cookies;
+            // @ts-ignore
+            response._cookiesDecoder = this._cookies;
+        }
+    }
+
+    protected _mountPreHandle(
+        request: Core.ServerRequest,
+        response: Core.ServerResponse
+    ): Promise<void> {
+
+        this.__initializeRequest(request, response);
+
+        return this.__requestCallback(request, response);
     }
 
     protected async __requestCallback(
@@ -237,7 +259,32 @@ class Server extends events.EventEmitter implements Core.Server {
         response: Core.ServerResponse
     ): Promise<void> {
 
-        this.__initializeRequest(request, response);
+        if (this._mounts) {
+
+            let prefix: string = request.realPath;
+
+            let pos = prefix.indexOf("/", 1);
+
+            if (pos !== -1) {
+
+                prefix = prefix.substr(0, pos);
+            }
+
+            if (this._mounts[prefix]) {
+
+                request.realPath = request.realPath.substr(prefix.length);
+
+                if (0 === request.realPath.length) {
+
+                    request.realPath = "/";
+                }
+
+                return this._mounts[prefix].__requestCallback(
+                    request,
+                    response
+                );
+            }
+        }
 
         let context = new Context();
 
@@ -350,7 +397,7 @@ class Server extends events.EventEmitter implements Core.Server {
     }
 }
 
-export default function(opts: Core.CreateServerOptions): Core.Server {
+export default function(opts: Core.CreateMountableServerOptions): Core.Server {
 
-    return new Server(opts);
+    return new MountableServer(opts);
 }

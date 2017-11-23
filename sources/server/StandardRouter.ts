@@ -11,8 +11,8 @@ import {
     HTTP_METHODS,
     HTTPStatus
 } from "./Core";
-import HttpException = require("./Exception");
-import ServerError = require("./Errors");
+import HttpException from "./Exception";
+import ServerError from "./Errors";
 import PlainRouteRule = require("./router-rules/Plain");
 import RegExpRouteRule = require("./router-rules/RegExp");
 import SmartRouteRule = require("./router-rules/Smart");
@@ -372,7 +372,7 @@ class Router implements StandardRouter {
     }
 }
 
-export = function(): StandardRouter {
+export default function(): StandardRouter {
 
     return new Router();
-};
+}

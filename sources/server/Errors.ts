@@ -50,4 +50,4 @@ enum ServerError {
     MISSING_CALLING_NEXT
 }
 
-export = ServerError;
+export default ServerError;

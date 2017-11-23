@@ -32,7 +32,18 @@ export {
 } from "./server/Core";
 
 export * from "./server/StandardCookiesEncoder";
-export import createStandardRouter = require("./server/StandardRouter");
-export import createServer = require("./server/Server");
-export import ServerError = require("./server/Errors");
-export import Exception = require("./server/Exception");
+
+import createMountableServer from "./server/MountableServer";
+import createServer from "./server/Server";
+
+import createStandardRouter from "./server/StandardRouter";
+import ServerError from "./server/Errors";
+import Exception from "./server/Exception";
+
+export {
+    createMountableServer,
+    createServer,
+    createStandardRouter,
+    ServerError,
+    Exception
+};

@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.2.1
+
+- Added mount-points supports for server.
+
 ## v0.2.0
 
 - A full new async/await based HTTP server.

@@ -10,6 +10,11 @@ export interface ServerRequest extends http.IncomingMessage {
     "path": string;
 
     /**
+     * The real path used in router.
+     */
+    "realPath": string;
+
+    /**
      * The flag determining whether requested over SSL.
      */
     "https": boolean;
@@ -349,6 +354,11 @@ export interface CreateServerOptions {
      * Default: none
      */
     "cookies"?: CookiesEncoder;
+}
+
+export interface CreateMountableServerOptions extends CreateServerOptions {
+
+    "mounts"?: IDictionary<Server>;
 }
 
 export enum CookiesEncoding {

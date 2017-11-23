@@ -21,6 +21,8 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "path": string;
 
+    "realPath": string;
+
     "https": boolean;
 
     "ip": string;
@@ -161,9 +163,21 @@ let queryString: string;
 
 ------------------------------------------------------------------------------
 
+### 属性 realPath
+
+realPath 属性为处理当前请求的有效路径，这个路径用于路由匹配。
+
+> 如果使用挂载服务器，则 realPath 属性为去除了挂载点前缀后的路径。
+
+```ts
+let realPath: string;
+```
+
+------------------------------------------------------------------------------
+
 ### 属性 server
 
-server 属性为处理当前请求的服务器对象
+server 属性为处理当前请求的服务器对象。
 
 ```ts
 let server: Server;

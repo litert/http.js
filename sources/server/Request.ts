@@ -1,6 +1,6 @@
 import http = require("http");
-import HttpException = require("./Exception");
-import ServerError = require("./Errors");
+import HttpException from "./Exception";
+import ServerError from "./Errors";
 import { RawPromise } from "@litert/core";
 import * as Core from "./Core";
 

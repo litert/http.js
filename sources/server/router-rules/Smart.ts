@@ -1,6 +1,6 @@
 import * as Core from "../Core";
-import HttpException = require("../Exception");
-import ServerError = require("../Errors");
+import HttpException from "../Exception";
+import ServerError from "../Errors";
 import { IDictionary } from "@litert/core";
 
 enum VarType {

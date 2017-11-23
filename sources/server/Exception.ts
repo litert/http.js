@@ -11,4 +11,4 @@ class HttpException extends AbstractException {
     }
 }
 
-export = HttpException;
+export default HttpException;

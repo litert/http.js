@@ -1,13 +1,13 @@
-## 模块方法 createServer
+## 模块方法 createMountableServer
 
 ### 用途
 
-创建一个 HTTP(S) 服务器控制对象。
+创建一个可以层叠挂载的 HTTP(S) 服务器控制对象。
 
 ### 方法声明
 
 ```ts
-function createServer(cfg: {
+function createMountableServer(cfg: {
 
     /**
      * 路由器对象。
@@ -50,6 +50,11 @@ function createServer(cfg: {
      * 默认值: 512
      */
     "backlog"?: number;
+
+    /**
+     * 服务器挂载点。
+     */
+    "mounts"?: IDictionary<Server>;
 
     /**
      * 处理链接的超时时长。
@@ -143,6 +148,29 @@ let keeyAlive: number = 5000;
 
 keeyAlive 参数用于设定 HTTP Keep Alive 链接复用时，空闲链接的维持时长，超过此时长后
 服务器将自动关闭链接。（单位：毫秒）
+
+### 参数 mounts
+
+```ts
+let mounts: IDictionary<Server> = {};
+```
+
+用于设置子服务器挂载点，例如：
+
+```ts
+let server1 = http.createMountableServer({ ... });
+let server2 = http.createMountableServer({ ... });
+let serverMain = http.createMountableServer({
+    // ...
+    "mounts": {
+        "/sub1": server1,
+        "/sub2": server2
+    }
+});
+```
+
+这样，凡是 URI 以 /sub1 开头的，都将由 server1 处理，凡是 URI 以 /sub2 开头的，都将
+由 server2 处理。
 
 ### 参数 port
 

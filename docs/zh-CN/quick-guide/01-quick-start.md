@@ -337,4 +337,115 @@ server.start().then(() => {
 
 编译并执行，然后在浏览器里打开，看看调试控制台显示什么？
 
+## Demo V: 使用挂载点
+
+举个例子，我们希望有一个 HTTP 站点，有如下需求：
+
+- 默认请求由子系统 A 处理
+- 凡是 URI 以 `/admin` 开头的由子系统 B 处理
+- 凡是 URI 以 `/statics` 开头的由子系统 C 处理
+
+这个时候，我们可以用服务器的挂载点功能。
+
+> 挂载点是指将某个“虚拟目录”下的请求全部交给另一个服务器对象去处理，而这个“虚拟目录”
+> 就叫挂载点。
+
+```ts
+// File: demo-05-mount-points.ts
+import * as http from "@litert/http";
+
+/**
+ * 创建路由器对象 A
+ */
+let routerA = http.createStandardRouter();
+
+routerA.get("/", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system A with path ${req.realPath}. (${req.path})`);
+
+}).get("/a", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system A with path ${req.realPath}. (${req.path})`);
+});
+
+/**
+ * 创建路由器对象 B
+ */
+let routerB = http.createStandardRouter();
+
+routerB.get("/", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system B with path ${req.realPath}. (${req.path})`);
+
+}).get("/a", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system B with path ${req.realPath}. (${req.path})`);
+});
+
+/**
+ * 创建路由器对象 C
+ */
+let routerC = http.createStandardRouter();
+
+routerC.get("/", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system C with path ${req.realPath}. (${req.path})`);
+
+}).get("/a", function(ctx) {
+
+    const req = ctx.request;
+    const resp = ctx.response;
+
+    resp.send(`Visiting system C with path ${req.realPath}. (${req.path})`);
+});
+
+let serverC = http.createMountableServer({
+    "router": routerC
+});
+
+let serverB = http.createMountableServer({
+    "router": routerB
+});
+
+/**
+ * 创建一个监听 0.0.0.0:8080 端口的 HTTP 服务器，并指定使用 router 对象作为路由器。
+ */
+let serverA = http.createMountableServer({
+    "port": 8080,
+    "router": routerA,
+    "mounts": {
+        "/admin": serverB,
+        "/statics": serverC
+    }
+});
+
+// 启动服务器
+serverA.start().then(() => {
+
+    console.log("服务器成功启动");
+
+}).catch((e) => {
+
+    console.error(e);
+});
+
+```
+
+编译并执行，然后在浏览器里打开，看看调试控制台显示什么？
+
 > [下一节：使用路由器](./02-router.md) | [返回目录](../index.md)
