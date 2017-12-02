@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.2.2
+
+- Added multi-entry for router register methods. (Issue #1)
+
 ## v0.2.1
 
 - Added mount-points supports for server.

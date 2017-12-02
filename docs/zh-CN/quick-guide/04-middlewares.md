@@ -152,6 +152,27 @@ router.use(async function(ctx, next) {
     // 只处理 POST 请求
     await next();
 
+}).use(["POST", "GET"], async function(ctx, next) {
+
+    // 只处理 POST 和 GET 请求
+    await next();
+
+}).use([
+    "POST",
+    "GET"
+], [
+    "/admin/{rest:any}",
+    "/statics/{rest:any}"
+], async function(ctx, next) {
+
+    // 只处理 /admin/ 和 /statics/ 路径下的 POST 和 GET 请求
+    await next();
+
+}).use(["/admin/{rest:any}", "/statics/{rest:any}"], async function(ctx, next) {
+
+    // 只处理 /admin/ 和 /statics/ 路径下的请求
+    await next();
+
 }).use("POST", "/admin/{rest:any}", async function(ctx, next) {
 
     // 只处理 /admin/ 路径下的 POST 请求

@@ -88,7 +88,11 @@ router.use(async function(context, next) {
     context.response.write(JSON.stringify(context.request.query));
     context.response.write(context.request.path);
 
-}).get("/test", async function(context) {
+}).get(["/test", "/test2"], async function(context) {
+
+    context.response.write(`Requested at ${new Date(context.request.time)}`);
+
+}).register(["POST", "GET"], ["/test3", "/test4"], async function(context) {
 
     context.response.write(`Requested at ${new Date(context.request.time)}`);
 

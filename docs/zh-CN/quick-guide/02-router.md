@@ -156,8 +156,8 @@ router.get("/users/{name:string}", async function(ctx) {
 
 ```ts
 type RegisterMethod = (
-    method: HTTPMethod,
-    path: string | RegExp,
+    method: HTTPMethod | HTTPMethod[],
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ) => StandardRouter;
@@ -175,6 +175,16 @@ router.register("NOTIFY", "/users", async function(ctx) {
 
     // do something
 });
+
+router.register(["PUT", "PATCH"], "/users", async function(ctx) {
+
+    // do something
+});
+
+router.register("GET", ["/", "/index"], async function(ctx) {
+
+    // do something
+});
 ```
 
 上面的 GET/POST/PUT/TRACE/DELETE/OPTIONS/HEAD 是 HTTP/1.1 的标准方法（其他均是
@@ -183,7 +193,7 @@ WebDAV 的扩展方法），因此他们可以通过快捷函数（以方法的�
 
 ```ts
 type RegisterShortcutMethod = (
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ) => StandardRouter;
@@ -193,6 +203,11 @@ type RegisterShortcutMethod = (
 
 ```ts
 router.get("/users", async function(ctx) {
+
+    // do something
+});
+
+router.get(["/", "/index"], async function(ctx) {
 
     // do something
 });

@@ -10,8 +10,7 @@ A simple HTTP server based on LiteRT framework.
 ## Installation
 
 ```sh
-npm i typescript -g
-npm i git+https://github.com/litert/http.js.git --save
+npm i @litert/http --save
 ```
 
 ## Document

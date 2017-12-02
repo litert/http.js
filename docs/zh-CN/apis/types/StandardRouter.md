@@ -10,18 +10,18 @@
 interface StandardRouter extends Router {
 
     use(
-        method: HTTPMethod,
-        path: string | RegExp,
+        method: HTTPMethod | HTTPMethod[],
+        path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware
     ): StandardRouter;
 
     use(
-        method: HTTPMethod,
+        method: HTTPMethod | HTTPMethod[],
         middleware: RequestMiddleware
     ): StandardRouter;
 
     use(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware
     ): StandardRouter;
 
@@ -30,8 +30,8 @@ interface StandardRouter extends Router {
     ): StandardRouter;
 
     register(
-        method: HTTPMethod,
-        path: string | RegExp,
+        method: HTTPMethod | HTTPMethod[],
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -39,49 +39,49 @@ interface StandardRouter extends Router {
     notFound(handler: RequestHandler): StandardRouter;
 
     get(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     post(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     put(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     patch(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     delete(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     options(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     head(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
 
     trace(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -107,7 +107,7 @@ interface StandardRouter extends Router {
 
 ```ts
 function delete(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -115,7 +115,7 @@ function delete(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -154,7 +154,7 @@ function delete(
 
 ```ts
 function get(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -162,7 +162,7 @@ function get(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -201,7 +201,7 @@ function get(
 
 ```ts
 function head(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -209,7 +209,7 @@ function head(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -275,7 +275,7 @@ function notFound(
 
 ```ts
 function options(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -283,7 +283,7 @@ function options(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -322,7 +322,7 @@ function options(
 
 ```ts
 function patch(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -330,7 +330,7 @@ function patch(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -369,7 +369,7 @@ function patch(
 
 ```ts
 function post(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -377,7 +377,7 @@ function post(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -416,7 +416,7 @@ function post(
 
 ```ts
 function put(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -424,7 +424,7 @@ function put(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -460,8 +460,8 @@ function put(
 
 ```ts
 function register(
-    method: HTTPMethod,
-    path: string | RegExp,
+    method: HTTPMethod | HTTPMethod[],
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -469,11 +469,11 @@ function register(
 
 #### 参数说明
 
-- `method: HTTPMethod`
+- `method: HTTPMethod | HTTPMethod[]`
 
     指定该规则适配的请求方法，参考 [HTTPMethod](./HTTPMethod.md) 的说明。
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -512,7 +512,7 @@ function register(
 
 ```ts
 function trace(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler,
     data?: IDictionary<any>
 ): StandardRouter;
@@ -520,7 +520,7 @@ function trace(
 
 #### 参数说明
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     指定该规则适配的请求路径。
 
@@ -561,33 +561,33 @@ function use(
 
 @override
 function use(
-    method: HTTPMethod,
+    method: HTTPMethod | HTTPMethod[],
     middleware: RequestMiddleware
 ): StandardRouter;
 
 @override
 function use(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     middleware: RequestMiddleware
 ): StandardRouter;
 
 @override
 function use(
-    method: HTTPMethod,
-    path: string | RegExp,
+    method: HTTPMethod | HTTPMethod[],
+    path: string | RegExp | Array<string | RegExp>,
     middleware: RequestMiddleware
 ): StandardRouter;
 ```
 
 #### 参数说明
 
-- `method: HTTPMethod`
+- `method: HTTPMethod | HTTPMethod[]`
 
     （可选参数）
 
     指定该规则适配的请求方法，参考 [HTTPMethod](./HTTPMethod.md) 的说明。
 
-- `path: string | RegExp`
+- `path: string | RegExp | Array<string | RegExp>`
 
     （可选参数）
 

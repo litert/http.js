@@ -36,6 +36,17 @@
                 "${workspaceRoot}\\**\\*.js"
             ],
             "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Middleware",
+            "program": "${workspaceRoot}\\sources\\tests\\middleware.ts",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "sourceMaps": true
         }
     ]
 }

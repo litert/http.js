@@ -71,48 +71,104 @@ class Router implements StandardRouter {
         };
     }
 
-    public use(): StandardRouter {
+    protected _setupMiddlewareRule(
+        middleware: Middleware,
+        path: string | RegExp
+    ): void {
+
+        if (typeof path === "string") {
+
+            this._checkPath(path);
+
+            if (path.indexOf("{")) {
+
+                middleware.rule = new SmartRouteRule<null>(
+                    null,
+                    path,
+                    {}
+                );
+            }
+            else {
+
+                middleware.rule = new PlainRouteRule<null>(
+                    null,
+                    path,
+                    {}
+                );
+            }
+        }
+        else if (path instanceof RegExp) {
+
+            middleware.rule = new RegExpRouteRule<null>(null, path, {});
+        }
+    }
+
+    public use(...args: any[]): StandardRouter {
 
         let middleware = new Middleware();
+        let arg0 = args[0];
 
-        for (const arg of arguments) {
+        switch (args.length) {
+        case 1:
 
-            if (typeof arg === "string") {
+            middleware.handler = args[0];
+            break;
 
-                if (HTTP_METHODS.indexOf(<HTTPMethod> arg) > -1) {
+        case 2:
 
-                    middleware.method = <HTTPMethod> arg;
+            if (HTTP_METHODS.indexOf(arg0) > -1) {
+
+                middleware.method = <HTTPMethod> arg0;
+            }
+            else if (Array.isArray(arg0)) {
+
+                for (let el of arg0) {
+
+                    this.use(el, args[1]);
                 }
-                else {
 
-                    this._checkPath(arg);
+                return this;
+            }
+            else {
 
-                    if (arg.indexOf("{")) {
+                this._setupMiddlewareRule(
+                    middleware,
+                    arg0
+                );
+            }
 
-                        middleware.rule = new SmartRouteRule<null>(
-                            null,
-                            arg,
-                            {}
-                        );
-                    }
-                    else {
+            middleware.handler = args[1];
 
-                        middleware.rule = new PlainRouteRule<null>(
-                            null,
-                            arg,
-                            {}
-                        );
-                    }
+            break;
+
+        case 3:
+
+            if (Array.isArray(arg0)) {
+
+                for (let method of arg0) {
+
+                    this.use(method, arguments[1], arguments[2]);
                 }
-            }
-            else if (arg instanceof RegExp) {
 
-                middleware.rule = new RegExpRouteRule<null>(null, arg, {});
+                return this;
             }
-            else if (typeof arg === "function") {
 
-                middleware.handler = arg;
+            if (Array.isArray(arguments[1])) {
+
+                for (let path of arguments[1]) {
+
+                    this.use(arg0, path, arguments[2]);
+                }
+
+                return this;
             }
+
+            middleware.method = arg0;
+            this._setupMiddlewareRule(
+                middleware,
+                arguments[1]
+            );
+            middleware.handler = arguments[2];
         }
 
         if (middleware.method) {
@@ -136,7 +192,7 @@ class Router implements StandardRouter {
     }
 
     public get(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -147,7 +203,7 @@ class Router implements StandardRouter {
     }
 
     public post(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -158,7 +214,7 @@ class Router implements StandardRouter {
     }
 
     public put(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -169,7 +225,7 @@ class Router implements StandardRouter {
     }
 
     public patch(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -180,7 +236,7 @@ class Router implements StandardRouter {
     }
 
     public delete(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -191,7 +247,7 @@ class Router implements StandardRouter {
     }
 
     public options(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -202,7 +258,7 @@ class Router implements StandardRouter {
     }
 
     public head(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -213,7 +269,7 @@ class Router implements StandardRouter {
     }
 
     public trace(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter {
@@ -239,11 +295,26 @@ class Router implements StandardRouter {
     }
 
     public register(
-        method: HTTPMethod,
-        path: string | RegExp,
+        method: HTTPMethod | HTTPMethod[],
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data: IDictionary<any> = {}
     ): StandardRouter {
+
+        if (Array.isArray(method)) {
+
+            for (let m of method) {
+
+                this.register(
+                    m,
+                    path,
+                    handler,
+                    data
+                );
+            }
+
+            return this;
+        }
 
         if (path instanceof RegExp) {
 
@@ -251,6 +322,18 @@ class Router implements StandardRouter {
                 method,
                 new RegExpRouteRule(handler, path, data)
             );
+        }
+        else if (Array.isArray(path)) {
+
+            for (let p of path) {
+
+                this.register(
+                    method,
+                    p,
+                    handler,
+                    data
+                );
+            }
         }
         else {
 

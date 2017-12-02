@@ -451,8 +451,8 @@ export interface StandardRouter extends Router {
      * @param middleware The middleware handler.
      */
     use(
-        method: HTTPMethod,
-        path: string | RegExp,
+        method: HTTPMethod | HTTPMethod[],
+        path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware
     ): StandardRouter;
 
@@ -463,7 +463,7 @@ export interface StandardRouter extends Router {
      * @param middleware The middleware handler.
      */
     use(
-        method: HTTPMethod,
+        method: HTTPMethod | HTTPMethod[],
         middleware: RequestMiddleware
     ): StandardRouter;
 
@@ -474,7 +474,7 @@ export interface StandardRouter extends Router {
      * @param middleware The middleware handler.
      */
     use(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware
     ): StandardRouter;
 
@@ -498,8 +498,8 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     register(
-        method: HTTPMethod,
-        path: string | RegExp,
+        method: HTTPMethod | HTTPMethod[],
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -519,7 +519,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     get(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -536,7 +536,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     post(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -553,7 +553,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     put(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -570,7 +570,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     patch(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -587,7 +587,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     delete(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -604,7 +604,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     options(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -621,7 +621,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     head(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
@@ -638,7 +638,7 @@ export interface StandardRouter extends Router {
      * @throws Exception
      */
     trace(
-        path: string | RegExp,
+        path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler,
         data?: IDictionary<any>
     ): StandardRouter;
