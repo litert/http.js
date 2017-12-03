@@ -3,8 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/@litert/http.svg?colorB=brightgreen)](https://www.npmjs.com/package/@litert/http)
 [![npm version](https://img.shields.io/npm/v/@litert/http/dev.svg?colorB=brightgreen)](https://www.npmjs.com/package/@litert/http)
 [![License](https://img.shields.io/npm/l/@litert/http.svg?maxAge=2592000?style=plastic)](https://github.com/litert/http/blob/master/LICENSE)
-![node](https://img.shields.io/node/v/@litert/http.svg?colorB=brightgreen)
-[![GitHub issues](https://img.shields.io/github/issues/litert/http.js.svg)](https://github.com/litert/http.js)
+[![node](https://img.shields.io/node/v/@litert/http.svg?colorB=brightgreen)](https://nodejs.org/dist/latest-v8.x/)
+[![GitHub issues](https://img.shields.io/github/issues/litert/http.js.svg)](https://github.com/litert/http.js/issues)
 
 A simple HTTP server based on LiteRT framework.
 
