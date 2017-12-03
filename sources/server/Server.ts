@@ -5,7 +5,7 @@ import https = require("https");
 import { RawPromise } from "@litert/core";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
-import Context = require("./Context");
+import createDefaultContext from "./DefaultContext";
 import libUrl = require("url");
 import events = require("events");
 import queryString = require("querystring");
@@ -32,6 +32,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _expectRequest: boolean;
 
+    protected _contextCreator: Core.ContextCreator<Core.RequestContext>;
+
     protected _timeout: number;
 
     protected _cookies: Core.CookiesEncoder;
@@ -40,6 +42,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
         super();
 
+        this._contextCreator = opts.contextCreator || createDefaultContext;
         this._host = opts.host || Core.DEFAULT_HOST;
         this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
         this._router = opts.router;
@@ -239,10 +242,10 @@ class Server extends events.EventEmitter implements Core.Server {
 
         this.__initializeRequest(request, response);
 
-        let context = new Context();
-
-        context.request = request;
-        context.response = response;
+        let context = this._contextCreator(
+            request,
+            response
+        );
 
         let routeResult = this._router.route(
             <Core.HTTPMethod> request.method,

@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.3.0
+
+- Enable using a customized request context object.
+
 ## v0.2.2
 
 - Added multi-entry for router register methods. (Issue #1)

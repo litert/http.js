@@ -7,86 +7,94 @@
 ## 接口定义
 
 ```ts
-interface StandardRouter extends Router {
+interface StandardRouter<
+    CT extends RequestContext = RequestContext
+> extends Router {
 
     use(
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
-        middleware: RequestMiddleware
-    ): StandardRouter;
+        middleware: RequestMiddleware<CT>
+    ): StandardRouter<CT>;
 
     use(
         method: HTTPMethod | HTTPMethod[],
-        middleware: RequestMiddleware
-    ): StandardRouter;
+        middleware: RequestMiddleware<CT>
+    ): StandardRouter<CT>;
 
     use(
         path: string | RegExp | Array<string | RegExp>,
-        middleware: RequestMiddleware
-    ): StandardRouter;
+        middleware: RequestMiddleware<CT>
+    ): StandardRouter<CT>;
 
     use(
-        middleware: RequestMiddleware
-    ): StandardRouter;
+        middleware: RequestMiddleware<CT>
+    ): StandardRouter<CT>;
 
     register(
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
-    notFound(handler: RequestHandler): StandardRouter;
+    notFound(handler: RequestHandler<CT>): StandardRouter<CT>;
 
     get(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     post(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     put(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     patch(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     delete(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     options(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     head(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 
     trace(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter;
+    ): StandardRouter<CT>;
 }
 ```
+
+## 类型参数
+
+-   `CT extends RequestContext`
+
+    指定请求上下文对象的类型，默认是 RequestContext。
 
 ## 方法介绍
 
@@ -108,9 +116,9 @@ interface StandardRouter extends Router {
 ```ts
 function delete(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -121,7 +129,7 @@ function delete(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -155,9 +163,9 @@ function delete(
 ```ts
 function get(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -168,7 +176,7 @@ function get(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -202,9 +210,9 @@ function get(
 ```ts
 function head(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -215,7 +223,7 @@ function head(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -246,13 +254,13 @@ function head(
 
 ```ts
 function notFound(
-    handler: RequestHandler
-): StandardRouter;
+    handler: RequestHandler<CT>
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -276,9 +284,9 @@ function notFound(
 ```ts
 function options(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -289,7 +297,7 @@ function options(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -323,9 +331,9 @@ function options(
 ```ts
 function patch(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -336,7 +344,7 @@ function patch(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -370,9 +378,9 @@ function patch(
 ```ts
 function post(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -383,7 +391,7 @@ function post(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -417,9 +425,9 @@ function post(
 ```ts
 function put(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -430,7 +438,7 @@ function put(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -462,9 +470,9 @@ function put(
 function register(
     method: HTTPMethod | HTTPMethod[],
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -479,7 +487,7 @@ function register(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -513,9 +521,9 @@ function register(
 ```ts
 function trace(
     path: string | RegExp | Array<string | RegExp>,
-    handler: RequestHandler,
+    handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter;
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -526,7 +534,7 @@ function trace(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `handler: RequestHandler`
+- `handler: RequestHandler<CT>`
 
     指定该规则的处理器函数。
 
@@ -556,27 +564,27 @@ function trace(
 
 ```ts
 function use(
-    middleware: RequestMiddleware
-): StandardRouter;
+    middleware: RequestMiddleware<CT>
+): StandardRouter<CT>;
 
 @override
 function use(
     method: HTTPMethod | HTTPMethod[],
-    middleware: RequestMiddleware
-): StandardRouter;
+    middleware: RequestMiddleware<CT>
+): StandardRouter<CT>;
 
 @override
 function use(
     path: string | RegExp | Array<string | RegExp>,
-    middleware: RequestMiddleware
-): StandardRouter;
+    middleware: RequestMiddleware<CT>
+): StandardRouter<CT>;
 
 @override
 function use(
     method: HTTPMethod | HTTPMethod[],
     path: string | RegExp | Array<string | RegExp>,
-    middleware: RequestMiddleware
-): StandardRouter;
+    middleware: RequestMiddleware<CT>
+): StandardRouter<CT>;
 ```
 
 #### 参数说明
@@ -595,7 +603,7 @@ function use(
 
     > 更多请参考[路径匹配规则](#路径匹配规则)。
 
-- `middleware: RequestMiddleware`
+- `middleware: RequestMiddleware<CT>`
 
     指定该规则的中间件函数。
 

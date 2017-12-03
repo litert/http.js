@@ -174,4 +174,4 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
     }
 }
 
-export = SmartRouteRule;
+export default SmartRouteRule;

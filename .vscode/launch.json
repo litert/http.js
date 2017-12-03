@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "HTTP/1.1 Server",
-            "program": "${workspaceRoot}\\sources\\tests\\http-1.1.ts",
+            "program": "${workspaceRoot}\\sources\\samples\\http-1.1.ts",
             "outFiles": [
                 "${workspaceRoot}\\*.js",
                 "${workspaceRoot}\\**\\*.js"
@@ -19,7 +19,7 @@
             "type": "node",
             "request": "launch",
             "name": "HTTPS/1.1 Server",
-            "program": "${workspaceRoot}\\sources\\tests\\https-1.1.ts",
+            "program": "${workspaceRoot}\\sources\\samples\\https-1.1.ts",
             "outFiles": [
                 "${workspaceRoot}\\*.js",
                 "${workspaceRoot}\\**\\*.js"
@@ -30,7 +30,7 @@
             "type": "node",
             "request": "launch",
             "name": "Mountable Server",
-            "program": "${workspaceRoot}\\sources\\tests\\mount-http-1.1.ts",
+            "program": "${workspaceRoot}\\sources\\samples\\mount-http-1.1.ts",
             "outFiles": [
                 "${workspaceRoot}\\*.js",
                 "${workspaceRoot}\\**\\*.js"
@@ -41,7 +41,18 @@
             "type": "node",
             "request": "launch",
             "name": "Middleware",
-            "program": "${workspaceRoot}\\sources\\tests\\middleware.ts",
+            "program": "${workspaceRoot}\\sources\\samples\\middleware.ts",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Custom Context",
+            "program": "${workspaceRoot}\\sources\\samples\\custom-context.ts",
             "outFiles": [
                 "${workspaceRoot}\\*.js",
                 "${workspaceRoot}\\**\\*.js"

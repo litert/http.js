@@ -13,9 +13,9 @@ import {
 } from "./Core";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
-import PlainRouteRule = require("./router-rules/Plain");
-import RegExpRouteRule = require("./router-rules/RegExp");
-import SmartRouteRule = require("./router-rules/Smart");
+import PlainRouteRule from "./router-rules/Plain";
+import RegExpRouteRule from "./router-rules/RegExp";
+import SmartRouteRule from "./router-rules/Smart";
 
 class Middleware {
 
@@ -26,19 +26,21 @@ class Middleware {
     public handler: RequestMiddleware;
 }
 
-class Router implements StandardRouter {
+class Router<
+    CT extends RequestContext = RequestContext
+> implements StandardRouter<CT> {
 
     protected _stringRouter: HTTPMethodDictionary<
-        IDictionary<RouteRule<RequestHandler>>
+        IDictionary<RouteRule<RequestHandler<CT>>>
     >;
 
     protected _regexpRouter: HTTPMethodDictionary<
-        Array<RouteRule<RequestHandler>>
+        Array<RouteRule<RequestHandler<CT>>>
     >;
 
     protected _middlewares: HTTPMethodDictionary<Middleware[]>;
 
-    protected _notFoundHandler: RequestHandler;
+    protected _notFoundHandler: RequestHandler<CT>;
 
     public constructor() {
 
@@ -103,7 +105,7 @@ class Router implements StandardRouter {
         }
     }
 
-    public use(...args: any[]): StandardRouter {
+    public use(...args: any[]): StandardRouter<CT> {
 
         let middleware = new Middleware();
         let arg0 = args[0];
@@ -193,9 +195,9 @@ class Router implements StandardRouter {
 
     public get(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("GET", path, handler, data);
 
@@ -204,9 +206,9 @@ class Router implements StandardRouter {
 
     public post(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("POST", path, handler, data);
 
@@ -215,9 +217,9 @@ class Router implements StandardRouter {
 
     public put(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("PUT", path, handler, data);
 
@@ -226,9 +228,9 @@ class Router implements StandardRouter {
 
     public patch(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("PATCH", path, handler, data);
 
@@ -237,9 +239,9 @@ class Router implements StandardRouter {
 
     public delete(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("DELETE", path, handler, data);
 
@@ -248,9 +250,9 @@ class Router implements StandardRouter {
 
     public options(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("OPTIONS", path, handler, data);
 
@@ -259,9 +261,9 @@ class Router implements StandardRouter {
 
     public head(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("HEAD", path, handler, data);
 
@@ -270,9 +272,9 @@ class Router implements StandardRouter {
 
     public trace(
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         this.register("TRACE", path, handler, data);
 
@@ -297,9 +299,9 @@ class Router implements StandardRouter {
     public register(
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
-        handler: RequestHandler,
+        handler: RequestHandler<CT>,
         data: IDictionary<any> = {}
-    ): StandardRouter {
+    ): StandardRouter<CT> {
 
         if (Array.isArray(method)) {
 
@@ -446,8 +448,8 @@ class Router implements StandardRouter {
     }
 
     public notFound(
-        handler: RequestHandler
-    ): StandardRouter {
+        handler: RequestHandler<CT>
+    ): StandardRouter<CT> {
 
         this._notFoundHandler = handler;
 
@@ -455,7 +457,9 @@ class Router implements StandardRouter {
     }
 }
 
-export default function(): StandardRouter {
+export default function<
+    CT extends RequestContext = RequestContext
+>(): StandardRouter<CT> {
 
-    return new Router();
+    return new Router<CT>();
 }

@@ -47,3 +47,8 @@ export {
     ServerError,
     Exception
 };
+
+export {
+    createDefaultContext,
+    DefaultContext
+} from "./server/DefaultContext";

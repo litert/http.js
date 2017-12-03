@@ -5,8 +5,8 @@
 处理器函数是用于处理 HTTP 请求的一个函数，它的签名如下：
 
 ```ts
-type RequestHandler = (
-    context: RequestContext
+type RequestHandler<CT extends RequestContext = RequestContext> = (
+    context: CT
 ) => Promise<void>;
 ```
 

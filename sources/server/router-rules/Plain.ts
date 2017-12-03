@@ -32,4 +32,4 @@ class PlainRouteRule<T> implements Core.RouteRule<T> {
     }
 }
 
-export = PlainRouteRule;
+export default PlainRouteRule;

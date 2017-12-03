@@ -17,8 +17,8 @@
 先来看看中间件函数的签名：
 
 ```ts
-type RequestMiddleware = (
-    context: RequestContext,
+type RequestMiddleware<CT extends RequestContext = RequestContext> = (
+    context: CT,
     next: MiddlewareNextCallback
 ) => Promise<void>;
 
@@ -33,11 +33,32 @@ type MiddlewareNextCallback = (end?: boolean) => Promise<void>;
 我们得到函数调用堆栈图如下：（A、B、C 都是中间件）
 
 ```
-请求开始 → A → B → C
-                  ↓
-               Handler
-                  ↓
-请求结束 ← A ← B ← C
+[Request]   [Middleware A]   [Middleware B]   [Middleware C]   [Handler]
+    |             |                |                |              |
+    | await next  |                |                |              |
+    |------------>|                |                |              |
+    |             |                |                |              |
+    |             |   await next   |                |              |
+    |             |--------------->|                |              |
+    |             |                |                |              |
+    |             |                |   await next   |              |
+    |             |                |--------------->|              |
+    |             |                |                |              |
+    |             |                |                |  await next  |
+    |             |                |                |------------->|
+    |             |                |                |              |
+    |             |                |                |  completed   |
+    |             |                |                |<-------------|
+    |             |                |                |              |
+    |             |                |   after next   |              |
+    |             |                |<---------------|              |
+    |             |                |                |              |
+    |             |   after next   |                |              |
+    |             |<---------------|                |              |
+    |             |                |                |              |
+    |  after next |                |                |              |
+    |<------------|                |                |              |
+    |             |                |                |              |
 ```
 
 对于某个中间件，在 `await next();` 之后，这个中间件后面的所有中间件函数和处理器函数

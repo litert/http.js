@@ -40,4 +40,4 @@ class RegExpRouteRule<T> implements Core.RouteRule<T> {
     }
 }
 
-export = RegExpRouteRule;
+export default RegExpRouteRule;

@@ -5,13 +5,17 @@
 ## 定义
 
 ```ts
-type RequestMiddleware = (
-    context: RequestContext,
+type RequestMiddleware<CT extends RequestContext = RequestContext> = (
+    context: CT,
     next: MiddlewareNextCallback
 ) => Promise<void>;
 ```
 
 ## 参数说明
+
+-   类型参数 `CT extends RequestContext`
+
+    指定请求上下文对象的类型，默认是 RequestContext。
 
 - `context: RequestContext`
 

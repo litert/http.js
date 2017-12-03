@@ -4,6 +4,10 @@
 
 [CSCE]: ./module-methods/createStandardCookiesEncoder.md
 
+- 类
+
+    - [DefaultContext](./classes/DefaultContext.md)
+
 - 模块方法
 
     - [createMountableServer](./module-methods/createMountableServer.md)
@@ -20,6 +24,7 @@
 
 - 数据类型
 
+    - [ContextCreator](./types/ContextCreator.md)
     - [CookieConfiguration](./types/CookieConfiguration.md)
     - [HTTPMethod](./types/HTTPMethod.md)
     - [MiddlewareNextCallback](./types/MiddlewareNextCallback.md)

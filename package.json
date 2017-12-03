@@ -1,18 +1,22 @@
 {
   "name": "@litert/http",
-  "version": "0.2.2",
+  "version": "0.3.0-0",
   "description": "A simple HTTP server based on LiteRT framework.",
   "main": "./index.js",
   "scripts": {
-    "prepublish": "tsc -p .",
-    "test": "node ./test.js"
+    "prepare": "npm run rebuild",
+    "build": "tsc -p .",
+    "rebuild": "npm run clean && npm run build",
+    "test": "echo See directory sources/samples",
+    "clean": "rm -rf index.* server samples"
   },
   "keywords": [
     "litert",
     "lrt",
-    "http"
+    "http",
+    "server"
   ],
-  "author": "Angus.Fenying <i.am.x.fenying@gmail.com>",
+  "author": "Angus.Fenying <i.am.x.fenying@gmail.com> (https://fenying.net)",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

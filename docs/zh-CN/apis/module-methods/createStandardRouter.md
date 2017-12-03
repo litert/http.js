@@ -7,7 +7,9 @@
 ### 方法声明
 
 ```ts
-function createStandardRouter(): StandardRouter;
+function createStandardRouter<
+    CT extends RequestContext = RequestContext
+>(): StandardRouter<CT>;
 ```
 
 ## 使用示例

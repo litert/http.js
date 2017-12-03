@@ -5,13 +5,17 @@
 ## 定义
 
 ```ts
-export type RequestHandler = (
-    context: RequestContext
+type RequestHandler<CT extends RequestContext = RequestContext> = (
+    context: CT
 ) => Promise<void>;
 ```
 
 ## 参数说明
 
-- `context: RequestContext`
+-   类型参数 `CT extends RequestContext`
+
+    指定请求上下文对象的类型，默认是 RequestContext。
+
+-   `context: RequestContext`
 
     请求的上下文对象。

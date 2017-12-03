@@ -86,6 +86,11 @@ function createServer(cfg: {
      */
     "cookies"?: CookiesEncoder;
 
+    /**
+     * 上下文对象工厂。
+     */
+    "contextCreator"?: ContextCreator<RequestContext>;
+
 }): Server;
 ```
 
@@ -99,6 +104,14 @@ let backlog: number = 512;
 
 backlog 参数用于设定服务器的最大监听队列长度，也就是说同一时间能有多少个请求在等待
 处理。
+
+### 参数 contextCreator
+
+```ts
+let contextCreator: ContextCreator<RequestContext> = createDefaultContext;
+```
+
+contextCreator 参数用于配置请求的上下文对象的工厂函数。
 
 ### 参数 cookies
 
