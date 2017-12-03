@@ -14,6 +14,7 @@
     - [createServer](./module-methods/createServer.md)
     - [createStandardCookiesEncoder][CSCE]
     - [createStandardRouter](./module-methods/createStandardRouter.md)
+    - [createDefaultContext](./module-methods/createDefaultContext.md)
 
 - 抽象接口
 
