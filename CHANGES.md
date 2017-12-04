@@ -2,6 +2,7 @@
 
 ## v0.3.0
 
+- Added events `closed` and `started`.
 - Enable using a customized request context object.
 
 ## v0.2.2

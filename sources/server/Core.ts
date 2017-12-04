@@ -15,7 +15,6 @@
 
 import http = require("http");
 import { IDictionary } from "@litert/core";
-import { EventEmitter } from "events";
 
 export interface ServerRequest extends http.IncomingMessage {
 
@@ -428,7 +427,7 @@ export enum ServerStatus {
 
 }
 
-export interface Server extends EventEmitter {
+export interface Server {
 
     /**
      * The port of server listening.
@@ -459,6 +458,16 @@ export interface Server extends EventEmitter {
      * Stop listening.
      */
     shutdown(): Promise<void>;
+
+    on(event: "started", listener: () => void): this;
+
+    on(event: "closed", listener: () => void): this;
+
+    on(event: "error", listener: (e: any) => void): this;
+
+    removeListener(event: string, listener: Function): this;
+
+    removeAllListeners(event: string): this;
 }
 
 export interface Router {

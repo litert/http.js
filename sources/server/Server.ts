@@ -169,6 +169,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
                 this._status = Core.ServerStatus.WORKING;
                 ret.resolve();
+
+                this.emit("started");
             }
         );
 
@@ -362,6 +364,8 @@ class Server extends events.EventEmitter implements Core.Server {
             this._status = Core.ServerStatus.READY;
 
             ret.resolve();
+
+            this.emit("closed");
         });
 
         return ret.promise;

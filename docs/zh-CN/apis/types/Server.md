@@ -17,9 +17,9 @@ interface Server extends EventEmitter {
 
     readonly status: ServerStatus;
 
-    start(): Promise<void>;
-
     shutdown(): Promise<void>;
+
+    start(): Promise<void>;
 }
 ```
 
@@ -61,9 +61,31 @@ public readonly status: ServerStatus;
 
 > 根据方法名称按字母表顺序排列。
 
+### 方法 shutdown
+
+该方法用于关闭服务器，停止监听请求。
+
+> 该方法将触发 closed 事件。
+
+#### 方法声明
+
+```ts
+async function shutdown(): Promise<void>;
+```
+
+#### 返回值
+
+返回一个 void 类型的 Promise 对象。
+
+#### 错误处理
+
+通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
+
 ### 方法 start
 
 该方法用于启动服务器，开始监听请求。
+
+> 该方法将触发 started 事件。
 
 #### 方法声明
 
@@ -79,20 +101,43 @@ async function start(): Promise<void>;
 
 通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
 
-### 方法 shutdown
+## 事件介绍
 
-该方法用于关闭服务器，停止监听请求。
+### `closed` 事件
 
-#### 方法声明
+该事件在服务器成功停止监听后触发。
+
+### 使用方式
 
 ```ts
-async function shutdown(): Promise<void>;
+server.on("closed", function() {
+
+    console.info(`Server bas been shutted down.`);
+});
 ```
 
-#### 返回值
+### `error` 事件
 
-返回一个 void 类型的 Promise 对象。
+该事件在服务器发生错误时（内部错误，或者来自处理器、中间件未处理的异常）触发。
 
-#### 错误处理
+### 使用方式
 
-通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
+```ts
+server.on("error", function(e: any) {
+
+    console.error(e);
+});
+```
+
+### `started` 事件
+
+该事件在服务器成功监听端口后触发。
+
+### 使用方式
+
+```ts
+server.on("started", function() {
+
+    console.info(`Server started listening.`);
+});
+```
