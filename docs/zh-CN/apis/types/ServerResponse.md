@@ -17,11 +17,11 @@ import nodeHTTP = require("http");
 
 interface ServerResponse extends nodeHTTP.ServerResponse {
 
-    redirect(target: string, statusCode?: number): ServerResponse;
+    redirect(target: string, statusCode?: number): this;
 
-    sendJSON(data: any): ServerResponse;
+    sendJSON(data: any): this;
 
-    send(data: string | Buffer): ServerResponse;
+    send(data: string | Buffer): this;
 
     setCookie(
         name: string,
@@ -31,11 +31,11 @@ interface ServerResponse extends nodeHTTP.ServerResponse {
         secureOnly?: boolean,
         path?: string,
         domain?: string
-    ): ServerResponse;
+    ): this;
 
     setCookie(
         cookie: SetCookieConfiguration
-    ): ServerResponse;
+    ): this;
 }
 ```
 
@@ -52,7 +52,7 @@ interface ServerResponse extends nodeHTTP.ServerResponse {
 #### 方法声明
 
 ```ts
-function redirect(target: string, statusCode?: number): ServerResponse;
+function redirect(target: string, statusCode?: number): this;
 ```
 
 #### 参数说明
@@ -86,7 +86,7 @@ function redirect(target: string, statusCode?: number): ServerResponse;
 #### 方法声明
 
 ```ts
-function send(data: string | Buffer): ServerResponse;
+function send(data: string | Buffer): this;
 ```
 
 #### 参数说明
@@ -114,7 +114,7 @@ function send(data: string | Buffer): ServerResponse;
 #### 方法声明
 
 ```ts
-function sendJSON(data: any): ServerResponse;
+function sendJSON(data: any): this;
 ```
 
 #### 参数说明
@@ -154,11 +154,11 @@ function setCookie(
     secureOnly?: boolean,
     path?: string,
     domain?: string
-): ServerResponse;
+): this;
 
 function setCookie(
     cookie: SetCookieConfiguration
-): ServerResponse;
+): this;
 ```
 
 #### 参数说明

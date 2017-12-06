@@ -9,7 +9,7 @@
 ```ts
 function createStandardRouter<
     CT extends RequestContext = RequestContext
->(): StandardRouter<CT>;
+>(): this;
 ```
 
 ## 使用示例

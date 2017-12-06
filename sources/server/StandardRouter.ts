@@ -120,7 +120,7 @@ class Router<
         }
     }
 
-    public use(...args: any[]): StandardRouter<CT> {
+    public use(...args: any[]): this {
 
         let middleware = new Middleware();
         let arg0 = args[0];
@@ -212,7 +212,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("GET", path, handler, data);
 
@@ -223,7 +223,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("POST", path, handler, data);
 
@@ -234,7 +234,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("PUT", path, handler, data);
 
@@ -245,7 +245,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("PATCH", path, handler, data);
 
@@ -256,7 +256,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("DELETE", path, handler, data);
 
@@ -267,7 +267,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("OPTIONS", path, handler, data);
 
@@ -278,7 +278,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("HEAD", path, handler, data);
 
@@ -289,7 +289,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT> {
+    ): this {
 
         this.register("TRACE", path, handler, data);
 
@@ -316,7 +316,7 @@ class Router<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data: IDictionary<any> = {}
-    ): StandardRouter<CT> {
+    ): this {
 
         if (Array.isArray(method)) {
 
@@ -464,7 +464,7 @@ class Router<
 
     public notFound(
         handler: RequestHandler<CT>
-    ): StandardRouter<CT> {
+    ): this {
 
         this._notFoundHandler = handler;
 

@@ -169,21 +169,21 @@ export interface ServerResponse extends http.ServerResponse {
     /**
      * Send a redirection to client.
      */
-    redirect(target: string, statusCode?: number): ServerResponse;
+    redirect(target: string, statusCode?: number): this;
 
     /**
      * Encode the data as JSON and send it to client.
      *
      * > The response will be closed.
      */
-    sendJSON(data: any): ServerResponse;
+    sendJSON(data: any): this;
 
     /**
      * Send data to client.
      *
      * > The response will be closed.
      */
-    send(data: string | Buffer): ServerResponse;
+    send(data: string | Buffer): this;
 
     /**
      * Set the cookies of response.
@@ -198,7 +198,7 @@ export interface ServerResponse extends http.ServerResponse {
         secureOnly?: boolean,
         path?: string,
         domain?: string
-    ): ServerResponse;
+    ): this;
 
     /**
      * Set the cookies of response.
@@ -207,7 +207,7 @@ export interface ServerResponse extends http.ServerResponse {
      */
     setCookie(
         cookie: SetCookieConfiguration
-    ): ServerResponse;
+    ): this;
 }
 
 export type RequestHandler<CT extends RequestContext = RequestContext> = (
@@ -494,7 +494,7 @@ export interface StandardRouter<
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Use a middleware, with a METHOD filter.
@@ -505,7 +505,7 @@ export interface StandardRouter<
     use(
         method: HTTPMethod | HTTPMethod[],
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Use a middleware, with a PATH filter.
@@ -516,7 +516,7 @@ export interface StandardRouter<
     use(
         path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Use a middleware, without any filter.
@@ -525,7 +525,7 @@ export interface StandardRouter<
      */
     use(
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP request.
@@ -542,12 +542,12 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Register the handler for NOT FOUND request.
      */
-    notFound(handler: RequestHandler<CT>): StandardRouter<CT>;
+    notFound(handler: RequestHandler<CT>): this;
 
     /**
      * Bind a handler with a HTTP GET request.
@@ -562,7 +562,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP POST request.
@@ -579,7 +579,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP PUT request.
@@ -596,7 +596,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP PATCH request.
@@ -613,7 +613,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP DELETE request.
@@ -630,7 +630,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP OPTIONS request.
@@ -647,7 +647,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP HEAD request.
@@ -664,7 +664,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     /**
      * Bind a handler with a HTTP TRACE request.
@@ -681,7 +681,7 @@ export interface StandardRouter<
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 }
 
 export interface RouteRule<T> {

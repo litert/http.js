@@ -15,78 +15,78 @@ interface StandardRouter<
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     use(
         method: HTTPMethod | HTTPMethod[],
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     use(
         path: string | RegExp | Array<string | RegExp>,
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     use(
         middleware: RequestMiddleware<CT>
-    ): StandardRouter<CT>;
+    ): this;
 
     register(
         method: HTTPMethod | HTTPMethod[],
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
-    notFound(handler: RequestHandler<CT>): StandardRouter<CT>;
+    notFound(handler: RequestHandler<CT>): this;
 
     get(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     post(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     put(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     patch(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     delete(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     options(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     head(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 
     trace(
         path: string | RegExp | Array<string | RegExp>,
         handler: RequestHandler<CT>,
         data?: IDictionary<any>
-    ): StandardRouter<CT>;
+    ): this;
 }
 ```
 
@@ -118,7 +118,7 @@ function delete(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -165,7 +165,7 @@ function get(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -212,7 +212,7 @@ function head(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -255,7 +255,7 @@ function head(
 ```ts
 function notFound(
     handler: RequestHandler<CT>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -286,7 +286,7 @@ function options(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -333,7 +333,7 @@ function patch(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -380,7 +380,7 @@ function post(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -427,7 +427,7 @@ function put(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -472,7 +472,7 @@ function register(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -523,7 +523,7 @@ function trace(
     path: string | RegExp | Array<string | RegExp>,
     handler: RequestHandler<CT>,
     data?: IDictionary<any>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
@@ -565,26 +565,26 @@ function trace(
 ```ts
 function use(
     middleware: RequestMiddleware<CT>
-): StandardRouter<CT>;
+): this;
 
 @override
 function use(
     method: HTTPMethod | HTTPMethod[],
     middleware: RequestMiddleware<CT>
-): StandardRouter<CT>;
+): this;
 
 @override
 function use(
     path: string | RegExp | Array<string | RegExp>,
     middleware: RequestMiddleware<CT>
-): StandardRouter<CT>;
+): this;
 
 @override
 function use(
     method: HTTPMethod | HTTPMethod[],
     path: string | RegExp | Array<string | RegExp>,
     middleware: RequestMiddleware<CT>
-): StandardRouter<CT>;
+): this;
 ```
 
 #### 参数说明
