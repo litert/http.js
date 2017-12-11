@@ -114,14 +114,7 @@ class Server extends events.EventEmitter implements Core.Server {
             this._server = http.createServer();
         }
 
-        this._server.on("error", function(err: Error) {
-
-            ret.reject(new HttpException(
-                ServerError.FAILED_TO_START,
-                err.message
-            ));
-
-        }).on("connect", function(
+        this._server.on("connect", function(
             req: http.IncomingMessage,
             socket: net.Socket
         ) {
@@ -143,6 +136,18 @@ class Server extends events.EventEmitter implements Core.Server {
 
         this._server.keepAliveTimeout = this._keepAlive;
 
+        this._server.once("error", (err: Error) => {
+
+            ret.reject(new HttpException(
+                ServerError.FAILED_TO_START,
+                err.message
+            ));
+
+            delete this._server;
+
+            this._status = Core.ServerStatus.READY;
+        });
+
         this._server.listen(
             this._port,
             this._host,
@@ -150,6 +155,13 @@ class Server extends events.EventEmitter implements Core.Server {
             (): void => {
 
                 this._status = Core.ServerStatus.WORKING;
+
+                this._server.removeAllListeners("error")
+                .on("error", (e: Error) => {
+
+                    this.emit("error", e);
+                });
+
                 ret.resolve();
             }
         );

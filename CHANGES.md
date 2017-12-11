@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.2.3
+
+- Fixed: The error event leads a promise leak.
+
 ## v0.2.2
 
 - Added multi-entry for router register methods. (Issue #1)
