@@ -19,6 +19,16 @@ import ServerError from "./Errors";
 import { RawPromise } from "@litert/core";
 import * as Core from "./Core";
 
+interface InternalServer extends Core.Server {
+
+    _cookiesEncoder: Core.CookiesEncoder;
+}
+
+interface InternalRequest extends Core.ServerRequest {
+
+    server: InternalServer;
+}
+
 function extend(obj: any, name: string, fn: Function) {
 
     obj[name] = fn;
@@ -38,6 +48,12 @@ extend(http.IncomingMessage.prototype, "getBodyAsJSON", async function(
     catch (e) {
 
         return Promise.reject(e);
+    }
+});
+
+Object.defineProperty(http.IncomingMessage.prototype, "server", {
+    get(this: any): http.Server {
+        return this.connection.server.controlServer;
     }
 });
 
@@ -135,7 +151,7 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
 });
 
 extend(http.IncomingMessage.prototype, "loadCookies", function(
-    this: any
+    this: InternalRequest
 ): boolean {
 
     if (this.isCookiesLoaded()) {
@@ -160,7 +176,7 @@ extend(http.IncomingMessage.prototype, "loadCookies", function(
         cookies = data.join(";");
     }
 
-    this.cookies = this._cookiesEncoder.parse(cookies);
+    this.cookies = this.server._cookiesEncoder.parse(cookies);
 
     return true;
 });

@@ -18,6 +18,16 @@ import HttpException from "./Exception";
 import ServerError from "./Errors";
 import * as Core from "./Core";
 
+interface InternalServer extends Core.Server {
+
+    _cookiesEncoder: Core.CookiesEncoder;
+}
+
+interface InternalResponse extends Core.ServerResponse {
+
+    server: InternalServer;
+}
+
 function extend(obj: any, name: string, fn: Function) {
 
     obj[name] = fn;
@@ -47,6 +57,12 @@ extend(http.ServerResponse.prototype, "send", function(
     this.end(data);
 
     return this;
+});
+
+Object.defineProperty(http.ServerResponse.prototype, "server", {
+    get(this: any): http.Server {
+        return this.connection.server.controlServer;
+    }
 });
 
 extend(http.ServerResponse.prototype, "redirect", function(
@@ -95,7 +111,7 @@ extend(http.ServerResponse.prototype, "sendJSON", function(
 });
 
 extend(http.ServerResponse.prototype, "setCookie", function(
-    this: any,
+    this: InternalResponse,
     ...args: any[]
 ): http.ServerResponse {
 
@@ -111,11 +127,11 @@ extend(http.ServerResponse.prototype, "setCookie", function(
 
     if (args.length === 1) {
 
-        cookieText = this._cookiesDecoder.stringify(args[0]);
+        cookieText = this.server._cookiesEncoder.stringify(args[0]);
     }
     else {
 
-        cookieText = this._cookiesDecoder.stringify({
+        cookieText = this.server._cookiesEncoder.stringify({
             "name": args[0],
             "value": args[1],
             "ttl": args[2],
@@ -128,7 +144,7 @@ extend(http.ServerResponse.prototype, "setCookie", function(
 
     if (this.hasHeader("Set-Cookie")) {
 
-        let cookies = this.getHeaders()["set-cookie"];
+        let cookies = this.getHeaders()["set-cookie"] as string[];
 
         cookies.push(cookieText);
 

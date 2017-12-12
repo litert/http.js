@@ -186,6 +186,11 @@ export interface ServerResponse extends http.ServerResponse {
     send(data: string | Buffer): this;
 
     /**
+     * The server object.
+     */
+    "server": Server;
+
+    /**
      * Set the cookies of response.
      *
      * > NOTES: This must be called with setting up cookies for server.

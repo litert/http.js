@@ -27,6 +27,11 @@ import queryString = require("querystring");
 import "./Response";
 import "./Request";
 
+interface InternalServer extends http.Server {
+
+    controlServer: Core.Server;
+}
+
 class Server extends events.EventEmitter implements Core.Server {
 
     protected _port: number;
@@ -39,7 +44,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _status: Core.ServerStatus;
 
-    protected _server: http.Server | https.Server;
+    private _server: InternalServer;
 
     protected _router: Core.Router;
 
@@ -51,7 +56,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _timeout: number;
 
-    protected _cookies: Core.CookiesEncoder;
+    protected _cookiesEncoder: Core.CookiesEncoder;
 
     public constructor(opts: Core.CreateServerOptions) {
 
@@ -81,7 +86,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
         if (opts.cookies) {
 
-            this._cookies = opts.cookies;
+            this._cookiesEncoder = opts.cookies;
         }
     }
 
@@ -118,7 +123,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
         if (this._ssl) {
 
-            this._server = https.createServer({
+            this._server = <any> https.createServer({
 
                 "key": this._ssl.key,
 
@@ -129,7 +134,7 @@ class Server extends events.EventEmitter implements Core.Server {
         }
         else {
 
-            this._server = http.createServer();
+            this._server = http.createServer() as InternalServer;
         }
 
         this._server.on("connect", function(
@@ -137,7 +142,9 @@ class Server extends events.EventEmitter implements Core.Server {
             socket: net.Socket
         ) {
 
-            socket.write("HTTP/1.1 405 METHOD NOW ALLOWED\r\nConnection: Close\r\n\r\n");
+            socket.write(
+                "HTTP/1.1 405 METHOD NOW ALLOWED\r\nConnection: Close\r\n\r\n"
+            );
 
         }).on(
             "request",
@@ -180,6 +187,8 @@ class Server extends events.EventEmitter implements Core.Server {
                     this.emit("error", e);
                 });
 
+                this._server.controlServer = this;
+
                 ret.resolve();
 
                 this.emit("started");
@@ -208,7 +217,10 @@ class Server extends events.EventEmitter implements Core.Server {
 
         if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
 
-            request.realPath = request.realPath.substr(0, request.realPath.length - 1);
+            request.realPath = request.realPath.substr(
+                0,
+                request.realPath.length - 1
+            );
         }
 
         if (typeof url.query === "string") {
@@ -223,7 +235,6 @@ class Server extends events.EventEmitter implements Core.Server {
         // @ts-ignore
         request.ip = request.connection.remoteAddress;
 
-        request.server = this;
         request.time = Date.now();
 
         if (request.headers["host"]) {
@@ -257,11 +268,6 @@ class Server extends events.EventEmitter implements Core.Server {
 
             this.closed = true;
         });
-
-        // @ts-ignore
-        request._cookiesEncoder = this._cookies;
-        // @ts-ignore
-        response._cookiesDecoder = this._cookies;
     }
 
     protected async __requestCallback(
@@ -372,6 +378,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
         this._server.close(() => {
 
+            delete this._server.controlServer;
             delete this._server;
             this._status = Core.ServerStatus.READY;
 

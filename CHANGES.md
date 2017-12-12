@@ -2,6 +2,7 @@
 
 ## v0.3.0
 
+- Improved the cookies encode/decode performances.
 - Improved the signature of self-returning methods.
 - Added events `closed` and `started`.
 - Enable using a customized request context object.
