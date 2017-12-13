@@ -17,13 +17,13 @@ import * as Core from "./Core";
 import net = require("net");
 import http = require("http");
 import https = require("https");
+import * as http2 from "http2";
 import { RawPromise } from "@litert/core";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
 import createDefaultContext from "./DefaultContext";
 import libUrl = require("url");
 import events = require("events");
-import queryString = require("querystring");
 import "./Response";
 import "./Request";
 
@@ -58,6 +58,8 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _cookiesEncoder: Core.CookiesEncoder;
 
+    protected _version: number;
+
     public constructor(opts: Core.CreateServerOptions) {
 
         super();
@@ -71,6 +73,8 @@ class Server extends events.EventEmitter implements Core.Server {
         this._timeout = opts.timeout !== undefined ?
                             opts.timeout :
                             Core.DEFAULT_TIMEOUT;
+
+        this._version = opts.version || Core.DEFAULT_VERSION;
 
         if (opts.ssl) {
 
@@ -121,20 +125,41 @@ class Server extends events.EventEmitter implements Core.Server {
 
         this._status = Core.ServerStatus.STARTING;
 
-        if (this._ssl) {
+        if (this._version === 2) {
 
-            this._server = <any> https.createServer({
+            if (this._ssl) {
 
-                "key": this._ssl.key,
+                this._server = <any> http2.createSecureServer({
 
-                "cert": this._ssl.certificate,
+                    "key": this._ssl.key,
 
-                "passphrase": this._ssl.passphrase
-            });
+                    "cert": this._ssl.certificate,
+
+                    "passphrase": this._ssl.passphrase
+                });
+            }
+            else {
+
+                this._server = http2.createServer() as InternalServer;
+            }
         }
         else {
 
-            this._server = http.createServer() as InternalServer;
+            if (this._ssl) {
+
+                this._server = <any> https.createServer({
+
+                    "key": this._ssl.key,
+
+                    "cert": this._ssl.certificate,
+
+                    "passphrase": this._ssl.passphrase
+                });
+            }
+            else {
+
+                this._server = http.createServer() as InternalServer;
+            }
         }
 
         this._server.on("connect", function(
@@ -203,7 +228,7 @@ class Server extends events.EventEmitter implements Core.Server {
         response: Core.ServerResponse
     ): void {
 
-        let url = libUrl.parse(<string> request.url);
+        let url = libUrl.parse(request.url as string);
 
         request.params = {};
 
@@ -223,42 +248,7 @@ class Server extends events.EventEmitter implements Core.Server {
             );
         }
 
-        if (typeof url.query === "string") {
-
-            request.query = queryString.parse(url.query);
-        }
-        else {
-
-            request.query = url.query || {};
-        }
-
-        // @ts-ignore
-        request.ip = request.connection.remoteAddress;
-
         request.time = Date.now();
-
-        if (request.headers["host"]) {
-
-            if (typeof request.headers["host"] === "string") {
-
-                // @ts-ignore
-                request.host = request.headers["host"];
-            }
-            else {
-
-                // @ts-ignore
-                request.host = request.headers["host"][0];
-            }
-        }
-        else {
-
-            request.host = this._host;
-        }
-
-        if (this._ssl) {
-
-            request.https = true;
-        }
 
         request.on("aborted", function(this: Core.ServerRequest) {
 

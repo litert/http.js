@@ -13,28 +13,57 @@
    +----------------------------------------------------------------------+
  */
 
-import http = require("http");
+import * as http from "http";
+import * as http2 from "http2";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
-import { RawPromise } from "@litert/core";
+import { RawPromise, IDictionary } from "@litert/core";
 import * as Core from "./Core";
+import * as libUrl from "url";
+import * as queryString from "querystring";
+
+declare module "http2" {
+
+    export class Http2ServerRequest {
+    }
+}
 
 interface InternalServer extends Core.Server {
 
     _cookiesEncoder: Core.CookiesEncoder;
+
+    _version: Core.HTTPVersion;
+
+    _ssl: any;
 }
 
 interface InternalRequest extends Core.ServerRequest {
 
     server: InternalServer;
+
+    _host: string;
+
+    __initializeHostName(): void;
 }
 
-function extend(obj: any, name: string, fn: Function) {
+function _extend(obj: any, name: string, fn: Function) {
 
     obj[name] = fn;
 }
 
-extend(http.IncomingMessage.prototype, "getBodyAsJSON", async function(
+function extend(name: string, fn: Function) {
+
+    _extend(http.IncomingMessage.prototype, name, fn);
+    _extend(http2.Http2ServerRequest.prototype, name, fn);
+}
+
+function extenDef(name: string, fn: Object) {
+
+    Object.defineProperty(http.IncomingMessage.prototype, name, fn);
+    Object.defineProperty(http2.Http2ServerRequest.prototype, name, fn);
+}
+
+extend("getBodyAsJSON", async function(
     this: Core.ServerRequest,
     maxLength: number = 0
 ): Promise<any> {
@@ -51,13 +80,205 @@ extend(http.IncomingMessage.prototype, "getBodyAsJSON", async function(
     }
 });
 
-Object.defineProperty(http.IncomingMessage.prototype, "server", {
+extenDef("server", {
     get(this: any): http.Server {
-        return this.connection.server.controlServer;
+
+        delete this.server;
+
+        Object.defineProperty(this, "server", {
+            "value": this.connection.server.controlServer
+        });
+
+        return this.server;
     }
 });
 
-extend(http.IncomingMessage.prototype, "getBody", async function(
+extenDef("https", {
+
+    get(this: InternalRequest): boolean {
+
+        delete this.https;
+
+        Object.defineProperty(this, "https", {
+            "value": this.server._ssl !== undefined
+        });
+
+        return this.https;
+    }
+});
+
+extend("__initializeHostName", function(this: InternalRequest) {
+
+    delete this.hostPort;
+    delete this.hostDomain;
+
+    if (this.host) {
+
+        let hostInfo = this.host.split(":");
+
+        if (hostInfo.length === 2) {
+
+            Object.defineProperty(this, "hostPort", {
+                "value": parseInt(hostInfo[1])
+            });
+
+            Object.defineProperty(this, "hostDomain", {
+                "value": hostInfo[0]
+            });
+        }
+        else {
+
+            Object.defineProperty(this, "hostPort", {
+                // @ts-ignore
+                "value": this.connection.server.controlServer.port
+            });
+
+            Object.defineProperty(this, "hostDomain", {
+                "value": this.host
+            });
+        }
+    }
+    else {
+
+        Object.defineProperty(this, "hostPort", {
+            // @ts-ignore
+            "value": this.connection.server.controlServer.port
+        });
+
+        Object.defineProperty(this, "hostDomain", {
+            "value": ""
+        });
+    }
+
+});
+
+extenDef("hostDomain", {
+
+    get(this: InternalRequest): string {
+
+        this.__initializeHostName();
+
+        return this.hostDomain;
+    }
+});
+
+extenDef("hostPort", {
+
+    get(this: InternalRequest): number {
+
+        this.__initializeHostName();
+
+        return this.hostPort;
+    },
+    set(): void {
+        //
+    }
+});
+
+Object.defineProperty(http.IncomingMessage.prototype, "host", {
+
+    get(this: InternalRequest): string {
+
+        delete this.host;
+
+        if (this.headers["host"]) {
+
+            if (typeof this.headers["host"] === "string") {
+
+                Object.defineProperty(this, "host", {
+                    "value": this.headers["host"]
+                });
+            }
+            else {
+
+                Object.defineProperty(this, "host", {
+                    "value": this.headers["host"][0]
+                });
+            }
+        }
+        else {
+
+            Object.defineProperty(this, "host", {
+                "value": ""
+            });
+        }
+
+        return this.host;
+    }
+});
+
+Object.defineProperty(http2.Http2ServerRequest.prototype, "host", {
+
+    get(this: InternalRequest): string {
+
+        delete this.host;
+
+        if (this.headers[":authority"]) {
+
+            if (typeof this.headers[":authority"] === "string") {
+
+                Object.defineProperty(this, "host", {
+                    "value": this.headers[":authority"]
+                });
+            }
+            else {
+
+                Object.defineProperty(this, "host", {
+                    "value": this.headers[":authority"][0]
+                });
+            }
+        }
+        else {
+
+            Object.defineProperty(this, "host", {
+                "value": ""
+            });
+        }
+
+        return this.host;
+    }
+});
+
+extenDef("query", {
+
+    get(this: InternalRequest): IDictionary<any> {
+
+        delete this.query;
+
+        let url = libUrl.parse(this.url as string);
+
+        if (typeof url.query === "string") {
+
+            Object.defineProperty(this, "query", {
+                "value": queryString.parse(url.query)
+            });
+        }
+        else {
+
+            Object.defineProperty(this, "query", {
+                "value": url.query || {}
+            });
+        }
+
+        return this.query;
+    }
+});
+
+extenDef("ip", {
+
+    get(this: InternalRequest): string {
+
+        delete this.ip;
+
+        Object.defineProperty(this, "ip", {
+            "value": this.connection.remoteAddress
+        });
+
+        return this.ip;
+    }
+});
+
+extend("getBody", async function(
     this: Core.ServerRequest,
     maxLength: number = 0
 ): Promise<Buffer> {
@@ -150,7 +371,7 @@ extend(http.IncomingMessage.prototype, "getBody", async function(
     return ret.promise;
 });
 
-extend(http.IncomingMessage.prototype, "loadCookies", function(
+extend("loadCookies", function(
     this: InternalRequest
 ): boolean {
 
@@ -181,13 +402,7 @@ extend(http.IncomingMessage.prototype, "loadCookies", function(
     return true;
 });
 
-extend(
-    http.IncomingMessage.prototype,
-    "isCookiesLoaded",
-    function isCookiesLoaded(
-        this: any
-    ): boolean {
+extend("isCookiesLoaded", function(this: any): boolean {
 
-        return this.cookies !== undefined;
-    }
-);
+    return this.cookies !== undefined;
+});

@@ -11,7 +11,7 @@ LiteRT/HTTP.js 是一个基于 Node.js HTTP(S) API 实现的轻量级框架，�
 - 提供中间件（Middleware）支持
 - 提供 HTTPS 支持
 - 智能路由，实现 API 更方便。
-- 提供 HTTP/2 支持（开发中）
+- 提供 HTTP/2 支持（实验版本）
 
 ## 使用要求
 

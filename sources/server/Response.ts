@@ -13,10 +13,22 @@
    +----------------------------------------------------------------------+
  */
 
-import http = require("http");
+import * as http from "http";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
 import * as Core from "./Core";
+import * as http2 from "http2";
+
+declare module "http2" {
+
+    export class Http2ServerResponse {
+    }
+}
+
+interface InternalServer extends Core.Server {
+
+    _cookiesEncoder: Core.CookiesEncoder;
+}
 
 interface InternalServer extends Core.Server {
 
@@ -28,12 +40,24 @@ interface InternalResponse extends Core.ServerResponse {
     server: InternalServer;
 }
 
-function extend(obj: any, name: string, fn: Function) {
+function _extend(obj: any, name: string, fn: Function) {
 
     obj[name] = fn;
 }
 
-extend(http.ServerResponse.prototype, "send", function(
+function extend(name: string, fn: Function) {
+
+    _extend(http.ServerResponse.prototype, name, fn);
+    _extend(http2.Http2ServerResponse.prototype, name, fn);
+}
+
+function extenDef(name: string, fn: Object) {
+
+    Object.defineProperty(http.ServerResponse.prototype, name, fn);
+    Object.defineProperty(http2.Http2ServerResponse.prototype, name, fn);
+}
+
+extend("send", function(
     this: Core.ServerResponse,
     data: string | Buffer
 ): Core.ServerResponse {
@@ -59,13 +83,13 @@ extend(http.ServerResponse.prototype, "send", function(
     return this;
 });
 
-Object.defineProperty(http.ServerResponse.prototype, "server", {
+extenDef("server", {
     get(this: any): http.Server {
         return this.connection.server.controlServer;
     }
 });
 
-extend(http.ServerResponse.prototype, "redirect", function(
+extend("redirect", function(
     this: Core.ServerResponse,
     target: string,
     statusCode: number = Core.HTTPStatus.TEMPORARY_REDIRECT
@@ -84,7 +108,7 @@ extend(http.ServerResponse.prototype, "redirect", function(
     return this;
 });
 
-extend(http.ServerResponse.prototype, "sendJSON", function(
+extend("sendJSON", function(
     this: Core.ServerResponse,
     data: any
 ): http.ServerResponse {
@@ -110,7 +134,7 @@ extend(http.ServerResponse.prototype, "sendJSON", function(
     return this;
 });
 
-extend(http.ServerResponse.prototype, "setCookie", function(
+extend("setCookie", function(
     this: InternalResponse,
     ...args: any[]
 ): http.ServerResponse {

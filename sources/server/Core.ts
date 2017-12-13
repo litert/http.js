@@ -69,6 +69,16 @@ export interface ServerRequest extends http.IncomingMessage {
     "host": string;
 
     /**
+     * The hostname of request visited.
+     */
+    "hostDomain": string;
+
+    /**
+     * The port of request visited.
+     */
+    "hostPort": number;
+
+    /**
      * The server object.
      */
     "server": Server;
@@ -314,6 +324,8 @@ export type ContextCreator<T extends RequestContext> = (
     response: ServerResponse
 ) => T;
 
+export type HTTPVersion = 1.1 | 2;
+
 /**
  * The options for creating HTTP server object.
  */
@@ -348,6 +360,11 @@ export interface CreateServerOptions {
      * Default: 5000 (ms)
      */
     "keeyAlive"?: number;
+
+    /**
+     * Specify the version of HTTP protocol to be used.
+     */
+    "version"?: HTTPVersion;
 
     /**
      * The backlog to listen.
@@ -714,6 +731,8 @@ export const DEFAULT_EXPECT_REQUEST: boolean = false;
  * The default connection timeout of server.
  */
 export const DEFAULT_TIMEOUT: number = 60000;
+
+export const DEFAULT_VERSION: number = 1.1;
 
 export const EXCEPTION_TYPE: string = "litert/http";
 

@@ -29,6 +29,17 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "HTTPS/2 Server",
+            "program": "${workspaceRoot}\\sources\\samples\\https-2.ts",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Mountable Server",
             "program": "${workspaceRoot}\\sources\\samples\\mount-http-1.1.ts",
             "outFiles": [

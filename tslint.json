@@ -25,7 +25,8 @@
         "unified-signatures": false,
         "ban-types": false,
         "no-conditional-assignment": false,
-        "radix": false
+        "radix": false,
+        "no-var-requires": false
     },
     "rulesDirectory": []
 }

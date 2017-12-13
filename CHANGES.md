@@ -1,10 +1,21 @@
 # Changes Logs
 
-## v0.3.0
+## v0.3.0-3
+
+- Added experimental HTTP/2 protocol supports.
+
+## v0.3.0-2
 
 - Improved the cookies encode/decode performances.
 - Improved the signature of self-returning methods.
+- Fixed: The error event leads a promise leak. (Merged from v0.2.3)
+
+## v0.3.0-1
+
 - Added events `closed` and `started`.
+
+## v0.3.0-0
+
 - Enable using a customized request context object.
 
 ## v0.2.3

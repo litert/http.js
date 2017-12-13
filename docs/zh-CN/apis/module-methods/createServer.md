@@ -91,6 +91,11 @@ function createServer(cfg: {
      */
     "contextCreator"?: ContextCreator<RequestContext>;
 
+    /**
+     * 要使用的 HTTP 版本，只能是 `1.1` 或者 `2`
+     */
+    "version"?: number;
+
 }): Server;
 ```
 
@@ -198,6 +203,8 @@ let ssl: {
 };
 ```
 
+ssl 参数用于配置并开启 HTTP 服务器的 SSL 模式。
+
 ### 参数 timeout
 
 ```ts
@@ -206,7 +213,13 @@ let timeout: number = 60000;
 
 timeout 参数指定，一个请求在多长时间后会被关闭。（单位：毫秒）
 
-ssl 参数用于配置并开启 HTTP 服务器的 SSL 模式。
+### 参数 version
+
+```ts
+let version: number = 1.1;
+```
+
+version 参数指定服务器使用的 HTTP 协议版本号，默认为 `1.1`。
 
 ## 使用示例
 

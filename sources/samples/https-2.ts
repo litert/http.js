@@ -15,6 +15,7 @@
 
 // tslint:disable:no-console
 import * as http from "../";
+import fs = require("fs");
 
 let router = http.createStandardRouter();
 
@@ -67,9 +68,13 @@ router.notFound(async function(ctx) {
         `Date: ${new Date(request.time).toUTCString()}<br>`
     );
 
+    request.loadCookies();
+
+    console.log(request.cookies);
+
 }).get("/test", async function(context) {
 
-    context.response.write(`Requested at ${new Date(context.request.time)}`);
+    context.response.setCookie("a", "2333");
 
 }).get("/users/{user:int}", async function(context) {
 
@@ -80,10 +85,17 @@ router.notFound(async function(ctx) {
     context.response.redirect("/");
 });
 
+let cookies = http.createStandardCookiesEncoder();
+
 let server = http.createServer({
-    "port": 8080,
+    "port": 443,
     "router": router,
-    "version": 1.1
+    "ssl": {
+        "key": fs.readFileSync("key.pem"),
+        "certificate": fs.readFileSync("cert.pem")
+    },
+    "version": 2,
+    "cookies": cookies
 });
 
 server.on("error", function(err: Error) {

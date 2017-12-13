@@ -14,8 +14,11 @@
 
 ```ts
 import nodeHTTP = require("http");
+import * as http from "@litert/http";
 
 interface ServerResponse extends nodeHTTP.ServerResponse {
+
+    "server": http.Server;
 
     redirect(target: string, statusCode?: number): this;
 
@@ -37,6 +40,18 @@ interface ServerResponse extends nodeHTTP.ServerResponse {
         cookie: SetCookieConfiguration
     ): this;
 }
+```
+
+## 属性介绍
+
+------------------------------------------------------------------------------
+
+### 属性 server
+
+server 属性用于获取当前响应控制对象所属的 Server 对象。
+
+```ts
+let server: http.Server;
 ```
 
 ## 方法介绍
