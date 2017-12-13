@@ -42,6 +42,7 @@
     - [CookiesEncoding](./constants/CookiesEncoding.md)
     - [HTTPStatus](./constants/HTTPStatus.md)
     - [ServerStatus](./constants/ServerStatus.md)
+    - [ServerError](./constants/ServerError.md)
 
 - 其他常量
 

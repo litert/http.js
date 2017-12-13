@@ -2,6 +2,7 @@
 
 ## v0.3.0-3
 
+- Rebuilt the servers' mount-points.
 - Added experimental HTTP/2 protocol supports.
 
 ## v0.3.0-2

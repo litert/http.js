@@ -62,7 +62,12 @@ enum ServerError {
     /**
      * The next callback is not called inside middleware.
      */
-    MISSING_CALLING_NEXT
+    MISSING_CALLING_NEXT,
+
+    /**
+     * Cannot start a mounted server.
+     */
+    START_MOUNTED_SERVER
 }
 
 export default ServerError;

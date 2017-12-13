@@ -26,13 +26,18 @@ import libUrl = require("url");
 import events = require("events");
 import "./Response";
 import "./Request";
+import Errors from "./Errors";
 
-interface InternalServer extends http.Server {
+export interface InternalServer extends http.Server {
 
     controlServer: Core.Server;
 }
 
-class Server extends events.EventEmitter implements Core.Server {
+
+
+export abstract class AbstractServer
+extends events.EventEmitter
+implements Core.Server {
 
     protected _port: number;
 
@@ -44,7 +49,7 @@ class Server extends events.EventEmitter implements Core.Server {
 
     protected _status: Core.ServerStatus;
 
-    private _server: InternalServer;
+    protected _server: InternalServer;
 
     protected _router: Core.Router;
 
@@ -59,6 +64,8 @@ class Server extends events.EventEmitter implements Core.Server {
     protected _cookiesEncoder: Core.CookiesEncoder;
 
     protected _version: number;
+
+    protected _mounted: boolean;
 
     public constructor(opts: Core.CreateServerOptions) {
 
@@ -114,7 +121,43 @@ class Server extends events.EventEmitter implements Core.Server {
         return this._status;
     }
 
+    public shutdown(): Promise<void> {
+
+        if (this._status !== Core.ServerStatus.WORKING) {
+
+            return Promise.reject(new HttpException(
+                ServerError.SERVER_NOT_WORKING,
+                "Server is not started."
+            ));
+        }
+
+        this._status = Core.ServerStatus.CLOSING;
+
+        let ret = new RawPromise<void, HttpException>();
+
+        this._server.close(() => {
+
+            delete this._server.controlServer;
+            delete this._server;
+            this._status = Core.ServerStatus.READY;
+
+            ret.resolve();
+
+            this.emit("closed");
+        });
+
+        return ret.promise;
+    }
+
     public start(): Promise<void> {
+
+        if (this._mounted) {
+
+            return Promise.reject(new HttpException(
+                Errors.CONNECTION_CLOESD,
+                "Cannot start a mounted server."
+            ));
+        }
 
         if (this._status !== Core.ServerStatus.READY) {
 
@@ -223,49 +266,20 @@ class Server extends events.EventEmitter implements Core.Server {
         return ret.promise;
     }
 
-    protected __initializeRequest(
-        request: Core.ServerRequest,
-        response: Core.ServerResponse
-    ): void {
-
-        let url = libUrl.parse(request.url as string);
-
-        request.params = {};
-
-        // @ts-ignore
-        request.path = url.pathname;
-
-        // @ts-ignore
-        request.queryString = url.search;
-
-        request.realPath = request.path;
-
-        if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
-
-            request.realPath = request.realPath.substr(
-                0,
-                request.realPath.length - 1
-            );
-        }
-
-        request.time = Date.now();
-
-        request.on("aborted", function(this: Core.ServerRequest) {
-
-            this.aborted = true;
-
-        }).on("close", function(this: Core.ServerRequest) {
-
-            this.closed = true;
-        });
-    }
-
-    protected async __requestCallback(
+    protected __requestCallback(
         request: Core.ServerRequest,
         response: Core.ServerResponse
     ): Promise<void> {
 
         this.__initializeRequest(request, response);
+
+        return this.__requestEntry(request, response);
+    }
+
+    protected async __requestEntry(
+        request: Core.ServerRequest,
+        response: Core.ServerResponse
+    ): Promise<void> {
 
         let context = this._contextCreator(
             request,
@@ -299,13 +313,15 @@ class Server extends events.EventEmitter implements Core.Server {
             }
             else {
 
-                throw e;
+                return Promise.reject(e);
             }
         }
+        finally {
 
-        delete context.request;
-        delete context.response;
-        delete context.data;
+            delete context.request;
+            delete context.response;
+            delete context.data;
+        }
     }
 
     protected async __execute(
@@ -352,36 +368,42 @@ class Server extends events.EventEmitter implements Core.Server {
         }
     }
 
-    public shutdown(): Promise<void> {
+    protected __initializeRequest(
+        request: Core.ServerRequest,
+        response: Core.ServerResponse
+    ): void {
 
-        if (this._status !== Core.ServerStatus.WORKING) {
+        let url = libUrl.parse(request.url as string);
 
-            return Promise.reject(new HttpException(
-                ServerError.SERVER_NOT_WORKING,
-                "Server is not started."
-            ));
+        request.params = {};
+
+        // @ts-ignore
+        request.path = url.pathname;
+
+        // @ts-ignore
+        request.queryString = url.search;
+
+        request.realPath = request.path;
+
+        if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
+
+            request.realPath = request.realPath.substr(
+                0,
+                request.realPath.length - 1
+            );
         }
 
-        this._status = Core.ServerStatus.CLOSING;
+        request.time = Date.now();
 
-        let ret = new RawPromise<void, HttpException>();
+        request.on("aborted", function(this: Core.ServerRequest) {
 
-        this._server.close(() => {
+            this.aborted = true;
 
-            delete this._server.controlServer;
-            delete this._server;
-            this._status = Core.ServerStatus.READY;
+        }).on("close", function(this: Core.ServerRequest) {
 
-            ret.resolve();
-
-            this.emit("closed");
+            this.closed = true;
         });
-
-        return ret.promise;
     }
 }
 
-export default function(opts: Core.CreateServerOptions): Core.Server {
-
-    return new Server(opts);
-}
+export default AbstractServer;

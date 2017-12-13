@@ -48,17 +48,30 @@ export {
 
 export * from "./server/StandardCookiesEncoder";
 
-import createMountableServer from "./server/MountableServer";
-import createServer from "./server/Server";
+import MountableHost from "./server/MountableHost";
+import StandardHost from "./server/StandardHost";
 
 import createStandardRouter from "./server/StandardRouter";
 import ServerError from "./server/Errors";
 import Exception from "./server/Exception";
+import {
+    CreateServerOptions,
+    Server
+} from "./server/Core";
+
+export function createServer(opts: CreateServerOptions): Server {
+
+    if (opts.mounts) {
+
+        return new MountableHost(opts);
+    }
+
+    return new StandardHost(opts);
+}
 
 export {
-    createMountableServer,
-    createServer,
     createStandardRouter,
+    createServer as createMountableServer,
     ServerError,
     Exception
 };

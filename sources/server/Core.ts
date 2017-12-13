@@ -403,11 +403,10 @@ export interface CreateServerOptions {
      * Default: none
      */
     "cookies"?: CookiesEncoder;
-}
 
-export interface CreateMountableServerOptions
-extends CreateServerOptions {
-
+    /**
+     * Mount-points of servers.
+     */
     "mounts"?: IDictionary<Server>;
 }
 
