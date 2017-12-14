@@ -27,13 +27,12 @@ import events = require("events");
 import "./Response";
 import "./Request";
 import Errors from "./Errors";
+import * as nodeConstants from "constants";
 
 export interface InternalServer extends http.Server {
 
     controlServer: Core.Server;
 }
-
-
 
 export abstract class AbstractServer
 extends events.EventEmitter
@@ -121,6 +120,43 @@ implements Core.Server {
         return this._status;
     }
 
+    protected static __getMinSSLVersionFlag(minVer: string): number {
+
+        const availableVersions = [{
+            "name": "SSLv2",
+            "flag": nodeConstants.SSL_OP_NO_SSLv2
+        }, {
+            "name": "SSLv3",
+            "flag": nodeConstants.SSL_OP_NO_SSLv3
+        }, {
+            "name": "TLSv1.0",
+            "flag": nodeConstants.SSL_OP_NO_TLSv1
+        }, {
+            "name": "TLSv1.1",
+            "flag": nodeConstants.SSL_OP_NO_TLSv1_1
+        }, {
+            "name": "TLSv1.2",
+            "flag": nodeConstants.SSL_OP_NO_TLSv1_2
+        }];
+
+        let ret: number = 0;
+
+        let minPos = availableVersions.findIndex(function(val): boolean {
+
+            return val.name === minVer;
+        });
+
+        if (minPos !== -1) {
+
+            for (let item of availableVersions.slice(0, minPos)) {
+
+                ret |= item.flag;
+            }
+        }
+
+        return ret;
+    }
+
     public shutdown(): Promise<void> {
 
         if (this._status !== Core.ServerStatus.WORKING) {
@@ -168,18 +204,31 @@ implements Core.Server {
 
         this._status = Core.ServerStatus.STARTING;
 
+        let sslConfig: any;
+
+        if (this._ssl) {
+
+            sslConfig = {
+                "key": this._ssl.key,
+                "cert": this._ssl.certificate,
+                "passphrase": this._ssl.passphrase
+            };
+
+            if (!this._ssl.minProtocolVersion) {
+
+                this._ssl.minProtocolVersion = Core.DEFAULT_MIN_SSL_VERSION;
+            }
+
+            sslConfig.secureOptions = AbstractServer.__getMinSSLVersionFlag(
+                this._ssl.minProtocolVersion
+            );
+        }
+
         if (this._version === 2) {
 
             if (this._ssl) {
 
-                this._server = <any> http2.createSecureServer({
-
-                    "key": this._ssl.key,
-
-                    "cert": this._ssl.certificate,
-
-                    "passphrase": this._ssl.passphrase
-                });
+                this._server = <any> http2.createSecureServer(sslConfig);
             }
             else {
 
@@ -190,14 +239,7 @@ implements Core.Server {
 
             if (this._ssl) {
 
-                this._server = <any> https.createServer({
-
-                    "key": this._ssl.key,
-
-                    "cert": this._ssl.certificate,
-
-                    "passphrase": this._ssl.passphrase
-                });
+                this._server = <any> https.createServer(sslConfig);
             }
             else {
 

@@ -26,7 +26,8 @@
         "ban-types": false,
         "no-conditional-assignment": false,
         "radix": false,
-        "no-var-requires": false
+        "no-var-requires": false,
+        "no-bitwise": false
     },
     "rulesDirectory": []
 }

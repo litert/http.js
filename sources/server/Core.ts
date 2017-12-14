@@ -298,22 +298,29 @@ export const HTTP_METHODS: HTTPMethod[] = [
     "NOTIFY", "SUBSCRIBE", "UNSUBSCRIBE"
 ];
 
+export interface SSLKey {
+
+    "pem": string | Buffer;
+
+    "passphrase"?: string;
+}
+
 export interface SSLConfiguration {
 
     /**
      * The content of private key for SSL
      */
-    "key": string | Buffer;
+    "key": string | Buffer | string[] | Buffer[] | SSLKey[];
 
     /**
      * The content of certificate for SSL.
      */
-    "certificate": string | Buffer;
+    "certificate": string | Buffer | string[] | Buffer[];
 
-    /**
-     * Optional passphrase for the private key.
-     */
     "passphrase"?: string;
+
+    "minProtocolVersion"?: "SSLv2" | "SSLv3" | "TLSv1.0" |
+                           "TLSv1.1" | "TLSv1.2";
 }
 
 /**
@@ -734,6 +741,8 @@ export const DEFAULT_TIMEOUT: number = 60000;
 export const DEFAULT_VERSION: number = 1.1;
 
 export const EXCEPTION_TYPE: string = "litert/http";
+
+export const DEFAULT_MIN_SSL_VERSION = "TLSv1.0";
 
 export enum HTTPStatus {
 

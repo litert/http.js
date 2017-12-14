@@ -73,17 +73,43 @@ function createServer(cfg: {
         /**
          * SSL 私钥内容。
          */
-        "key": string | Buffer;
+        "key": string | Buffer | string[] | Buffer[] | {
+
+            /**
+             * SSL 私钥内容。
+             */
+            "pem": string | Buffer;
+
+            /**
+             * SSL 私钥的加密口令。
+             */
+            "passphrase": string;
+        }[];
 
         /**
          * SSL 证书内容。
          */
-        "certificate": string | Buffer;
+        "certificate": string | Buffer | string[] | Buffer[];
 
         /**
          * SSL 私钥的加密口令。
+         * 
+         * 如果 key 字段是单一字符串或者 Buffer 时，可以用此字段指定 key 的密钥；
+         * 
+         * 如果 key 字段是多个字符串或者 Buffer，请用 SSLKey 结构指定 key 的密钥。
          */
         "passphrase"?: string;
+
+        /**
+         * 最低支持的 SSL/TLS 版本号，可以取如下值（大小写敏感）：
+         *
+         * - SSLv2
+         * - SSLv3
+         * - TLSv1.0   （默认值）
+         * - TLSv1.1
+         * - TLSv1.2
+         */
+        "minProtocolVersion": string;
     };
 
     /**
@@ -217,17 +243,43 @@ let ssl: {
     /**
      * SSL 私钥内容。
      */
-    "key": string | Buffer;
+    "key": string | Buffer | string[] | Buffer[] | {
+
+        /**
+         * SSL 私钥内容。
+         */
+        "pem": string | Buffer;
+
+        /**
+         * SSL 私钥的加密口令。
+         */
+        "passphrase": string;
+    }[];
 
     /**
      * SSL 证书内容。
      */
-    "certificate": string | Buffer;
+    "certificate": string | Buffer | string[] | Buffer[];
 
     /**
      * SSL 私钥的加密口令。
+     * 
+     * 如果 key 字段是单一字符串或者 Buffer 时，可以用此字段指定 key 的密钥；
+     * 
+     * 如果 key 字段是多个字符串或者 Buffer，请用 SSLKey 结构指定 key 的密钥。
      */
     "passphrase"?: string;
+
+    /**
+     * 最低支持的 SSL/TLS 版本号，可以取如下值（大小写敏感）：
+     *
+     * - SSLv2
+     * - SSLv3
+     * - TLSv1.0   （默认值）
+     * - TLSv1.1
+     * - TLSv1.2
+     */
+    "minProtocolVersion": string;
 };
 ```
 

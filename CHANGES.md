@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.3.0-4
+
+- Added minimal SSL/TLS protocol version restriction.
+
 ## v0.3.0-3
 
 - Rebuilt the servers' mount-points.
