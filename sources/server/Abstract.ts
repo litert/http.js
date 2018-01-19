@@ -2,14 +2,14 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
@@ -336,7 +336,7 @@ export type HTTPVersion = 1.1 | 2;
 /**
  * The options for creating HTTP server object.
  */
-export interface CreateServerOptions {
+export interface CreateServerOptionsBase {
 
     /**
      * The host to listen.
@@ -381,11 +381,6 @@ export interface CreateServerOptions {
     "backlog"?: number;
 
     /**
-     * The router object.
-     */
-    "router": Router;
-
-    /**
      * The factory function for context object.
      */
     "contextCreator"?: ContextCreator<RequestContext>;
@@ -405,16 +400,33 @@ export interface CreateServerOptions {
     "ssl"?: SSLConfiguration;
 
     /**
-     * Set up the encoder and decoder for cookies.
-     *
-     * Default: none
+     * The plugins for server.
      */
-    "cookies"?: CookiesEncoder;
+    "plugins"?: IDictionary<any>;
+}
+
+export interface CreateServerOptions extends CreateServerOptionsBase {
 
     /**
-     * Mount-points of servers.
+     * The router object.
      */
-    "mounts"?: IDictionary<Server>;
+    "router": Router;
+}
+
+export interface CreateMountableServerOptions extends CreateServerOptions {
+
+    /**
+     * Mount-points of hosts.
+     */
+    "mounts": IDictionary<Server>;
+}
+
+export interface CreateHostDispatcherOptions extends CreateServerOptionsBase {
+
+    /**
+     * Virtual hosts.
+     */
+    "hosts": IDictionary<Server>;
 }
 
 export enum CookiesEncoding {
@@ -738,7 +750,7 @@ export const DEFAULT_EXPECT_REQUEST: boolean = false;
  */
 export const DEFAULT_TIMEOUT: number = 60000;
 
-export const DEFAULT_VERSION: number = 1.1;
+export const DEFAULT_VERSION: HTTPVersion = 1.1;
 
 export const EXCEPTION_TYPE: string = "litert/http";
 

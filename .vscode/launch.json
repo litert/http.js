@@ -51,6 +51,17 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Virtual Hosts",
+            "program": "${workspaceRoot}\\sources\\samples\\vhosts-http-1.1.ts",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Middleware",
             "program": "${workspaceRoot}\\sources\\samples\\middleware.ts",
             "outFiles": [

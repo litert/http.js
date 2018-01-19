@@ -2,19 +2,18 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
-import * as Core from "./Core";
-
+import * as Abstracts from "./Abstract";
 import AbstractServer from "./AbstractServer";
 import { IDictionary } from "@litert/core";
 
@@ -23,51 +22,60 @@ export class MountableHost extends AbstractServer {
     protected _mounts: IDictionary<AbstractServer>;
 
     public constructor(
-        opts: Core.CreateServerOptions
+        opts: Abstracts.CreateMountableServerOptions
     ) {
-
         super(opts);
 
-        if (opts.mounts) {
+        this._mounts = opts.mounts as IDictionary<AbstractServer>;
 
-            this._mounts = opts.mounts as IDictionary<AbstractServer>;
+        for (let prefix in this._mounts) {
 
-            for (let prefix in this._mounts) {
+            this._mounts[prefix].setMounted();
 
-                // @ts-ignore
-                this._mounts[prefix]._mounted = true;
-            }
-        }
-    }
+            for (let k in this._opts.plugins as IDictionary<any>) {
 
-    protected __requestEntry(
-        request: Core.ServerRequest,
-        response: Core.ServerResponse
-    ): Promise<void> {
+                if (!this._mounts[prefix].hasPlugin(k)) {
 
-        if (this._mounts) {
-
-            for (let prefix in this._mounts) {
-
-                if (request.realPath.startsWith(prefix)) {
-
-                    request.realPath = request.realPath.substr(prefix.length);
-
-                    if (0 === request.realPath.length) {
-
-                        request.realPath = "/";
-                    }
-
-                    // @ts-ignore
-                    return this._mounts[prefix].__requestEntry(
-                        request,
-                        response
+                    this._mounts[prefix].setPlugin(
+                        k,
+                        // @ts-ignore
+                        this._opts.plugins[k]
                     );
                 }
             }
         }
+    }
 
-        return super.__requestEntry(request, response);
+    public __requestEntry(
+        context: Abstracts.RequestContext
+    ): Promise<void> {
+
+        const request = context.request;
+
+        for (let prefix in this._mounts) {
+
+            if (request.realPath.startsWith(prefix)) {
+
+                request.realPath = request.realPath.substr(prefix.length);
+
+                if (0 === request.realPath.length) {
+
+                    request.realPath = "/";
+                }
+
+                // @ts-ignore
+                request.connection.server.controlServer = this._mounts[prefix];
+
+                // @ts-ignore
+                request.plugins = response.plugins = this._opts.plugins;
+
+                return this._mounts[prefix].__requestEntry(
+                    context
+                );
+            }
+        }
+
+        return super.__requestEntry(context);
     }
 }
 

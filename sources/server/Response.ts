@@ -2,22 +2,23 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
 import * as http from "http";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
-import * as Core from "./Core";
+import * as Abstracts from "./Abstract";
 import * as http2 from "http2";
+import { IDictionary } from "@litert/core";
 
 declare module "http2" {
 
@@ -25,19 +26,11 @@ declare module "http2" {
     }
 }
 
-interface InternalServer extends Core.Server {
+interface InternalResponse extends Abstracts.ServerResponse {
 
-    _cookiesEncoder: Core.CookiesEncoder;
-}
+    server: Abstracts.Server;
 
-interface InternalServer extends Core.Server {
-
-    _cookiesEncoder: Core.CookiesEncoder;
-}
-
-interface InternalResponse extends Core.ServerResponse {
-
-    server: InternalServer;
+    plugins: IDictionary<any>;
 }
 
 function _extend(obj: any, name: string, fn: Function) {
@@ -58,9 +51,9 @@ function extenDef(name: string, fn: Object) {
 }
 
 extend("send", function(
-    this: Core.ServerResponse,
+    this: Abstracts.ServerResponse,
     data: string | Buffer
-): Core.ServerResponse {
+): Abstracts.ServerResponse {
 
     if (this.finished) {
 
@@ -90,10 +83,10 @@ extenDef("server", {
 });
 
 extend("redirect", function(
-    this: Core.ServerResponse,
+    this: Abstracts.ServerResponse,
     target: string,
-    statusCode: number = Core.HTTPStatus.TEMPORARY_REDIRECT
-): Core.ServerResponse {
+    statusCode: number = Abstracts.HTTPStatus.TEMPORARY_REDIRECT
+): Abstracts.ServerResponse {
 
     if (this.headersSent) {
 
@@ -109,7 +102,7 @@ extend("redirect", function(
 });
 
 extend("sendJSON", function(
-    this: Core.ServerResponse,
+    this: Abstracts.ServerResponse,
     data: any
 ): http.ServerResponse {
 
@@ -151,11 +144,11 @@ extend("setCookie", function(
 
     if (args.length === 1) {
 
-        cookieText = this.server._cookiesEncoder.stringify(args[0]);
+        cookieText = this.plugins.cookies.stringify(args[0]);
     }
     else {
 
-        cookieText = this.server._cookiesEncoder.stringify({
+        cookieText = this.plugins.cookies.stringify({
             "name": args[0],
             "value": args[1],
             "ttl": args[2],

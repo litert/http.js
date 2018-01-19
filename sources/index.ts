@@ -2,14 +2,14 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
@@ -44,11 +44,12 @@ export {
     CookiesEncoding,
     CookiesEncoder
 
-} from "./server/Core";
+} from "./server/Abstract";
 
 export * from "./server/StandardCookiesEncoder";
 
 import MountableHost from "./server/MountableHost";
+import StandardDispatcher from "./server/StandardDispatcher";
 import StandardHost from "./server/StandardHost";
 
 import createStandardRouter from "./server/StandardRouter";
@@ -56,22 +57,32 @@ import ServerError from "./server/Errors";
 import Exception from "./server/Exception";
 import {
     CreateServerOptions,
-    Server
-} from "./server/Core";
+    Server,
+    CreateMountableServerOptions,
+    CreateHostDispatcherOptions
+} from "./server/Abstract";
 
 export function createServer(opts: CreateServerOptions): Server {
-
-    if (opts.mounts) {
-
-        return new MountableHost(opts);
-    }
 
     return new StandardHost(opts);
 }
 
+export function createMountableServer(
+    opts: CreateMountableServerOptions
+): Server {
+
+    return new MountableHost(opts);
+}
+
+export function createVirtualDispatcher(
+    opts: CreateHostDispatcherOptions
+): Server {
+
+    return new StandardDispatcher(opts);
+}
+
 export {
     createStandardRouter,
-    createServer as createMountableServer,
     ServerError,
     Exception
 };

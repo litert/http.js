@@ -3,6 +3,7 @@
 ## v0.3.0-4
 
 - Added minimal SSL/TLS protocol version restriction.
+- Added virtual hosts supports.
 
 ## v0.3.0-3
 

@@ -2,14 +2,14 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
@@ -18,7 +18,7 @@ import * as http2 from "http2";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
 import { RawPromise, IDictionary } from "@litert/core";
-import * as Core from "./Core";
+import * as Abstracts from "./Abstract";
 import * as libUrl from "url";
 import * as queryString from "querystring";
 
@@ -28,18 +28,11 @@ declare module "http2" {
     }
 }
 
-interface InternalServer extends Core.Server {
+interface InternalRequest extends Abstracts.ServerRequest {
 
-    _cookiesEncoder: Core.CookiesEncoder;
+    server: Abstracts.Server;
 
-    _version: Core.HTTPVersion;
-
-    _ssl: any;
-}
-
-interface InternalRequest extends Core.ServerRequest {
-
-    server: InternalServer;
+    plugins: IDictionary<any>;
 
     _host: string;
 
@@ -64,7 +57,7 @@ function extenDef(name: string, fn: Object) {
 }
 
 extend("getBodyAsJSON", async function(
-    this: Core.ServerRequest,
+    this: Abstracts.ServerRequest,
     maxLength: number = 0
 ): Promise<any> {
 
@@ -93,152 +86,6 @@ extenDef("server", {
     }
 });
 
-extenDef("https", {
-
-    get(this: InternalRequest): boolean {
-
-        delete this.https;
-
-        Object.defineProperty(this, "https", {
-            "value": this.server._ssl !== undefined
-        });
-
-        return this.https;
-    }
-});
-
-extend("__initializeHostName", function(this: InternalRequest) {
-
-    delete this.hostPort;
-    delete this.hostDomain;
-
-    if (this.host) {
-
-        let hostInfo = this.host.split(":");
-
-        if (hostInfo.length === 2) {
-
-            Object.defineProperty(this, "hostPort", {
-                "value": parseInt(hostInfo[1])
-            });
-
-            Object.defineProperty(this, "hostDomain", {
-                "value": hostInfo[0]
-            });
-        }
-        else {
-
-            Object.defineProperty(this, "hostPort", {
-                // @ts-ignore
-                "value": this.connection.server.controlServer.port
-            });
-
-            Object.defineProperty(this, "hostDomain", {
-                "value": this.host
-            });
-        }
-    }
-    else {
-
-        Object.defineProperty(this, "hostPort", {
-            // @ts-ignore
-            "value": this.connection.server.controlServer.port
-        });
-
-        Object.defineProperty(this, "hostDomain", {
-            "value": ""
-        });
-    }
-
-});
-
-extenDef("hostDomain", {
-
-    get(this: InternalRequest): string {
-
-        this.__initializeHostName();
-
-        return this.hostDomain;
-    }
-});
-
-extenDef("hostPort", {
-
-    get(this: InternalRequest): number {
-
-        this.__initializeHostName();
-
-        return this.hostPort;
-    },
-    set(): void {
-        //
-    }
-});
-
-Object.defineProperty(http.IncomingMessage.prototype, "host", {
-
-    get(this: InternalRequest): string {
-
-        delete this.host;
-
-        if (this.headers["host"]) {
-
-            if (typeof this.headers["host"] === "string") {
-
-                Object.defineProperty(this, "host", {
-                    "value": this.headers["host"]
-                });
-            }
-            else {
-
-                Object.defineProperty(this, "host", {
-                    "value": this.headers["host"][0]
-                });
-            }
-        }
-        else {
-
-            Object.defineProperty(this, "host", {
-                "value": ""
-            });
-        }
-
-        return this.host;
-    }
-});
-
-Object.defineProperty(http2.Http2ServerRequest.prototype, "host", {
-
-    get(this: InternalRequest): string {
-
-        delete this.host;
-
-        if (this.headers[":authority"]) {
-
-            if (typeof this.headers[":authority"] === "string") {
-
-                Object.defineProperty(this, "host", {
-                    "value": this.headers[":authority"]
-                });
-            }
-            else {
-
-                Object.defineProperty(this, "host", {
-                    "value": this.headers[":authority"][0]
-                });
-            }
-        }
-        else {
-
-            Object.defineProperty(this, "host", {
-                "value": ""
-            });
-        }
-
-        return this.host;
-    }
-});
-
 extenDef("query", {
 
     get(this: InternalRequest): IDictionary<any> {
@@ -264,22 +111,8 @@ extenDef("query", {
     }
 });
 
-extenDef("ip", {
-
-    get(this: InternalRequest): string {
-
-        delete this.ip;
-
-        Object.defineProperty(this, "ip", {
-            "value": this.connection.remoteAddress
-        });
-
-        return this.ip;
-    }
-});
-
 extend("getBody", async function(
-    this: Core.ServerRequest,
+    this: Abstracts.ServerRequest,
     maxLength: number = 0
 ): Promise<Buffer> {
 
@@ -397,7 +230,7 @@ extend("loadCookies", function(
         cookies = data.join(";");
     }
 
-    this.cookies = this.server._cookiesEncoder.parse(cookies);
+    this.cookies = this.plugins.cookies.parse(cookies);
 
     return true;
 });

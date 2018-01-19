@@ -2,28 +2,28 @@
    +----------------------------------------------------------------------+
    | LiteRT HTTP.js Library                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2007-2017 Fenying Studio                               |
+   | Copyright (c) 2018 Fenying Studio                                    |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.0 of the Apache license,    |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
    | https://github.com/litert/http.js/blob/master/LICENSE                |
    +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <i.am.x.fenying@gmail.com>                    |
+   | Authors: Angus Fenying <fenying@litert.org>                          |
    +----------------------------------------------------------------------+
  */
 
-import * as Core from "./Core";
-import net = require("net");
-import http = require("http");
-import https = require("https");
+import * as Abstracts from "./Abstract";
+import * as net from "net";
+import * as http from "http";
+import * as https from "https";
 import * as http2 from "http2";
+import * as libUrl from "url";
+import * as events from "events";
 import { RawPromise } from "@litert/core";
 import HttpException from "./Exception";
 import ServerError from "./Errors";
 import createDefaultContext from "./DefaultContext";
-import libUrl = require("url");
-import events = require("events");
 import "./Response";
 import "./Request";
 import Errors from "./Errors";
@@ -31,96 +31,94 @@ import * as nodeConstants from "constants";
 
 export interface InternalServer extends http.Server {
 
-    controlServer: Core.Server;
+    controlServer: Abstracts.Server;
 }
 
 export abstract class AbstractServer
 extends events.EventEmitter
-implements Core.Server {
+implements Abstracts.Server {
 
-    protected _port: number;
-
-    protected _host: string;
-
-    protected _backlog: number;
-
-    protected _keepAlive: number;
-
-    protected _status: Core.ServerStatus;
+    protected _status: Abstracts.ServerStatus;
 
     protected _server: InternalServer;
 
-    protected _router: Core.Router;
-
-    protected _ssl: Core.SSLConfiguration;
-
-    protected _expectRequest: boolean;
-
-    protected _contextCreator: Core.ContextCreator<Core.RequestContext>;
-
-    protected _timeout: number;
-
-    protected _cookiesEncoder: Core.CookiesEncoder;
-
-    protected _version: number;
+    protected _router: Abstracts.Router;
 
     protected _mounted: boolean;
 
-    public constructor(opts: Core.CreateServerOptions) {
+    protected _opts: Abstracts.CreateServerOptions;
+
+    public setMounted(): void {
+
+        this._mounted = true;
+    }
+
+    public setPlugin(key: string, plugin: any): AbstractServer {
+
+        // @ts-ignore
+        this._opts.plugins[key] = plugin;
+
+        return this;
+    }
+
+    public hasPlugin(key: string): boolean {
+
+        // @ts-ignore
+        return this._opts.plugins[key] !== undefined;
+    }
+
+    public constructor(opts: Abstracts.CreateServerOptions) {
 
         super();
 
-        this._contextCreator = opts.contextCreator || createDefaultContext;
-        this._host = opts.host || Core.DEFAULT_HOST;
-        this._backlog = opts.backlog || Core.DEFAULT_BACKLOG;
-        this._router = opts.router;
-        this._expectRequest = opts.expectRequest || Core.DEFAULT_EXPECT_REQUEST;
-        this._keepAlive = opts.keeyAlive || Core.DEFAULT_KEEP_ALIVE;
-        this._timeout = opts.timeout !== undefined ?
+        this._opts = {
+            "router": opts.router,
+            "contextCreator": opts.contextCreator || createDefaultContext,
+            "backlog": opts.backlog || Abstracts.DEFAULT_BACKLOG,
+            "host": opts.host || Abstracts.DEFAULT_HOST,
+            "expectRequest": opts.expectRequest || Abstracts.DEFAULT_EXPECT_REQUEST,
+            "keeyAlive": opts.keeyAlive || Abstracts.DEFAULT_KEEP_ALIVE,
+            "timeout": opts.timeout !== undefined ?
                             opts.timeout :
-                            Core.DEFAULT_TIMEOUT;
+                            Abstracts.DEFAULT_TIMEOUT,
+            "version": opts.version || Abstracts.DEFAULT_VERSION,
+            "ssl": opts.ssl,
+            "port": opts.port || (opts.ssl ? Abstracts.DEFAULT_SSL_PORT :
+                                             Abstracts.DEFAULT_PORT),
+            "plugins": opts.plugins || {}
+        };
 
-        this._version = opts.version || Core.DEFAULT_VERSION;
+        this._router = opts.router;
 
-        if (opts.ssl) {
-
-            this._port = opts.port || Core.DEFAULT_SSL_PORT;
-            this._ssl = opts.ssl;
-        }
-        else {
-
-            this._port = opts.port || Core.DEFAULT_PORT;
-        }
-
-        this._status = Core.ServerStatus.READY;
-
-        if (opts.cookies) {
-
-            this._cookiesEncoder = opts.cookies;
-        }
+        this._status = Abstracts.ServerStatus.READY;
     }
 
     public get host(): string {
 
-        return this._host;
+        return <string> this._opts.host;
     }
 
     public get port(): number {
 
-        return this._port;
+        return <number> this._opts.port;
     }
 
     public get backlog(): number {
 
-        return this._backlog;
+        return <number> this._opts.backlog;
     }
 
-    public get status(): Core.ServerStatus {
+    public get status(): Abstracts.ServerStatus {
 
         return this._status;
     }
 
-    protected static __getMinSSLVersionFlag(minVer: string): number {
+    public get ssl(): Abstracts.SSLConfiguration {
+
+        return <Abstracts.SSLConfiguration> this._opts.ssl;
+    }
+
+    public static __getMinSSLVersionFlag(minVer: string): number {
 
         const availableVersions = [{
             "name": "SSLv2",
@@ -141,10 +139,7 @@ implements Core.Server {
 
         let ret: number = 0;
 
-        let minPos = availableVersions.findIndex(function(val): boolean {
-
-            return val.name === minVer;
-        });
+        let minPos = availableVersions.findIndex((val) => val.name === minVer);
 
         if (minPos !== -1) {
 
@@ -159,7 +154,7 @@ implements Core.Server {
 
     public shutdown(): Promise<void> {
 
-        if (this._status !== Core.ServerStatus.WORKING) {
+        if (this._status !== Abstracts.ServerStatus.WORKING) {
 
             return Promise.reject(new HttpException(
                 ServerError.SERVER_NOT_WORKING,
@@ -167,7 +162,7 @@ implements Core.Server {
             ));
         }
 
-        this._status = Core.ServerStatus.CLOSING;
+        this._status = Abstracts.ServerStatus.CLOSING;
 
         let ret = new RawPromise<void, HttpException>();
 
@@ -175,7 +170,7 @@ implements Core.Server {
 
             delete this._server.controlServer;
             delete this._server;
-            this._status = Core.ServerStatus.READY;
+            this._status = Abstracts.ServerStatus.READY;
 
             ret.resolve();
 
@@ -183,6 +178,133 @@ implements Core.Server {
         });
 
         return ret.promise;
+    }
+
+    protected static _createListener(
+        opts: Abstracts.CreateServerOptions,
+        server: Abstracts.Server,
+        params: any,
+        requestCode: string
+    ) {
+
+        let hostField: string;
+
+        if (opts.version === 2) {
+
+            hostField = ":authority";
+        }
+        else {
+
+            hostField = "host";
+        }
+
+        let abortHandler = new Function(`this.aborted = true;`);
+        let closeHandler = new Function(`this.closed = true;`);
+
+        let fnBody: string = `
+return function(request, response) {
+
+    let url = libUrl.parse(request.url);
+
+    response.plugins = request.plugins = plugins;
+    request.params = {};
+    request.path = url.pathname;
+    request.queryString = url.search;
+    request.realPath = request.path;
+    request.ip = request.connection.remoteAddress;
+    request.https = ${opts.ssl ? "true" : "false"};
+
+    if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
+
+        request.realPath = request.realPath.substr(
+            0,
+            request.realPath.length - 1
+        );
+    }
+
+    if (request.headers["${hostField}"]) {
+
+        if (typeof request.headers["${hostField}"] === "string") {
+
+            request.host = request.headers["${hostField}"].toLowerCase();
+        }
+        else {
+
+            request.host = request.headers["${hostField}"][0].toLowerCase();
+        }
+    }
+    else {
+
+        request.host = "";
+    }
+
+    if (request.host) {
+
+        let hostInfo = request.host.split(":");
+
+        if (hostInfo.length === 2) {
+
+            request.hostPort = parseInt(hostInfo[1]);
+            request.hostDomain = hostInfo[0];
+        }
+        else {
+
+            request.hostPort = ${opts.port};
+            request.hostDomain = request.host;
+        }
+    }
+    else {
+
+        request.hostPort = ${opts.port};
+        request.hostDomain = "";
+    }
+
+    request.time = Date.now();
+
+    request.on("aborted", onAborted).on("close", onClosed);
+
+    let context = createContext(
+        request,
+        response
+    );
+
+    ${requestCode}
+};`;
+
+        return (new Function(
+            "plugins",
+            "createContext",
+            "server",
+            "libUrl",
+            "onClosed",
+            "onAborted",
+            "params",
+            fnBody
+        ))(
+            opts.plugins || {},
+            opts.contextCreator,
+            server,
+            libUrl,
+            closeHandler,
+            abortHandler,
+            params
+        );
+    }
+
+    protected _getRequestCode(): string {
+
+        return `
+    server.__requestEntry(createContext(
+        request,
+        response
+    )).catch(function(e) {
+        server.emit("error", e);
+    });`;
+    }
+
+    protected _getRequestParams(): any {
+
+        return null;
     }
 
     public start(): Promise<void> {
@@ -195,38 +317,38 @@ implements Core.Server {
             ));
         }
 
-        if (this._status !== Core.ServerStatus.READY) {
+        if (this._status !== Abstracts.ServerStatus.READY) {
 
             return Promise.resolve();
         }
 
         let ret = new RawPromise<void, HttpException>();
 
-        this._status = Core.ServerStatus.STARTING;
+        this._status = Abstracts.ServerStatus.STARTING;
 
         let sslConfig: any;
 
-        if (this._ssl) {
+        if (this._opts.ssl) {
 
             sslConfig = {
-                "key": this._ssl.key,
-                "cert": this._ssl.certificate,
-                "passphrase": this._ssl.passphrase
+                "key": this._opts.ssl.key,
+                "cert": this._opts.ssl.certificate,
+                "passphrase": this._opts.ssl.passphrase
             };
 
-            if (!this._ssl.minProtocolVersion) {
+            if (!this._opts.ssl.minProtocolVersion) {
 
-                this._ssl.minProtocolVersion = Core.DEFAULT_MIN_SSL_VERSION;
+                this._opts.ssl.minProtocolVersion = Abstracts.DEFAULT_MIN_SSL_VERSION;
             }
 
             sslConfig.secureOptions = AbstractServer.__getMinSSLVersionFlag(
-                this._ssl.minProtocolVersion
+                this._opts.ssl.minProtocolVersion
             );
         }
 
-        if (this._version === 2) {
+        if (this._opts.version === 2) {
 
-            if (this._ssl) {
+            if (this._opts.ssl) {
 
                 this._server = <any> http2.createSecureServer(sslConfig);
             }
@@ -237,7 +359,7 @@ implements Core.Server {
         }
         else {
 
-            if (this._ssl) {
+            if (this._opts.ssl) {
 
                 this._server = <any> https.createServer(sslConfig);
             }
@@ -246,6 +368,13 @@ implements Core.Server {
                 this._server = http.createServer() as InternalServer;
             }
         }
+
+        let callback = AbstractServer._createListener(
+            this._opts,
+            this,
+            this._getRequestParams(),
+            this._getRequestCode()
+        );
 
         this._server.on("connect", function(
             req: http.IncomingMessage,
@@ -258,18 +387,18 @@ implements Core.Server {
 
         }).on(
             "request",
-            this.__requestCallback.bind(this)
+            callback
         );
 
-        if (this._expectRequest) {
+        if (this._opts.expectRequest) {
 
-            this.on("checkContinue", this.__requestCallback.bind(this));
-            this.on("checkExpectation", this.__requestCallback.bind(this));
+            this.on("checkContinue", callback);
+            this.on("checkExpectation", callback);
         }
 
-        this._server.setTimeout(this._timeout);
+        this._server.setTimeout(this._opts.timeout);
 
-        this._server.keepAliveTimeout = this._keepAlive;
+        this._server.keepAliveTimeout = <number> this._opts.keeyAlive;
 
         this._server.once("error", (err: Error) => {
 
@@ -280,16 +409,16 @@ implements Core.Server {
 
             delete this._server;
 
-            this._status = Core.ServerStatus.READY;
+            this._status = Abstracts.ServerStatus.READY;
         });
 
         this._server.listen(
-            this._port,
-            this._host,
-            this._backlog,
+            this._opts.port,
+            this._opts.host,
+            this._opts.backlog,
             (): void => {
 
-                this._status = Core.ServerStatus.WORKING;
+                this._status = Abstracts.ServerStatus.WORKING;
 
                 this._server.removeAllListeners("error")
                 .on("error", (e: Error) => {
@@ -308,28 +437,21 @@ implements Core.Server {
         return ret.promise;
     }
 
-    protected __requestCallback(
-        request: Core.ServerRequest,
-        response: Core.ServerResponse
+    /**
+     * The real handler callback for a HTTP request.
+     *
+     * @param request The HTTP session request controller
+     * @param response The HTTP session response controller
+     */
+    public async __requestEntry(
+        context: Abstracts.RequestContext
     ): Promise<void> {
 
-        this.__initializeRequest(request, response);
-
-        return this.__requestEntry(request, response);
-    }
-
-    protected async __requestEntry(
-        request: Core.ServerRequest,
-        response: Core.ServerResponse
-    ): Promise<void> {
-
-        let context = this._contextCreator(
-            request,
-            response
-        );
+        const request = context.request;
+        const response = context.response;
 
         let routeResult = this._router.route(
-            <Core.HTTPMethod> request.method,
+            <Abstracts.HTTPMethod> request.method,
             request.realPath,
             context
         );
@@ -366,10 +488,10 @@ implements Core.Server {
         }
     }
 
-    protected async __execute(
-        middlewares: Core.RequestMiddleware[],
-        handler: Core.RequestHandler,
-        context: Core.RequestContext,
+    public async __execute(
+        middlewares: Abstracts.RequestMiddleware[],
+        handler: Abstracts.RequestHandler,
+        context: Abstracts.RequestContext,
         index: number = 0
     ): Promise<void> {
 
@@ -408,43 +530,6 @@ implements Core.Server {
 
             return Promise.reject(e);
         }
-    }
-
-    protected __initializeRequest(
-        request: Core.ServerRequest,
-        response: Core.ServerResponse
-    ): void {
-
-        let url = libUrl.parse(request.url as string);
-
-        request.params = {};
-
-        // @ts-ignore
-        request.path = url.pathname;
-
-        // @ts-ignore
-        request.queryString = url.search;
-
-        request.realPath = request.path;
-
-        if (request.realPath.length > 1 && request.realPath.endsWith("/")) {
-
-            request.realPath = request.realPath.substr(
-                0,
-                request.realPath.length - 1
-            );
-        }
-
-        request.time = Date.now();
-
-        request.on("aborted", function(this: Core.ServerRequest) {
-
-            this.aborted = true;
-
-        }).on("close", function(this: Core.ServerRequest) {
-
-            this.closed = true;
-        });
     }
 }
 
