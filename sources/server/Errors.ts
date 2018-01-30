@@ -70,6 +70,11 @@ enum ServerError {
     START_MOUNTED_SERVER,
 
     /**
+     * Cannot shutdown a mounted server.
+     */
+    SHUTDOWN_MOUNTED_SERVER,
+
+    /**
      * The host has been added already.
      */
     DUPLICATED_HOST,
@@ -80,7 +85,7 @@ enum ServerError {
     NON_EXISTENT_HOST,
 
     /**
-     * A server must contains TLS/SSL certificate in a secure host.
+     * A server must contains SSL/TLS certificate in a secure host.
      */
     REQUIRE_SSL_CERTIFICATE
 }

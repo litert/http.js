@@ -51,6 +51,7 @@ export class MountableHost extends AbstractServer {
     ): Promise<void> {
 
         const request = context.request;
+        const response = context.response;
 
         for (let prefix in this._mounts) {
 

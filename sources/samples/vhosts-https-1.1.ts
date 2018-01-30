@@ -15,6 +15,7 @@
 
 // tslint:disable:no-console
 import * as http from "../";
+import fs = require("fs");
 
 /**
  * 用于处理 a.local.org 以及默认的请求。
@@ -57,18 +58,26 @@ routerB.get("/", async function(ctx) {
 });
 
 let serverB = http.createServer({
-    "router": routerB
+    "router": routerB,
+    "ssl": {
+        "key": fs.readFileSync("b.local.org-privkey.pem"),
+        "certificate": fs.readFileSync("b.local.org-cert.pem")
+    }
 });
 
 let serverA = http.createServer({
-    "router": routerA
+    "router": routerA,
+    "ssl": {
+        "key": fs.readFileSync("a.local.org-privkey.pem").toString(),
+        "certificate": fs.readFileSync("a.local.org-cert.pem").toString()
+    }
 });
 
 /**
- * 创建一个监听 0.0.0.0:80 端口的虚拟主机分发器，注意这里不需要 router。
+ * 创建一个监听 0.0.0.0:443 端口的虚拟主机分发器，注意这里不需要 router。
  */
 let dispatcher = http.createVirtualDispatcher({
-    "port": 80,
+    "port": 443,
     "hosts": {
         "default": serverA,
         "a.local.org": serverA,

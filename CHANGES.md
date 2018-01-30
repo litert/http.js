@@ -4,6 +4,7 @@
 
 - Added minimal SSL/TLS protocol version restriction.
 - Added virtual hosts supports.
+- Fixed the cookies encoder about domain.
 
 ## v0.3.0-3
 

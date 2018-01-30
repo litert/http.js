@@ -1,4 +1,4 @@
-## 模块方法 createMountableServer
+## 模块方法 createVirtualDispatcher
 
 ### 用途
 
@@ -7,12 +7,7 @@
 ### 方法声明
 
 ```ts
-function createMountableServer(cfg: {
-
-    /**
-     * 路由器对象。
-     */
-    "router": Router;
+function createVirtualDispatcher(cfg: {
 
     /**
      * 服务器监听的 IP 地址。
@@ -52,9 +47,9 @@ function createMountableServer(cfg: {
     "backlog"?: number;
 
     /**
-     * 服务器挂载点。
+     * 虚拟主机映射表， key 为域名，值为服务器对象。
      */
-    "mounts"?: IDictionary<Server>;
+    "hosts"?: IDictionary<Server>;
 
     /**
      * 处理链接的超时时长。
@@ -124,14 +119,6 @@ function createMountableServer(cfg: {
          */
         "cookies"?: CookiesEncoder;
     };
-
-    /**
-     * HTTP Cookies 编码器对象。
-     *
-     * @deprecated 该字段将在 v0.5.0 版本中移除，请改用 plugins 字段注入 HTTP
-     * Cookies 编码器对象。
-     */
-    "cookies"?: CookiesEncoder;
 
     /**
      * 上下文对象工厂。
@@ -209,28 +196,47 @@ let keeyAlive: number = 5000;
 keeyAlive 参数用于设定 HTTP Keep Alive 链接复用时，空闲链接的维持时长，超过此时长后
 服务器将自动关闭链接。（单位：毫秒）
 
-### 参数 mounts
+### 参数 hosts
 
 ```ts
-let mounts: IDictionary<Server> = {};
+let hosts: IDictionary<Server> = {};
 ```
 
-用于设置子服务器挂载点，例如：
+虚拟主机映射表， key 为域名，值为服务器对象，例如：
 
 ```ts
-let server1 = http.createMountableServer({ ... });
-let server2 = http.createMountableServer({ ... });
-let serverMain = http.createMountableServer({
+let server1 = http.createServer({ ... });
+let server2 = http.createServer({ ... });
+let serverMain = http.createVirtualDispatcher({
     // ...
-    "mounts": {
-        "/sub1": server1,
-        "/sub2": server2
+    "hosts": {
+        "a.com": server1,
+        "b.com": server2
     }
 });
 ```
 
-这样，凡是 URI 以 /sub1 开头的，都将由 server1 处理，凡是 URI 以 /sub2 开头的，都将
-由 server2 处理。
+于是，凡是对 a.com 的请求都由 server1 处理，凡是对 b.com 的请求都由 server2 处理。
+
+由于虚拟主机本身不能处理任何请求，因此如果有一个既不是 a.com 也不是 b.com 的请求，则
+必须有一个 default 的服务器对这个请求进行处理。
+
+例如
+
+```ts
+let server1 = http.createServer({ ... });
+let server2 = http.createServer({ ... });
+let serverMain = http.createVirtualDispatcher({
+    // ...
+    "hosts": {
+        "a.com": server1,
+        "b.com": server2,
+        "default": server2
+    }
+});
+```
+
+> 如果未指定 default，则使用映射表内的第一个服务器作为默认处理服务器。
 
 ### 参数 port
 

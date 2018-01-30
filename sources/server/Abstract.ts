@@ -64,6 +64,11 @@ export interface ServerRequest extends http.IncomingMessage {
     "params": IDictionary<any>;
 
     /**
+     * The plugins.
+     */
+    "plugins": IDictionary<any>;
+
+    /**
      * The host of request visited.
      */
     "host": string;
@@ -97,6 +102,11 @@ export interface ServerRequest extends http.IncomingMessage {
     "cookies": IDictionary<string>;
 
     /**
+     * Get basic information of HTTP request body.
+     */
+    "contentInfo": ContentInfo;
+
+    /**
      * Check if the cookies are already loaded into field cookies.
      */
     isCookiesLoaded(): boolean;
@@ -121,6 +131,28 @@ export interface ServerRequest extends http.IncomingMessage {
      * @param maxLength (uint) Limit the max length of body.
      */
     getBodyAsJSON(maxLength?: number): Promise<any>;
+}
+
+export interface ContentInfo {
+
+    /**
+     * The real value of content-type.
+     *
+     * This value should be an empty string if not specified.
+     */
+    "type": string;
+
+    /**
+     * The extra value of content-type, such as charset or boundary.
+     */
+    "extras": IDictionary<string>;
+
+    /**
+     * The value of content-length.
+     *
+     * This value should be -1 if not specified.
+     */
+    "length": number;
 }
 
 export interface CookieConfiguration {
@@ -298,27 +330,29 @@ export const HTTP_METHODS: HTTPMethod[] = [
     "NOTIFY", "SUBSCRIBE", "UNSUBSCRIBE"
 ];
 
-export interface SSLKey {
-
-    "pem": string | Buffer;
-
-    "passphrase"?: string;
-}
-
-export interface SSLConfiguration {
+export interface SSLConfig {
 
     /**
-     * The content of private key for SSL
+     * The content of private key for SSL/TLS.
      */
-    "key": string | Buffer | string[] | Buffer[] | SSLKey[];
+    "key": string | Buffer;
 
     /**
-     * The content of certificate for SSL.
+     * The content of certificate for SSL/TLS.
      */
-    "certificate": string | Buffer | string[] | Buffer[];
+    "certificate": string | Buffer;
 
+    /**
+     * The password of SSL/TLS private key content.
+     *
+     * If there are more than one key, then the field `key` of SSLKey should be
+     * used instead.
+     */
     "passphrase"?: string;
 
+    /**
+     * The minimal TLS/SSL protocol version to be used.
+     */
     "minProtocolVersion"?: "SSLv2" | "SSLv3" | "TLSv1.0" |
                            "TLSv1.1" | "TLSv1.2";
 }
@@ -393,13 +427,6 @@ export interface CreateServerOptionsBase {
     "timeout"?: number;
 
     /**
-     * Configure this field to enabled HTTPS.
-     *
-     * Default: none
-     */
-    "ssl"?: SSLConfiguration;
-
-    /**
      * The plugins for server.
      */
     "plugins"?: IDictionary<any>;
@@ -411,6 +438,20 @@ export interface CreateServerOptions extends CreateServerOptionsBase {
      * The router object.
      */
     "router": Router;
+
+    /**
+     * @deprecated This field will be removed in v0.5.0
+     *
+     * Same as `plugins.cookies`.
+     */
+    "cookies"?: CookiesEncoder;
+
+    /**
+     * Configure this field to enabled HTTPS.
+     *
+     * Default: none
+     */
+    "ssl"?: SSLConfig;
 }
 
 export interface CreateMountableServerOptions extends CreateServerOptions {

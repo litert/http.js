@@ -27,7 +27,8 @@
         "no-conditional-assignment": false,
         "radix": false,
         "no-var-requires": false,
-        "no-bitwise": false
+        "no-bitwise": false,
+        "prefer-for-of": false
     },
     "rulesDirectory": []
 }

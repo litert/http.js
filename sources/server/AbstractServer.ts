@@ -88,6 +88,15 @@ implements Abstracts.Server {
             "plugins": opts.plugins || {}
         };
 
+        /**
+         * @deprecated Remove in v0.5.0
+         */
+        // @ts-ignore
+        if (opts.cookies && !opts.plugins["cookies"]) {
+            // @ts-ignore
+            opts.plugins["cookies"] = opts.cookies;
+        }
+
         this._router = opts.router;
 
         this._status = Abstracts.ServerStatus.READY;
@@ -113,9 +122,9 @@ implements Abstracts.Server {
         return this._status;
     }
 
-    public get ssl(): Abstracts.SSLConfiguration {
+    public get ssl(): Abstracts.SSLConfig {
 
-        return <Abstracts.SSLConfiguration> this._opts.ssl;
+        return this._opts.ssl as Abstracts.SSLConfig;
     }
 
     public static __getMinSSLVersionFlag(minVer: string): number {
@@ -153,6 +162,14 @@ implements Abstracts.Server {
     }
 
     public shutdown(): Promise<void> {
+
+        if (this._mounted) {
+
+            return Promise.reject(new HttpException(
+                Errors.SHUTDOWN_MOUNTED_SERVER,
+                "Cannot shutdown a mounted server."
+            ));
+        }
 
         if (this._status !== Abstracts.ServerStatus.WORKING) {
 
@@ -312,7 +329,7 @@ return function(request, response) {
         if (this._mounted) {
 
             return Promise.reject(new HttpException(
-                Errors.CONNECTION_CLOESD,
+                Errors.START_MOUNTED_SERVER,
                 "Cannot start a mounted server."
             ));
         }
@@ -330,19 +347,21 @@ return function(request, response) {
 
         if (this._opts.ssl) {
 
+            const sslItem = this.ssl as Abstracts.SSLConfig;
+
             sslConfig = {
-                "key": this._opts.ssl.key,
-                "cert": this._opts.ssl.certificate,
-                "passphrase": this._opts.ssl.passphrase
+                "key": sslItem.key,
+                "cert": sslItem.certificate,
+                "passphrase": sslItem.passphrase
             };
 
-            if (!this._opts.ssl.minProtocolVersion) {
+            if (!sslItem.minProtocolVersion) {
 
-                this._opts.ssl.minProtocolVersion = Abstracts.DEFAULT_MIN_SSL_VERSION;
+                sslItem.minProtocolVersion = Abstracts.DEFAULT_MIN_SSL_VERSION;
             }
 
             sslConfig.secureOptions = AbstractServer.__getMinSSLVersionFlag(
-                this._opts.ssl.minProtocolVersion
+                sslItem.minProtocolVersion
             );
         }
 

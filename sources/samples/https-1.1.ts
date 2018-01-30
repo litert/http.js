@@ -61,11 +61,10 @@ router.use("GET", async function(context, next): Promise<void> {
 });
 
 let server = http.createServer({
-    "port": 8080,
     "router": router,
     "ssl": {
-        "key": fs.readFileSync("localhost-privkey.pem"),
-        "certificate": fs.readFileSync("localhost-cert.pem")
+        "key": fs.readFileSync("a.local.org-privkey.pem"),
+        "certificate": fs.readFileSync("a.local.org-cert.pem")
     }
 });
 

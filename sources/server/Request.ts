@@ -32,11 +32,7 @@ interface InternalRequest extends Abstracts.ServerRequest {
 
     server: Abstracts.Server;
 
-    plugins: IDictionary<any>;
-
-    _host: string;
-
-    __initializeHostName(): void;
+    __rawData?: Buffer;
 }
 
 function _extend(obj: any, name: string, fn: Function) {
@@ -86,6 +82,57 @@ extenDef("server", {
     }
 });
 
+extenDef("contentInfo", {
+    get(this: any): http.Server {
+
+        delete this.contentInfo;
+
+        let ret: Abstracts.ContentInfo = {
+            "type": "",
+            "extras": {},
+            "length": -1
+        };
+
+        let data: any;
+
+        if (data = this.headers["content-length"]) {
+
+            ret.length = typeof data === "string" ?
+                parseInt(data) :
+                parseInt(data[0]);
+        }
+
+        if (data = this.headers["content-type"]) {
+
+            data = typeof data === "string" ?
+                data.toLowerCase().split(";") :
+                data[0].toLowerCase().split(";");
+
+            data = data.map((x: string) => x.trim());
+
+            for (let el of data) {
+
+                if (el.indexOf("=") > -1) {
+
+                    let kv = el.split("=", 2);
+                    // @ts-ignore
+                    ret.extras[kv[0]] = kv[1];
+                }
+                else {
+
+                    ret.type = el;
+                }
+            }
+        }
+
+        Object.defineProperty(this, "contentInfo", {
+            "value": ret
+        });
+
+        return this.contentInfo;
+    }
+});
+
 extenDef("query", {
 
     get(this: InternalRequest): IDictionary<any> {
@@ -112,12 +159,27 @@ extenDef("query", {
 });
 
 extend("getBody", async function(
-    this: Abstracts.ServerRequest,
+    this: InternalRequest,
     maxLength: number = 0
 ): Promise<Buffer> {
 
-    let ret = new RawPromise<Buffer, HttpException>();
+    if (this.__rawData) {
 
+        return Promise.resolve(this.__rawData);
+    }
+
+    if (maxLength > 0
+        && this.contentInfo.length > -1
+        && this.contentInfo.length < maxLength
+    ) {
+
+        return Promise.reject(new HttpException(
+            ServerError.EXCEED_MAX_BODY_LENGTH,
+            "The received body exceed max length restriction."
+        ));
+    }
+
+    let ret = new RawPromise<Buffer, HttpException>();
     let buf: Buffer[] = [];
 
     type EventCallback = (...args: any[]) => void;
@@ -166,14 +228,14 @@ extend("getBody", async function(
 
     onEnd = () => {
 
-        let data = Buffer.concat(buf);
+        this.__rawData = Buffer.concat(buf);
 
         // @ts-ignore
         buf = undefined;
 
         doCleanEvents();
 
-        ret.resolve(data);
+        ret.resolve(this.__rawData);
     };
 
     onClose = () => {
@@ -196,10 +258,10 @@ extend("getBody", async function(
         ));
     };
 
-    this.on("data", onData)
-    .on("end", onEnd)
-    .on("close", onClose)
-    .on("timeout", onTimeout);
+    this.once("data", onData)
+    .once("end", onEnd)
+    .once("close", onClose)
+    .once("timeout", onTimeout);
 
     return ret.promise;
 });

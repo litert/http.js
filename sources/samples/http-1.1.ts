@@ -78,6 +78,12 @@ router.notFound(async function(ctx) {
 }).get("/redirection", async function(context) {
 
     context.response.redirect("/");
+
+}).post("/test", async function(ctx) {
+
+    ctx.response.write(await ctx.request.getBody());
+    ctx.response.write(await ctx.request.getBody());
+    ctx.response.end(JSON.stringify(ctx.request.contentInfo));
 });
 
 let server = http.createServer({
@@ -91,4 +97,11 @@ server.on("error", function(err: Error) {
     console.log(err);
 });
 
-server.start();
+server.start().then(() => {
+
+    console.log("服务器成功启动。");
+
+}).catch((e) => {
+
+    console.error(e);
+});

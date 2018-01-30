@@ -76,6 +76,11 @@ router.notFound(async function(ctx) {
 
     context.response.setCookie("a", "2333");
 
+}).get("/cookies", async function(context) {
+
+    context.request.loadCookies();
+    context.response.sendJSON(context.request.cookies);
+
 }).get("/users/{user:int}", async function(context) {
 
     context.response.write(JSON.stringify(context.request.params));
@@ -91,8 +96,8 @@ let server = http.createServer({
     "port": 443,
     "router": router,
     "ssl": {
-        "key": fs.readFileSync("key.pem"),
-        "certificate": fs.readFileSync("cert.pem")
+        "key": fs.readFileSync("a.local.org-privkey.pem"),
+        "certificate": fs.readFileSync("a.local.org-cert.pem")
     },
     "version": 2,
     "plugins": {

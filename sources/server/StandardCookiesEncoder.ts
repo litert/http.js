@@ -103,14 +103,7 @@ class DefaultEncoder implements CookiesEncoder {
 
         if (domain) {
 
-            if (domain[0] === "." || /^\d+(\.\d+){3}$/.test(domain)) {
-
-                cookieText.push(`Domain=${domain}`);
-            }
-            else {
-
-                cookieText.push(`Domain=.${domain}`);
-            }
+            cookieText.push(`Domain=${domain}`);
         }
 
         if (secureOnly) {

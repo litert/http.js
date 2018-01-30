@@ -90,7 +90,7 @@ let serverB = http.createServer({
  * 创建一个监听 0.0.0.0:8080 端口的 HTTP 服务器，并指定使用 router 对象作为路由器。
  */
 let serverA = http.createMountableServer({
-    "port": 8080,
+    "port": 80,
     "router": routerA,
     "mounts": {
         "/admin": serverB,

@@ -15,6 +15,7 @@
     - [createStandardCookiesEncoder][CSCE]
     - [createStandardRouter](./module-methods/createStandardRouter.md)
     - [createDefaultContext](./module-methods/createDefaultContext.md)
+    - [createVirtualDispatcher](./module-methods/createVirtualDispatcher.md)
 
 - 抽象接口
 
