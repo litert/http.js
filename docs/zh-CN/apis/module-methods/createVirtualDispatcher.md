@@ -2,7 +2,7 @@
 
 ### 用途
 
-创建一个 HTTP(S) 服务器控制对象，该服务器可以提供挂载点，给其他服务器挂载。
+创建一个 HTTP(S) 服务器控制对象，该服务器可以提供挂载点，将其他服务器作为虚拟主机挂载。
 
 ### 方法声明
 
@@ -57,55 +57,6 @@ function createVirtualDispatcher(cfg: {
      * 默认值: 60000 (ms)
      */
     "timeout"?: number;
-
-    /**
-     * SSL 配置信息，需要 HTTPS 请配置该字段，否则请留空。
-     *
-     * 默认值: 无
-     */
-    "ssl"?: {
-
-        /**
-         * SSL 私钥内容。
-         */
-        "key": string | Buffer | string[] | Buffer[] | {
-
-            /**
-             * SSL 私钥内容。
-             */
-            "pem": string | Buffer;
-
-            /**
-             * SSL 私钥的加密口令。
-             */
-            "passphrase": string;
-        }[];
-
-        /**
-         * SSL 证书内容。
-         */
-        "certificate": string | Buffer | string[] | Buffer[];
-
-        /**
-         * SSL 私钥的加密口令。
-         * 
-         * 如果 key 字段是单一字符串或者 Buffer 时，可以用此字段指定 key 的密钥；
-         * 
-         * 如果 key 字段是多个字符串或者 Buffer，请用 SSLKey 结构指定 key 的密钥。
-         */
-        "passphrase"?: string;
-
-        /**
-         * 最低支持的 SSL/TLS 版本号，可以取如下值（大小写敏感）：
-         *
-         * - SSLv2
-         * - SSLv3
-         * - TLSv1.0   （默认值）
-         * - TLSv1.1
-         * - TLSv1.2
-         */
-        "minProtocolVersion": string;
-    };
 
     /**
      * 提供给服务器的插件。
@@ -257,56 +208,6 @@ let router: Router;
 
 router 参数指定 HTTP 请求的路由器对象。
 
-### 参数 ssl
-
-```ts
-let ssl: {
-
-    /**
-     * SSL 私钥内容。
-     */
-    "key": string | Buffer | string[] | Buffer[] | {
-
-        /**
-         * SSL 私钥内容。
-         */
-        "pem": string | Buffer;
-
-        /**
-         * SSL 私钥的加密口令。
-         */
-        "passphrase": string;
-    }[];
-
-    /**
-     * SSL 证书内容。
-     */
-    "certificate": string | Buffer | string[] | Buffer[];
-
-    /**
-     * SSL 私钥的加密口令。
-     * 
-     * 如果 key 字段是单一字符串或者 Buffer 时，可以用此字段指定 key 的密钥；
-     * 
-     * 如果 key 字段是多个字符串或者 Buffer，请用 SSLKey 结构指定 key 的密钥。
-     */
-    "passphrase"?: string;
-
-    /**
-     * 最低支持的 SSL/TLS 版本号，可以取如下值（大小写敏感）：
-     *
-     * - SSLv2
-     * - SSLv3
-     * - TLSv1.0   （默认值）
-     * - TLSv1.1
-     * - TLSv1.2
-     */
-    "minProtocolVersion": string;
-};
-```
-
-ssl 参数用于配置并开启 HTTP 服务器的 SSL 模式。
-
 ### 参数 timeout
 
 ```ts
@@ -339,4 +240,5 @@ let server = libHTTP.createServer({
 
 ## 注意事项
 
-该方法用于创建一个服务器对象，而不会自动启动服务器。
+1. 该方法用于创建一个服务器对象，而不会自动启动服务器。
+2. 启用 HTTPS 的方法是，将所有的虚拟主机都设置为 HTTPS。
