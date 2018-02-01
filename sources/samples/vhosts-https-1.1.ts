@@ -61,7 +61,8 @@ let serverB = http.createServer({
     "router": routerB,
     "ssl": {
         "key": fs.readFileSync("b.local.org-privkey.pem"),
-        "certificate": fs.readFileSync("b.local.org-cert.pem")
+        "certificate": fs.readFileSync("b.local.org-cert.pem"),
+        "minProtocolVersion": "SSLv3"
     }
 });
 
@@ -69,7 +70,8 @@ let serverA = http.createServer({
     "router": routerA,
     "ssl": {
         "key": fs.readFileSync("a.local.org-privkey.pem").toString(),
-        "certificate": fs.readFileSync("a.local.org-cert.pem").toString()
+        "certificate": fs.readFileSync("a.local.org-cert.pem").toString(),
+        "minProtocolVersion": "TLSv1.0"
     }
 });
 

@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.3.0-5
+
+- Fixed the minimal SSL/TLS protocol version restriction in virtual hosts.
+
 ## v0.3.0-4
 
 - Added minimal SSL/TLS protocol version restriction.

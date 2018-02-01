@@ -138,10 +138,21 @@ export class StandardDispatcher extends AbstractServer {
             this._opts.ssl = this._hosts[Object.keys(this._hosts)[0]].ssl;
         }
 
+        let minSSL = this._opts.ssl.minProtocolVersion ||
+                            Abstracts.DEFAULT_MIN_SSL_VERSION;
+
         for (let domain in this._hosts) {
 
+            const sslVersion = this._hosts[domain].ssl.minProtocolVersion;
             this._subSSL[domain] = this._hosts[domain].ssl;
+
+            if (sslVersion !== undefined && minSSL > sslVersion) {
+
+                minSSL = sslVersion;
+            }
         }
+
+        this._opts.ssl.minProtocolVersion = minSSL;
     }
 
     public async start(): Promise<void> {
