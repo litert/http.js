@@ -26,7 +26,7 @@ export class StandardDispatcher extends AbstractServer {
 
     protected _default: AbstractServer;
 
-    protected _subSSL: IDictionary<Abstracts.SSLConfig>;
+    protected _subSSL!: IDictionary<Abstracts.SSLConfig>;
 
     public constructor(
         opts: Abstracts.CreateHostDispatcherOptions

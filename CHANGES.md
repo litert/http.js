@@ -5,6 +5,7 @@
 - Added minimal SSL/TLS protocol version restriction.
 - Added virtual hosts supports.
 - Fixed the cookies encoder about domain.
+- Added new utility properties for ServerRequest objects.
 
 ## v0.3.0-3
 

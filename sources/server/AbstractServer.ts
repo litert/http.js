@@ -40,11 +40,11 @@ implements Abstracts.Server {
 
     protected _status: Abstracts.ServerStatus;
 
-    protected _server: InternalServer;
+    protected _server!: InternalServer;
 
     protected _router: Abstracts.Router;
 
-    protected _mounted: boolean;
+    protected _mounted!: boolean;
 
     protected _opts: Abstracts.CreateServerOptions;
 

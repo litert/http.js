@@ -27,11 +27,11 @@ enum VarType {
 
 class SmartRouteRule<T> implements Core.RouteRule<T> {
 
-    private keys: string[];
+    private keys!: string[];
 
-    private varTypes: VarType[];
+    private varTypes!: VarType[];
 
-    private expr: RegExp;
+    private expr!: RegExp;
 
     protected _handler: T;
 

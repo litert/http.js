@@ -43,6 +43,16 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "time": number;
 
+    "isDoNotTrack": boolean;
+
+    "headers": IDictionary<string>;
+
+    "acceptableLanguages": IDictionary<number>;
+
+    "acceptableTypes": IDictionary<number>;
+
+    "acceptableEncodings": IDictionary<number>;
+
     getBody(maxLength?: number): Promise<Buffer>;
 
     getBodyAsJSON(maxLength?: number): Promise<any>;
@@ -69,6 +79,36 @@ let aborted: boolean = false;
 
 ------------------------------------------------------------------------------
 
+### 属性 acceptableEncodings
+
+请求头中 Accept-Encoding 字段解析后的字典，键为编码代号，值为权重。
+
+```ts
+let acceptableEncodings IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 acceptableLanguages
+
+请求头中 Accept-Language 字段解析后的字典，键为语言代号，值为权重。
+
+```ts
+let acceptableLanguages IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 acceptableTypes
+
+请求头中 Accept 字段解析后的字典，键为 MIME 代号，值为权重。
+
+```ts
+let acceptableTypes IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
 ### 属性 closed
 
 closed 属性为 true 时，表示链接已经被关闭。
@@ -87,6 +127,16 @@ cookies 属性内储存从客户端请求读取的 Cookies 数据。
 
 ```ts
 let cookies: IDictionary<string>;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 headers
+
+headers 属性为请求携带的 HTTP 头字典。
+
+```ts
+let headers IDictionary<string>;
 ```
 
 ------------------------------------------------------------------------------
@@ -146,6 +196,16 @@ ip 属性的内容为客户端的 IP 地址。
 
 ```ts
 let ip: string;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 isDoNotTrack
+
+isDoNotTrack 表示客户端是否发送了 DNT 头，以防止服务器追踪客户信息。
+
+```ts
+let isDoNotTrack: boolean;
 ```
 
 ------------------------------------------------------------------------------

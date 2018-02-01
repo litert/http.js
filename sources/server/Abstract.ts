@@ -131,6 +131,31 @@ export interface ServerRequest extends http.IncomingMessage {
      * @param maxLength (uint) Limit the max length of body.
      */
     getBodyAsJSON(maxLength?: number): Promise<any>;
+
+    /**
+     * Check if the request is sent with DNT header.
+     */
+    "isDoNotTrack": boolean;
+
+    /**
+     * Get header value by key.
+     */
+    "headers": IDictionary<string>;
+
+    /**
+     * Get the acceptable languages list of client.
+     */
+    "acceptableLanguages": IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     */
+    "acceptableTypes": IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     */
+    "acceptableEncodings": IDictionary<number>;
 }
 
 export interface ContentInfo {

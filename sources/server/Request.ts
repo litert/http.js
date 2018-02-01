@@ -82,6 +82,87 @@ extenDef("server", {
     }
 });
 
+extenDef("isDoNotTrack", {
+    get(this: InternalRequest): boolean {
+
+        delete this.isDoNotTrack;
+
+        Object.defineProperty(this, "isDoNotTrack", {
+            "value": this.headers["dnt"] ? true : false
+        });
+
+        return this.isDoNotTrack;
+    }
+});
+
+function _splitWeightString(val: string): IDictionary<number> {
+
+    let ret: IDictionary<number> = {};
+
+    let tmp = val.replace(/\s/g, "").split(",").map(
+        (x: string) => x.split(";", 2)
+    );
+
+    for (let lang of tmp) {
+
+        if (!lang[1] || !lang[1].startsWith("q=")) {
+
+            ret[lang[0].toLowerCase()] = 1;
+        }
+        else {
+
+            ret[lang[0].toLowerCase()] = parseFloat(lang[1].substr(2));
+        }
+    }
+
+    return ret;
+}
+
+extenDef("acceptableLanguages", {
+    get(this: InternalRequest): IDictionary<number> {
+
+        delete this.acceptableLanguages;
+
+        const raw = this.headers["accept-language"];
+
+        Object.defineProperty(this, "acceptableLanguages", {
+            "value": raw ? _splitWeightString(raw) : {}
+        });
+
+        return this.acceptableLanguages;
+    }
+});
+
+extenDef("acceptableTypes", {
+    get(this: InternalRequest): IDictionary<number> {
+
+        delete this.acceptableTypes;
+
+        const raw = this.headers["accept"];
+
+        Object.defineProperty(this, "acceptableTypes", {
+            "value": raw ? _splitWeightString(raw) : {}
+        });
+
+        return this.acceptableTypes;
+    }
+});
+
+extenDef("acceptableEncodings", {
+    get(this: InternalRequest): IDictionary<number> {
+
+        delete this.acceptableEncodings;
+
+        const raw = this.headers["accept-encoding"];
+
+        Object.defineProperty(this, "acceptableEncodings", {
+            "value": raw ? _splitWeightString(raw) : {}
+        });
+
+        return this.acceptableEncodings;
+    }
+});
+
 extenDef("contentInfo", {
     get(this: any): http.Server {
 
@@ -275,7 +356,6 @@ extend("loadCookies", function(
         return true;
     }
 
-    let cookies: string;
     let data = this.headers["cookie"];
 
     if (!data) {
@@ -283,16 +363,7 @@ extend("loadCookies", function(
         return false;
     }
 
-    if (typeof data === "string") {
-
-        cookies = data;
-    }
-    else {
-
-        cookies = data.join(";");
-    }
-
-    this.cookies = this.plugins.cookies.parse(cookies);
+    this.cookies = this.plugins.cookies.parse(data);
 
     return true;
 });

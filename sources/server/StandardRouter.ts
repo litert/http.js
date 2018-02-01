@@ -34,11 +34,11 @@ import SmartRouteRule from "./router-rules/Smart";
 
 class Middleware {
 
-    public method: HTTPMethod;
+    public method!: HTTPMethod;
 
-    public rule: RouteRule<null>;
+    public rule!: RouteRule<null>;
 
-    public handler: RequestMiddleware;
+    public handler!: RequestMiddleware;
 }
 
 class Router<

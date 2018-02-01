@@ -18,7 +18,7 @@ import { IDictionary } from "@litert/core";
 
 export class DefaultContext implements Core.RequestContext {
 
-    public data: IDictionary<any>;
+    public data!: IDictionary<any>;
 
     public request: Core.ServerRequest;
 
