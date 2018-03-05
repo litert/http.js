@@ -29,10 +29,12 @@
   "types": "./index.d.ts",
   "typings": "./index.d.ts",
   "dependencies": {
-    "@litert/core": "^0.2.0"
+    "@litert/core": "^0.2.0",
+    "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
     "@types/node": "^8.0.51",
+    "@types/reflect-metadata": "^0.1.0",
     "typescript": "^2.7.1"
   },
   "engines": {

@@ -95,6 +95,18 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Using Controllers",
+            "program": "${workspaceRoot}\\sources\\samples\\using-controllers.ts",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "cwd": "${workspaceFolder}/samples",
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Custom Context",
             "program": "${workspaceRoot}\\sources\\samples\\custom-context.ts",
             "outFiles": [

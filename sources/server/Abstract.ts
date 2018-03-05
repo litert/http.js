@@ -790,6 +790,15 @@ export interface StandardRouter<
     ): this;
 }
 
+export interface ControllerRouter<
+    CT extends RequestContext = RequestContext
+> extends StandardRouter<CT> {
+
+    loadControllers(root: string): this;
+
+    loadMiddlewares(root: string): this;
+}
+
 export interface RouteRule<T> {
 
     readonly handler: T;

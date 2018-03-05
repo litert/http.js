@@ -14,7 +14,7 @@
  */
 
 import * as Abstracts from "./Abstract";
-import AbstractServer from "./AbstractServer";
+import AbstractServer, { kServer } from "./AbstractServer";
 import { IDictionary } from "@litert/core";
 import HttpException from "./Exception";
 import Errors from "./Errors";
@@ -163,7 +163,7 @@ export class StandardDispatcher extends AbstractServer {
 
             const item = this._subSSL[domain];
 
-            (<any> this._server as https.Server).addContext(
+            (<any> this[kServer] as https.Server).addContext(
                 domain,
                 <any> {
                     "key": item.key,

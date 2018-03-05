@@ -34,13 +34,16 @@ export interface InternalServer extends http.Server {
     controlServer: Abstracts.Server;
 }
 
+export const kStatus = Symbol("status");
+export const kServer = Symbol("server");
+
 export abstract class AbstractServer
 extends events.EventEmitter
 implements Abstracts.Server {
 
-    protected _status: Abstracts.ServerStatus;
+    private [kStatus]: Abstracts.ServerStatus;
 
-    protected _server!: InternalServer;
+    private [kServer]: InternalServer;
 
     protected _router: Abstracts.Router;
 
@@ -99,7 +102,7 @@ implements Abstracts.Server {
 
         this._router = opts.router;
 
-        this._status = Abstracts.ServerStatus.READY;
+        this[kStatus] = Abstracts.ServerStatus.READY;
     }
 
     public get host(): string {
@@ -119,7 +122,7 @@ implements Abstracts.Server {
 
     public get status(): Abstracts.ServerStatus {
 
-        return this._status;
+        return this[kStatus];
     }
 
     public get ssl(): Abstracts.SSLConfig {
@@ -171,7 +174,7 @@ implements Abstracts.Server {
             ));
         }
 
-        if (this._status !== Abstracts.ServerStatus.WORKING) {
+        if (this[kStatus] !== Abstracts.ServerStatus.WORKING) {
 
             return Promise.reject(new HttpException(
                 ServerError.SERVER_NOT_WORKING,
@@ -179,15 +182,15 @@ implements Abstracts.Server {
             ));
         }
 
-        this._status = Abstracts.ServerStatus.CLOSING;
+        this[kStatus] = Abstracts.ServerStatus.CLOSING;
 
         let ret = new RawPromise<void, HttpException>();
 
-        this._server.close(() => {
+        this[kServer].close(() => {
 
-            delete this._server.controlServer;
-            delete this._server;
-            this._status = Abstracts.ServerStatus.READY;
+            delete this[kServer].controlServer;
+            delete this[kServer];
+            this[kStatus] = Abstracts.ServerStatus.READY;
 
             ret.resolve();
 
@@ -334,14 +337,14 @@ return function(request, response) {
             ));
         }
 
-        if (this._status !== Abstracts.ServerStatus.READY) {
+        if (this[kStatus] !== Abstracts.ServerStatus.READY) {
 
             return Promise.resolve();
         }
 
         let ret = new RawPromise<void, HttpException>();
 
-        this._status = Abstracts.ServerStatus.STARTING;
+        this[kStatus] = Abstracts.ServerStatus.STARTING;
 
         let sslConfig: any;
 
@@ -369,22 +372,22 @@ return function(request, response) {
 
             if (this._opts.ssl) {
 
-                this._server = <any> http2.createSecureServer(sslConfig);
+                this[kServer] = <any> http2.createSecureServer(sslConfig);
             }
             else {
 
-                this._server = http2.createServer() as InternalServer;
+                this[kServer] = http2.createServer() as InternalServer;
             }
         }
         else {
 
             if (this._opts.ssl) {
 
-                this._server = <any> https.createServer(sslConfig);
+                this[kServer] = <any> https.createServer(sslConfig);
             }
             else {
 
-                this._server = http.createServer() as InternalServer;
+                this[kServer] = http.createServer() as InternalServer;
             }
         }
 
@@ -395,7 +398,7 @@ return function(request, response) {
             this._getRequestCode()
         );
 
-        this._server.on("connect", function(
+        this[kServer].on("connect", function(
             req: http.IncomingMessage,
             socket: net.Socket
         ) {
@@ -415,37 +418,37 @@ return function(request, response) {
             this.on("checkExpectation", callback);
         }
 
-        this._server.setTimeout(this._opts.timeout);
+        this[kServer].setTimeout(this._opts.timeout);
 
-        this._server.keepAliveTimeout = <number> this._opts.keeyAlive;
+        this[kServer].keepAliveTimeout = <number> this._opts.keeyAlive;
 
-        this._server.once("error", (err: Error) => {
+        this[kServer].once("error", (err: Error) => {
 
             ret.reject(new HttpException(
                 ServerError.FAILED_TO_START,
                 err.message
             ));
 
-            delete this._server;
+            delete this[kServer];
 
-            this._status = Abstracts.ServerStatus.READY;
+            this[kStatus] = Abstracts.ServerStatus.READY;
         });
 
-        this._server.listen(
+        this[kServer].listen(
             this._opts.port,
             this._opts.host,
             this._opts.backlog,
             (): void => {
 
-                this._status = Abstracts.ServerStatus.WORKING;
+                this[kStatus] = Abstracts.ServerStatus.WORKING;
 
-                this._server.removeAllListeners("error")
+                this[kServer].removeAllListeners("error")
                 .on("error", (e: Error) => {
 
                     this.emit("error", e);
                 });
 
-                this._server.controlServer = this;
+                this[kServer].controlServer = this;
 
                 ret.resolve();
 

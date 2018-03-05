@@ -52,7 +52,8 @@ import MountableHost from "./server/MountableHost";
 import StandardDispatcher from "./server/StandardDispatcher";
 import StandardHost from "./server/StandardHost";
 
-import createStandardRouter from "./server/StandardRouter";
+export { createStandardRouter } from "./server/StandardRouter";
+export * from "./server/ControllerRouter";
 import ServerError from "./server/Errors";
 import Exception from "./server/Exception";
 import {
@@ -82,7 +83,6 @@ export function createVirtualDispatcher(
 }
 
 export {
-    createStandardRouter,
     ServerError,
     Exception
 };

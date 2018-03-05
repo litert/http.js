@@ -41,7 +41,7 @@ class Middleware {
     public handler!: RequestMiddleware;
 }
 
-class Router<
+export class Router<
     CT extends RequestContext = RequestContext
 > implements StandardRouter<CT> {
 
@@ -53,7 +53,7 @@ class Router<
         Array<RouteRule<RequestHandler<CT>>>
     >;
 
-    protected _middlewares: HTTPMethodDictionary<Middleware[]>;
+    private _middlewares: HTTPMethodDictionary<Middleware[]>;
 
     protected _notFoundHandler: RequestHandler<CT>;
 
@@ -88,7 +88,7 @@ class Router<
         };
     }
 
-    protected _setupMiddlewareRule(
+    private _setupMiddlewareRule(
         middleware: Middleware,
         path: string | RegExp
     ): void {
@@ -472,9 +472,11 @@ class Router<
     }
 }
 
-export default function<
+export function createStandardRouter<
     CT extends RequestContext = RequestContext
 >(): StandardRouter<CT> {
 
     return new Router<CT>();
 }
+
+export default createStandardRouter;
