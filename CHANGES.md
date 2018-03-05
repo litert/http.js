@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.2.4
+
+- Fixed: The detection of smart-rule for middlewares.
+
 ## v0.2.3
 
 - Fixed: The error event leads a promise leak.
