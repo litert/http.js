@@ -4,6 +4,7 @@
 
 - Fixed the minimal SSL/TLS protocol version restriction in virtual hosts.
 - Added the router for controllers' methods mapping.
+- Added wildcard supports in router.
 
 ## v0.3.0-4
 

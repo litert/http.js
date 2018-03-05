@@ -71,6 +71,14 @@ router.notFound(async function(ctx) {
 
     context.response.write(`Requested at ${new Date(context.request.time)}`);
 
+}).get("/statics/*.txt", async function(context) {
+
+    context.response.write(`Requested at ${new Date(context.request.time)}`);
+
+}).get("/statics/ABC?F.txt", async function(context) {
+
+    context.response.write(`Requested at ${new Date(context.request.time)}`);
+
 }).get("/users/{user:int}", async function(context) {
 
     context.response.write(JSON.stringify(context.request.params));

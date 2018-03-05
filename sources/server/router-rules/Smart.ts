@@ -22,7 +22,8 @@ enum VarType {
     STRING,
     NUMERIC,
     INT,
-    HEX_UINT
+    HEX_UINT,
+    SKIPPED
 }
 
 class SmartRouteRule<T> implements Core.RouteRule<T> {
@@ -62,101 +63,128 @@ class SmartRouteRule<T> implements Core.RouteRule<T> {
         let replacement: string[] = [];
         let types: VarType[] = [];
 
-        path = path.replace(/\{.+?:.+?\}/g, function(el: string): string {
+        path = path.replace(
+            /\{.+?:.+?\}|[\*\?]/g,
+            function(el: string): string {
 
-            let matchResult: RegExpMatchArray = <any> el.match(/\{(.+?):(.+?)\}/);
+                if (el === "*") {
 
-            switch (matchResult[2]) {
-            case "int":
-
-                replacement.push("([-\\+]?\\d+)");
-                types.push(VarType.INT);
-
-                break;
-
-            case "uint":
-
-                replacement.push("(\\d+)");
-                types.push(VarType.INT);
-
-                break;
-
-            case "hex-uint":
-
-                replacement.push("(\\d+)");
-                types.push(VarType.HEX_UINT);
-
-                break;
-
-            case "hex-string":
-
-                replacement.push("([\\dA-fa-f]+)");
-                types.push(VarType.STRING);
-
-                break;
-
-            case "string":
-
-                replacement.push("([^\\/]+)");
-                types.push(VarType.STRING);
-
-                break;
-
-            case "any":
-
-                replacement.push("(.+)");
-                types.push(VarType.STRING);
-
-                break;
-
-            case "number":
-
-                replacement.push("(\\+?\\d+\\.\\d+|-\\d+\\.\\d+|\\+?\\d+|-\\d+)");
-                types.push(VarType.NUMERIC);
-
-                break;
-
-            default:
-
-                let mat = matchResult[2].match(/^string\[(\d+)\]$/);
-
-                if (mat) {
-
-                    replacement.push(`([^\\/]{${mat[1]}})`);
-                    types.push(VarType.STRING);
-
-                    break;
-                }
-                else if (mat = matchResult[2].match(/^hex-string\[(\d+)\]$/)) {
-
-                    replacement.push(`([a-fA-F0-9]{${mat[1]}})`);
-                    types.push(VarType.STRING);
-
-                    break;
+                    replacement.push(".*");
+                    types.push(VarType.SKIPPED);
+                    return `@::#${replacement.length - 1}#`;
                 }
 
-                throw new HttpException(
-                    ServerError.INVALID_VARIABLE_TYPE,
-                    `Invalid expression ${el} of variable.`
+                if (el === "?") {
+
+                    replacement.push(".");
+                    types.push(VarType.SKIPPED);
+                    return `@::#${replacement.length - 1}#`;
+                }
+
+                let matchResult: RegExpMatchArray = <any> el.match(
+                    /\{(.+?):(.+?)\}/
                 );
+
+                switch (matchResult[2]) {
+                case "int":
+
+                    replacement.push("([-\\+]?\\d+)");
+                    types.push(VarType.INT);
+
+                    break;
+
+                case "uint":
+
+                    replacement.push("(\\d+)");
+                    types.push(VarType.INT);
+
+                    break;
+
+                case "hex-uint":
+
+                    replacement.push("(\\d+)");
+                    types.push(VarType.HEX_UINT);
+
+                    break;
+
+                case "hex-string":
+
+                    replacement.push("([\\dA-fa-f]+)");
+                    types.push(VarType.STRING);
+
+                    break;
+
+                case "string":
+
+                    replacement.push("([^\\/]+)");
+                    types.push(VarType.STRING);
+
+                    break;
+
+                case "any":
+
+                    replacement.push("(.+)");
+                    types.push(VarType.STRING);
+
+                    break;
+
+                case "number":
+
+                    replacement.push(
+                        "(\\+?\\d+\\.\\d+|-\\d+\\.\\d+|\\+?\\d+|-\\d+)"
+                    );
+                    types.push(VarType.NUMERIC);
+
+                    break;
+
+                default:
+
+                    let mat = matchResult[2].match(/^string\[(\d+)\]$/);
+
+                    if (mat) {
+
+                        replacement.push(`([^\\/]{${mat[1]}})`);
+                        types.push(VarType.STRING);
+
+                        break;
+                    }
+                    else if (mat = matchResult[2].match(/^hex-string\[(\d+)\]$/)) {
+
+                        replacement.push(`([a-fA-F0-9]{${mat[1]}})`);
+                        types.push(VarType.STRING);
+
+                        break;
+                    }
+
+                    throw new HttpException(
+                        ServerError.INVALID_VARIABLE_TYPE,
+                        `Invalid expression ${el} of variable.`
+                    );
+                }
+
+                keys.push(matchResult[1]);
+
+                return `@::#${replacement.length - 1}#`;
             }
+        ).replace(/([\.\?\+\$\^\[\]\(\)\{\}\|\\])/g, "\\$1");
 
-            keys.push(matchResult[1]);
-
-            return `@::#${replacement.length - 1}#`;
-
-        }).replace(/([\*\.\?\+\$\^\[\]\(\)\{\}\|\\])/g, "\\$1");
+        let varTypes: VarType[] = [];
 
         for (let index = 0; index < replacement.length; index++) {
 
             path = path.replace(`@::#${index}#`, replacement[index]);
+
+            if (types[index] !== VarType.SKIPPED) {
+
+                varTypes.push(types[index]);
+            }
         }
 
         this.expr = new RegExp(`^${path}$`);
 
         this.keys = keys;
 
-        this.varTypes = types;
+        this.varTypes = varTypes;
     }
 
     public route(path: string, context: Core.RequestContext): boolean {

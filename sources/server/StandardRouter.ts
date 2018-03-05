@@ -88,6 +88,15 @@ export class Router<
         };
     }
 
+    private _isSmartRule(path: string): boolean {
+
+        const p = path.indexOf("{");
+
+        return (p > -1 && p < path.indexOf("}")) ||
+                path.indexOf("*") > -1 ||
+                path.indexOf("?") > -1;
+    }
+
     private _setupMiddlewareRule(
         middleware: Middleware,
         path: string | RegExp
@@ -97,7 +106,7 @@ export class Router<
 
             this._checkPath(path);
 
-            if (path.indexOf("{")) {
+            if (this._isSmartRule(path)) {
 
                 middleware.rule = new SmartRouteRule<null>(
                     null,
@@ -300,7 +309,6 @@ export class Router<
 
         if (
             path[0] !== "/"
-            || path.indexOf("?") > -1
             || (path.length > 1 && path.endsWith("/"))
         ) {
 
@@ -363,7 +371,7 @@ export class Router<
                 this._stringRouter[method] = collection = {};
             }
 
-            if (path.indexOf("{") > -1) {
+            if (this._isSmartRule(path)) {
 
                 this._addRegExpRule(
                     method,
