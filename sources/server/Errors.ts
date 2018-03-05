@@ -87,7 +87,12 @@ enum ServerError {
     /**
      * A server must contains SSL/TLS certificate in a secure host.
      */
-    REQUIRE_SSL_CERTIFICATE
+    REQUIRE_SSL_CERTIFICATE,
+
+    /**
+     * The path of controllers/middlewares doesn't exist.
+     */
+    PATH_NOT_EXIST
 }
 
 export default ServerError;

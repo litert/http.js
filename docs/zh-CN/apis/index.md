@@ -10,6 +10,7 @@
 
 - 模块方法
 
+    - [createControllerRouter](./module-methods/createControllerRouter.md)
     - [createMountableServer](./module-methods/createMountableServer.md)
     - [createServer](./module-methods/createServer.md)
     - [createStandardCookiesEncoder][CSCE]
@@ -19,10 +20,24 @@
 
 - 抽象接口
 
+    - [ControllerRouter](./types/ControllerRouter.md)
     - [CookiesEncoder](./types/CookiesEncoder.md)
     - [Router](./types/Router.md)
     - [StandardRouter](./types/StandardRouter.md)
     - [Server](./types/Server.md)
+
+- 装饰器
+
+    - [Delete](./decorators/Delete.md)
+    - [Get](./decorators/Get.md)
+    - [Head](./decorators/Head.md)
+    - [Middleware](./decorators/Middleware.md)
+    - [NotFound](./decorators/NotFound.md)
+    - [Options](./decorators/Options.md)
+    - [Patch](./decorators/Patch.md)
+    - [Post](./decorators/Post.md)
+    - [Put](./decorators/Put.md)
+    - [Route](./decorators/Route.md)
 
 - 数据类型
 

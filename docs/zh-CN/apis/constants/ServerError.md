@@ -57,6 +57,11 @@ enum ServerError {
     /**
      * 不能启动一个已经挂载到别的服务器上的服务器对象。
      */
-    START_MOUNTED_SERVER
+    START_MOUNTED_SERVER,
+
+    /**
+     * 参数指定的控制器或者中间件的扫描路径不存在。
+     */
+    PATH_NOT_EXIST
 }
 ```

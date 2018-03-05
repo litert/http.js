@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import * as Core from "@litert/core";
 import * as Abstract from "./Abstract";
+import Exception from "./Exception";
+import ServerError from "./Errors";
 import { Router } from "./StandardRouter";
 import * as fs from "fs";
 import * as pathUtils from "path";
@@ -19,7 +21,7 @@ interface RouterRule {
 
 export function Route(
     method: Abstract.HTTPMethod,
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -47,7 +49,7 @@ export function Route(
 }
 
 export function Get(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -55,7 +57,7 @@ export function Get(
 }
 
 export function Post(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -63,7 +65,7 @@ export function Post(
 }
 
 export function Put(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -71,7 +73,7 @@ export function Put(
 }
 
 export function Patch(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -79,7 +81,7 @@ export function Patch(
 }
 
 export function Delete(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -87,7 +89,7 @@ export function Delete(
 }
 
 export function Head(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -95,7 +97,7 @@ export function Head(
 }
 
 export function Options(
-    path: string,
+    path: string | RegExp,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -115,38 +117,50 @@ export interface MiddlewareRegister {
      *
      * @param method The method to be handled by middleware.
      * @param path The path to be handled by middleware.
+     * @param priority The order priority of middleware, default to be 10.
      */
     (
         method: Abstract.HTTPMethod | Abstract.HTTPMethod[],
-        path: string | RegExp | Array<string | RegExp>
+        path: string | RegExp | Array<string | RegExp>,
+        priority?: number
     ): Core.MethodDecorator;
 
     /**
      * Use a middleware, with a METHOD filter.
      *
      * @param method The method to be handled by middleware.
+     * @param priority The order priority of middleware, default to be 10.
      */
     (
-        method: Abstract.HTTPMethod | Abstract.HTTPMethod[]
+        method: Abstract.HTTPMethod | Abstract.HTTPMethod[],
+        priority?: number
     ): Core.MethodDecorator;
 
     /**
      * Use a middleware, with a PATH filter.
      *
      * @param path The path to be handled by middleware.
+     * @param priority The order priority of middleware, default to be 10.
      */
     (
-        path: string | RegExp | Array<string | RegExp>
+        path: string | RegExp | Array<string | RegExp>,
+        priority?: number
     ): Core.MethodDecorator;
 
     /**
      * Use a middleware, without any filter.
+     *
+     * @param priority The order priority of middleware, default to be 10.
      */
-    (): Core.MethodDecorator;
-
+    (priority?: number): Core.MethodDecorator;
 }
 
-export let Middleare: MiddlewareRegister = function(...args: any[]): Core.MethodDecorator {
+/**
+ * Set and configure a static method as a middleware.
+ */
+export let Middleare: MiddlewareRegister = function(
+    ...args: any[]
+): Core.MethodDecorator {
 
     return function(theClass: Object, methodName: string | symbol): void {
 
@@ -167,6 +181,15 @@ export let Middleare: MiddlewareRegister = function(...args: any[]): Core.Method
     };
 };
 
+interface MiddlewareConfig {
+
+    "args": any[];
+
+    "method": Abstract.RequestMiddleware;
+
+    "priority": number;
+}
+
 class ControllerRouter<
     CT extends Abstract.RequestContext = Abstract.RequestContext
 >
@@ -174,6 +197,14 @@ extends Router<CT>
 implements Abstract.ControllerRouter<CT>
 {
     public loadControllers(root: string): this {
+
+        if (!fs.existsSync(root)) {
+
+            throw new Exception(
+                ServerError.PATH_NOT_EXIST,
+                "The path of controllers/middlewares doesn't exist."
+            );
+        }
 
         let items = fs.readdirSync(root);
 
@@ -246,7 +277,27 @@ implements Abstract.ControllerRouter<CT>
         return this;
     }
 
-    public loadMiddlewares(root: string): this {
+    private _loadMiddlewares(root: string | string[]): MiddlewareConfig[] {
+
+        let ret: MiddlewareConfig[] = [];
+
+        if (Array.isArray(root)) {
+
+            for (let path of root) {
+
+                ret = ret.concat(this._loadMiddlewares(path));
+            }
+
+            return ret;
+        }
+
+        if (!fs.existsSync(root)) {
+
+            throw new Exception(
+                ServerError.PATH_NOT_EXIST,
+                "The path of controllers/middlewares doesn't exist."
+            );
+        }
 
         let items = fs.readdirSync(root);
 
@@ -257,38 +308,73 @@ implements Abstract.ControllerRouter<CT>
                 continue;
             }
 
-            if (item.endsWith(".js")) {
+            if (!item.endsWith(".js")) {
 
-                let path = pathUtils.resolve(root, item);
-                let cls = require(
-                    `${path.slice(0, -3)}`
-                ).default as ObjectConstructor;
+                if (fs.statSync(`${root}/${item}`).isDirectory()) {
 
-                for (let method of Object.getOwnPropertyNames(cls)) {
+                    this.loadControllers(`${root}/${item}`);
+                }
 
-                    let data = Reflect.getMetadata(
-                        META_KEY_MIDDLEWARES, cls, method
-                    ) as any[][];
+                continue;
+            }
 
-                    if (data === undefined) {
+            let path = pathUtils.resolve(root, item);
+            let cls = require(
+                `${path.slice(0, -3)}`
+            ).default as ObjectConstructor;
 
-                        continue;
-                    }
+            for (let method of Object.getOwnPropertyNames(cls)) {
 
-                    for (let rule of data) {
+                let data = Reflect.getMetadata(
+                    META_KEY_MIDDLEWARES, cls, method
+                ) as any[][];
 
-                        this.use(
-                            ...rule,
+                if (data === undefined) {
+
+                    continue;
+                }
+
+                for (let rule of data) {
+
+                    if (typeof rule[rule.length - 1] === "number") {
+
+                        let priority: number = rule.pop();
+
+                        ret.push({
+                            "args": rule,
                             // @ts-ignore
-                            cls[method].bind(cls)
-                        );
+                            "method": cls[method].bind(cls),
+                            priority
+                        });
+                    }
+                    else {
+
+                        ret.push({
+                            "args": rule,
+                            // @ts-ignore
+                            "method": cls[method].bind(cls),
+                            "priority": 10
+                        });
                     }
                 }
             }
-            else if (fs.statSync(`${root}/${item}`).isDirectory()) {
+        }
 
-                this.loadControllers(`${root}/${item}`);
-            }
+        return ret;
+    }
+
+    public loadMiddlewares(root: string | string[]): this {
+
+        let items = this._loadMiddlewares(root);
+
+        items = items.sort((a, b) => a.priority - b.priority);
+
+        for (let item of items) {
+
+            this.use(
+                ...item.args,
+                item.method
+            );
         }
 
         return this;

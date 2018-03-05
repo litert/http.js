@@ -33,8 +33,8 @@ npm i @litert/http@dev --save
 
 ### 简体中文版
 
-- [稳定版本](https://github.com/litert/http.js/blob/v0.2.3/docs/zh-CN/index.md)
-- [开发版本](./docs/zh-CN/index.md)
+- [v0.3.0](./docs/zh-CN/index.md)
+- [v0.2.x](https://github.com/litert/http.js/blob/v0.2.3/docs/zh-CN/index.md)
 
 ## License
 

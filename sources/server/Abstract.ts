@@ -794,9 +794,19 @@ export interface ControllerRouter<
     CT extends RequestContext = RequestContext
 > extends StandardRouter<CT> {
 
+    /**
+     * Load request handlers from controller files.
+     *
+     * @param root The root path of controller classes.
+     */
     loadControllers(root: string): this;
 
-    loadMiddlewares(root: string): this;
+    /**
+     * Load request middlewares from middleware files.
+     *
+     * @param root The root path of middleware classes.
+     */
+    loadMiddlewares(root: string | string[]): this;
 }
 
 export interface RouteRule<T> {

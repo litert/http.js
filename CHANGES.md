@@ -1,6 +1,6 @@
 # Changes Logs
 
-## v0.3.0-5
+## v0.3.0
 
 - Fixed the minimal SSL/TLS protocol version restriction in virtual hosts.
 - Added the router for controllers' methods mapping.
