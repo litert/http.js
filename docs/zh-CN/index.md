@@ -9,6 +9,7 @@
     - [第三节：使用路由器](./quick-guide/02-router.md)
     - [第四节：处理器函数](./quick-guide/03-handlers.md)
     - [第五节：中间件函数](./quick-guide/04-middlewares.md)
+    - [第六节：使用控制器类](./quick-guide/05-controllers.md)
 
 - [详细 API 文档](./apis/index.md)
 - [开发线路](./road-map.md)

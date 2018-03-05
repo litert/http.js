@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.3.1
+
+- Fixed the dependency to `@litert/core`.
+
 ## v0.3.0
 
 - Fixed the minimal SSL/TLS protocol version restriction in virtual hosts.

@@ -19,6 +19,7 @@ export {
     RequestHandler,
     RequestMiddleware,
     StandardRouter,
+    ControllerRouter,
     Router,
     MiddlewareNextCallback,
     ServerRequest,
