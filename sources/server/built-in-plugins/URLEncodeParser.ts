@@ -20,6 +20,8 @@ import {
 } from "../Abstract";
 
 import * as qs from "querystring";
+import HttpException from "../Exception";
+import ServerErrors from "../Errors";
 
 class URLEncodeParser implements ContentParser {
 
@@ -27,6 +29,17 @@ class URLEncodeParser implements ContentParser {
         request: ServerRequest,
         opts: GetContentOptions<string>
     ): Promise<any> {
+
+        if (opts.assert) {
+
+            if (request.getContentInfo().type !== "application/x-www-form-urlencoded") {
+
+                throw new HttpException(
+                    ServerErrors.UNACCEPTABLE_CONTENT_TYPE,
+                    "The content data is unparsable."
+                );
+            }
+        }
 
         const data = await request.getContent({
             type: "raw",

@@ -18,6 +18,8 @@ import {
     GetContentOptions,
     ContentParser
 } from "../Abstract";
+import HttpException from "../Exception";
+import ServerErrors from "../Errors";
 
 class JSONParser implements ContentParser {
 
@@ -25,6 +27,17 @@ class JSONParser implements ContentParser {
         request: ServerRequest,
         opts: GetContentOptions<string>
     ): Promise<any> {
+
+        if (opts.assert) {
+
+            if (request.getContentInfo().type !== "application/json") {
+
+                throw new HttpException(
+                    ServerErrors.UNACCEPTABLE_CONTENT_TYPE,
+                    "The content data is unparsable."
+                );
+            }
+        }
 
         const data = await request.getContent({
             type: "raw",

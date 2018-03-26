@@ -35,6 +35,11 @@ enum ServerError {
     EXCEED_MAX_BODY_LENGTH,
 
     /**
+     * The content data is unparsable by the parser of determined type.
+     */
+    UNACCEPTABLE_CONTENT_TYPE,
+
+    /**
      * Response headers were already sent.
      */
     HEADERS_ALREADY_SENT,

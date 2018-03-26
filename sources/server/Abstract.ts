@@ -18,10 +18,24 @@ import { IDictionary } from "@litert/core";
 
 export interface GetContentOptions<T> {
 
+    /**
+     * The maximum bytes allowed for content data.
+     */
     "maxBytes"?: number;
 
+    /**
+     * The type allowed for content data.
+     */
     "type": T;
 
+    /**
+     * Ensure that content-type is parsable for determined type.
+     */
+    "assert"?: boolean;
+
+    /**
+     * Other configurations for specific parser.
+     */
     [key: string]: any;
 }
 

@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.4.1
+
+- Added argument `assert` for method `ServerRequest.getContent`.
+
 ## v0.4.0
 
 - Upgraded `@litert/core` to v0.4.0.
