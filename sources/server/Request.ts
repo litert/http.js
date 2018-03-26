@@ -15,58 +15,106 @@
 
 import * as http from "http";
 import * as http2 from "http2";
-import HttpException from "./Exception";
-import ServerError from "./Errors";
-import { RawPromise, IDictionary } from "@litert/core";
+import { IDictionary } from "@litert/core";
 import * as Abstracts from "./Abstract";
 import * as libUrl from "url";
 import * as queryString from "querystring";
+import { InternalRequest, cServer } from "./Internal";
 
-declare module "http2" {
-
-    export class Http2ServerRequest {
-    }
-}
-
-interface InternalRequest extends Abstracts.ServerRequest {
-
-    server: Abstracts.Server;
-
-    __rawData?: Buffer;
-}
-
-function _extend(obj: any, name: string, fn: Function) {
+function _extend(obj: any, name: keyof InternalRequest, fn: Function) {
 
     obj[name] = fn;
 }
 
-function extend(name: string, fn: Function) {
+function extend(name: keyof InternalRequest, fn: Function) {
 
     _extend(http.IncomingMessage.prototype, name, fn);
     _extend(http2.Http2ServerRequest.prototype, name, fn);
 }
 
-function extenDef(name: string, fn: Object) {
+function extenDef(name: keyof InternalRequest, fn: Object) {
 
     Object.defineProperty(http.IncomingMessage.prototype, name, fn);
     Object.defineProperty(http2.Http2ServerRequest.prototype, name, fn);
 }
 
-extend("getBodyAsJSON", async function(
+extend("getBodyAsJSON", function(
     this: Abstracts.ServerRequest,
     maxLength: number = 0
 ): Promise<any> {
 
-    try {
+    return this.getContent({
+        "type": "json",
+        "maxBytes": maxLength
+    });
+});
 
-        return JSON.parse(
-            (await this.getBody(maxLength)).toString()
-        );
-    }
-    catch (e) {
+extend("getContent", function(
+    this: Abstracts.ServerRequest,
+    opts?: Abstracts.GetContentOptions<string>
+): Promise<any> {
 
-        return Promise.reject(e);
+    if (!opts) {
+
+        opts = {
+            type: "auto"
+        };
     }
+
+    if (opts.type === "auto") {
+
+        switch (this.getContentInfo().type) {
+        case "application/json":
+
+            opts.type = "json";
+            break;
+
+        case "application/x-www-form-urlencoded":
+
+            opts.type = "urlencode";
+            break;
+
+        case "text/plain":
+
+            opts.type = "string";
+            break;
+
+        case "application/xml":
+        case "application/atom+xml":
+
+            opts.type = "xml";
+            break;
+
+        case "application/base64":
+
+            opts.type = "base64";
+            break;
+
+        case "multipart/form-data":
+
+            opts.type = "multipart";
+            break;
+
+        default:
+        case "application/plain":
+        case "application/octed-stream":
+
+            opts.type = "buffer";
+            break;
+        }
+    }
+
+    // @ts-ignore
+    return this.connection.server[cServer]._opts.plugins[
+        `parser:${opts.type}`
+    ].parse(this, opts);
+});
+
+extend("isDoNotTrack", function(
+    this: Abstracts.ServerRequest
+): boolean {
+
+    return this.headers["dnt"] ? true : false;
 });
 
 extenDef("server", {
@@ -75,23 +123,10 @@ extenDef("server", {
         delete this.server;
 
         Object.defineProperty(this, "server", {
-            "value": this.connection.server.controlServer
+            "value": this.connection.server[cServer]
         });
 
         return this.server;
-    }
-});
-
-extenDef("isDoNotTrack", {
-    get(this: InternalRequest): boolean {
-
-        delete this.isDoNotTrack;
-
-        Object.defineProperty(this, "isDoNotTrack", {
-            "value": this.headers["dnt"] ? true : false
-        });
-
-        return this.isDoNotTrack;
     }
 });
 
@@ -117,6 +152,72 @@ function _splitWeightString(val: string): IDictionary<number> {
 
     return ret;
 }
+
+extend("getAcceptableLanguages", function(
+    this: Abstracts.ServerRequest
+): IDictionary<number> {
+
+    const raw = this.headers["accept-language"];
+
+    return raw ? _splitWeightString(raw) : {};
+});
+
+extend("getAcceptableTypes", function(
+    this: Abstracts.ServerRequest
+): IDictionary<number> {
+
+    const raw = this.headers["accept"];
+
+    return raw ? _splitWeightString(raw) : {};
+});
+
+extend("getAcceptableEncodings", function(
+    this: Abstracts.ServerRequest
+): IDictionary<number> {
+
+    const raw = this.headers["accept-encoding"];
+
+    return raw ? _splitWeightString(raw) : {};
+});
+
+extend("getContentInfo", function(
+    this: Abstracts.ServerRequest
+): Abstracts.ContentInfo {
+
+    let ret: Abstracts.ContentInfo = {
+        "type": "",
+        "extras": {},
+        "length": -1
+    };
+
+    let data: any;
+
+    if (data = this.headers["content-length"]) {
+
+        ret.length = parseInt(data);
+    }
+
+    if (data = this.headers["content-type"]) {
+
+        data = data.toLowerCase().split(";").map((x: string) => x.trim());
+
+        for (let el of data) {
+
+            if (el.indexOf("=") > -1) {
+
+                let kv = el.split("=", 2);
+                // @ts-ignore
+                ret.extras[kv[0]] = kv[1];
+            }
+            else {
+
+                ret.type = el;
+            }
+        }
+    }
+
+    return ret;
+});
 
 extenDef("acceptableLanguages", {
     get(this: InternalRequest): IDictionary<number> {
@@ -178,18 +279,12 @@ extenDef("contentInfo", {
 
         if (data = this.headers["content-length"]) {
 
-            ret.length = typeof data === "string" ?
-                parseInt(data) :
-                parseInt(data[0]);
+            ret.length = parseInt(data);
         }
 
         if (data = this.headers["content-type"]) {
 
-            data = typeof data === "string" ?
-                data.toLowerCase().split(";") :
-                data[0].toLowerCase().split(";");
-
-            data = data.map((x: string) => x.trim());
+            data = data.toLowerCase().split(";").map((x: string) => x.trim());
 
             for (let el of data) {
 
@@ -244,111 +339,14 @@ extend("getBody", async function(
     maxLength: number = 0
 ): Promise<Buffer> {
 
-    if (this.__rawData) {
-
-        return Promise.resolve(this.__rawData);
-    }
-
-    if (maxLength > 0
-        && this.contentInfo.length > -1
-        && this.contentInfo.length < maxLength
-    ) {
-
-        return Promise.reject(new HttpException(
-            ServerError.EXCEED_MAX_BODY_LENGTH,
-            "The received body exceed max length restriction."
-        ));
-    }
-
-    let ret = new RawPromise<Buffer, HttpException>();
-    let buf: Buffer[] = [];
-
-    type EventCallback = (...args: any[]) => void;
-
-    let onData: EventCallback;
-    let onEnd: EventCallback;
-    let onClose: EventCallback;
-    let onTimeout: EventCallback;
-
-    let doCleanEvents = () => {
-
-        this.removeListener("data", onData);
-        this.removeListener("end", onEnd);
-        this.removeListener("close", onClose);
-        this.removeListener("timeout", onTimeout);
-    };
-
-    if (maxLength) {
-
-        let length: number = 0;
-
-        onData = (d: Buffer) => {
-
-            length += d.byteLength;
-
-            if (length > maxLength) {
-
-                doCleanEvents();
-
-                return ret.reject(new HttpException(
-                    ServerError.EXCEED_MAX_BODY_LENGTH,
-                    "The received body exceed max length restriction."
-                ));
-            }
-
-            buf.push(d);
-        };
-    }
-    else {
-
-        onData = (d: Buffer) => {
-
-            buf.push(d);
-        };
-    }
-
-    onEnd = () => {
-
-        this.__rawData = Buffer.concat(buf);
-
-        // @ts-ignore
-        buf = undefined;
-
-        doCleanEvents();
-
-        ret.resolve(this.__rawData);
-    };
-
-    onClose = () => {
-
-        doCleanEvents();
-
-        return ret.reject(new HttpException(
-            ServerError.CONNECTION_CLOESD,
-            "The connection was closed."
-        ));
-    };
-
-    onTimeout = () => {
-
-        doCleanEvents();
-
-        return ret.reject(new HttpException(
-            ServerError.READING_DATA_TIMEOUT,
-            "Timeout when reading data from request."
-        ));
-    };
-
-    this.once("data", onData)
-    .once("end", onEnd)
-    .once("close", onClose)
-    .once("timeout", onTimeout);
-
-    return ret.promise;
+    return this.getContent({
+        "type": "raw",
+        maxBytes: maxLength
+    });
 });
 
 extend("loadCookies", function(
-    this: InternalRequest
+    this: any
 ): boolean {
 
     if (this.isCookiesLoaded()) {
@@ -363,7 +361,9 @@ extend("loadCookies", function(
         return false;
     }
 
-    this.cookies = this.plugins.cookies.parse(data);
+    this.cookies = this.connection.server[cServer]._opts.plugins[
+        "parser:cookies"
+    ].parse(data);
 
     return true;
 });

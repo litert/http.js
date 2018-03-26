@@ -16,6 +16,15 @@
 import http = require("http");
 import { IDictionary } from "@litert/core";
 
+export interface GetContentOptions<T> {
+
+    "maxBytes"?: number;
+
+    "type": T;
+
+    [key: string]: any;
+}
+
 export interface ServerRequest extends http.IncomingMessage {
 
     /**
@@ -37,6 +46,11 @@ export interface ServerRequest extends http.IncomingMessage {
      * The remote address.
      */
     "ip": string;
+
+    /**
+     * The requested URL.
+     */
+    "url": string;
 
     /**
      * The unseriailized data of query-string of request.
@@ -103,6 +117,9 @@ export interface ServerRequest extends http.IncomingMessage {
 
     /**
      * Get basic information of HTTP request body.
+     *
+     * @deprecated Use method getContentInfo instead, this method will
+     *             be removed in v0.5.0.
      */
     "contentInfo": ContentInfo;
 
@@ -119,9 +136,80 @@ export interface ServerRequest extends http.IncomingMessage {
     loadCookies(): boolean;
 
     /**
+     * Get basic information of HTTP request body.
+     */
+    getContentInfo(): ContentInfo;
+
+    /**
+     * Get the acceptable languages list of client.
+     */
+    getAcceptableLanguages(): IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     */
+    getAcceptableTypes(): IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     */
+    getAcceptableEncodings(): IDictionary<number>;
+
+    /**
+     * Get HTTP request body as raw stream.
+     *
+     * @param opts The options for getting contents. If omitted, a type based
+     *             on the content-type will be selected instead.
+     */
+    getContent(opts: GetContentOptions<"raw">): Promise<Buffer>;
+
+    /**
+     * Get HTTP request body as string.
+     *
+     * @param opts The options for getting contents. If omitted, a type based
+     *             on the content-type will be selected instead.
+     */
+    getContent(opts: GetContentOptions<"string">): Promise<string>;
+
+    /**
+     * Get HTTP request body and parse it into determined form.
+     *
+     * @param opts The options for getting contents. If omitted, a type based
+     *             on the content-type will be selected instead.
+     */
+    getContent<T = any>(opts?: GetContentOptions<string>): Promise<T>;
+
+    /**
+     * Get the acceptable languages list of client.
+     *
+     * @deprecated Use method getAcceptableLanguages instead, this method will
+     *             be removed in v0.5.0.
+     */
+    "acceptableLanguages": IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     *
+     * @deprecated Use method getAcceptableTypes instead, this method will
+     *             be removed in v0.5.0.
+     */
+    "acceptableTypes": IDictionary<number>;
+
+    /**
+     * Get the acceptable content types list of client.
+     *
+     * @deprecated Use method getAcceptableEncodings instead, this method will
+     *             be removed in v0.5.0.
+     */
+    "acceptableEncodings": IDictionary<number>;
+
+    /**
      * Get HTTP request body as raw stream.
      *
      * @param maxLength (uint) Limit the max length of body.
+     *
+     * @deprecated Use method getContent instead, this method will be removed
+     *             in v0.5.0.
      */
     getBody(maxLength?: number): Promise<Buffer>;
 
@@ -129,33 +217,21 @@ export interface ServerRequest extends http.IncomingMessage {
      * Get HTTP request body as JSON encoded data.
      *
      * @param maxLength (uint) Limit the max length of body.
+     *
+     * @deprecated Use method getContent instead, this method will be removed
+     *             in v0.5.0.
      */
     getBodyAsJSON(maxLength?: number): Promise<any>;
 
     /**
      * Check if the request is sent with DNT header.
      */
-    "isDoNotTrack": boolean;
+    isDoNotTrack(): boolean;
 
     /**
      * Get header value by key.
      */
     "headers": IDictionary<string>;
-
-    /**
-     * Get the acceptable languages list of client.
-     */
-    "acceptableLanguages": IDictionary<number>;
-
-    /**
-     * Get the acceptable content types list of client.
-     */
-    "acceptableTypes": IDictionary<number>;
-
-    /**
-     * Get the acceptable content types list of client.
-     */
-    "acceptableEncodings": IDictionary<number>;
 }
 
 export interface ContentInfo {
@@ -465,9 +541,10 @@ export interface CreateServerOptions extends CreateServerOptionsBase {
     "router": Router;
 
     /**
-     * @deprecated This field will be removed in v0.5.0
+     * Setup the plugins for parsing cookies.
      *
-     * Same as `plugins.cookies`.
+     * @deprecated Use `plugins["parser:cookies"]` instead. This field will be
+     *             removed in v0.5.0.
      */
     "cookies"?: CookiesEncoder;
 
@@ -477,6 +554,21 @@ export interface CreateServerOptions extends CreateServerOptionsBase {
      * Default: none
      */
     "ssl"?: SSLConfig;
+}
+
+export interface ServerOptions extends CreateServerOptions {
+
+    /**
+     * Configure this field to enabled HTTPS.
+     *
+     * Default: none
+     */
+    "ssl": SSLConfig;
+
+    /**
+     * The plugins for server.
+     */
+    "plugins": IDictionary<any>;
 }
 
 export interface CreateMountableServerOptions extends CreateServerOptions {
@@ -531,6 +623,14 @@ export enum ServerStatus {
      */
     CLOSING
 
+}
+
+export interface ContentParser {
+
+    parse(
+        request: ServerRequest,
+        opts: GetContentOptions<string>
+    ): Promise<any>;
 }
 
 export interface Server {

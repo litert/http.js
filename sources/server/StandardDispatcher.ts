@@ -14,11 +14,12 @@
  */
 
 import * as Abstracts from "./Abstract";
-import AbstractServer, { kServer } from "./AbstractServer";
+import AbstractServer from "./AbstractServer";
 import { IDictionary } from "@litert/core";
 import HttpException from "./Exception";
 import Errors from "./Errors";
 import * as https from "https";
+import { kServer } from "./Internal";
 
 export class StandardDispatcher extends AbstractServer {
 
@@ -197,7 +198,7 @@ export class StandardDispatcher extends AbstractServer {
 
         const host = params["hosts"][request.hostDomain];
 
-        request.connection.server.controlServer = host;
+        request.connection.server[cServer] = host;
 
         request.plugins = response.plugins = host._opts.plugins;
 
@@ -209,7 +210,7 @@ export class StandardDispatcher extends AbstractServer {
         });
     }
 
-    request.connection.server.controlServer = params["default"];
+    request.connection.server[cServer] = params["default"];
 
     request.plugins = response.plugins = params["default"]._opts.plugins;
 

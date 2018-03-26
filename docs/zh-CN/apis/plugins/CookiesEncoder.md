@@ -1,13 +1,27 @@
-## 模块方法 createStandardCookiesEncoder
+# 内置插件 CookiesEncoder
 
-> 该方法已经废除，请使用 plugins.createCookiesEncoder() 代替。该方法将在 v0.5.0 中
-> 被彻底移除。
+用于提供 HTTP Cookies 的编码和解码功能。
 
-### 用途
+## 使用方式
 
-创建一个标准的 HTTP Cookies 编解码器对象。
+```ts
+import * as http from "@litert/http";
 
-### 方法声明
+let server = http.createServer({
+
+    // ...
+    plugins: {
+
+        "parser:cookies": http.plugins.createCookiesEncoder()
+    }
+});
+
+// 事实上会自动设置 `parser:cookies` 为对应的解码器，因此一般不需要手动设置。
+// 除非要实现自定义的解码器。
+// 或者将之设置为 null，从而禁止对 Cookies 进行解码。
+```
+
+## 构造方法声明
 
 ```ts
 function createStandardCookiesEncoder(cfg?: {
@@ -57,11 +71,3 @@ let defaults: CookieConfiguration = {
 [setCookie]: ../types/ServerResponse.md#方法-setcookie
 
 设置 [ServerResponse.setCookie][setCookie] 的默认参数。
-
-## 使用示例
-
-```ts
-import * as libHTTP from "@litert/http";
-
-let cookies = libHTTP.createStandardCookiesEncoder();
-```

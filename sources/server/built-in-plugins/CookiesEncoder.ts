@@ -19,7 +19,7 @@ import {
     CookieConfiguration,
     CookiesEncoder,
     CookiesEncoding
-} from "./Abstract";
+} from "../Abstract";
 
 export interface CookiesEncoderConfig {
 
@@ -156,7 +156,7 @@ class DefaultEncoder implements CookiesEncoder {
     }
 }
 
-export function createStandardCookiesEncoder(
+export function createCookiesEncoder(
     cfg?: CookiesEncoderConfig
 ): CookiesEncoder {
 

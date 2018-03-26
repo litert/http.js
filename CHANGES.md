@@ -1,5 +1,29 @@
 # Changes Logs
 
+## v0.4.0
+
+- Upgraded `@litert/core` to v0.4.0.
+- Added following methods for class `ServerRequest`:
+  - `getAcceptableLanguages`
+  - `getAcceptableEncodings`
+  - `getAcceptableTypes`
+  - `getContent` get and parse the http content, supporting types **raw**,
+    **json**, **string**, **urlencode**, and etc.
+- Added built-in plugins for **raw**, **json**, **string**, **urlencode**, 
+  **base64** parser.
+- Deprecated creating-server options `plugins.cookies`, use the option
+  `plugins["parser:cookies"]` instead.
+- Deprecated following properties or methods in class `ServerRequest`:
+  - `acceptableLanguages` (use `getAcceptableLanguages` instead)
+  - `acceptableEncodings` (use `getAcceptableEncodings` instead)
+  - `acceptableTypes` (use `getAcceptableTypes` instead)
+  - `getBody` (use `getContent` instead)
+  - `getBodyAsJSON` (use `getContent` instead)
+- Deprecated methods `createStandardCookiesEncoder`, use
+  `plugins.createCookiesEncoder` instead.
+
+> **All the above DEPRECATED items will be removed in v0.5.0.**
+
 ## v0.3.1
 
 - Fixed the dependency to `@litert/core`.

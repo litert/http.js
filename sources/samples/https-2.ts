@@ -88,6 +88,13 @@ router.notFound(async function(ctx) {
 }).get("/redirection", async function(context) {
 
     context.response.redirect("/");
+
+}).post("/content", async function(context) {
+
+    context.response.write(await context.request.getContent({type: "raw"}));
+    context.response.write(await context.request.getContent({type: "raw"}));
+
+    context.response.end("/");
 });
 
 let cookies = http.createStandardCookiesEncoder();
@@ -102,7 +109,7 @@ let server = http.createServer({
     "version": 2,
     "plugins": {
 
-        cookies
+        "parser:cookies": cookies
     }
 });
 

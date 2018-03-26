@@ -19,6 +19,7 @@ import ServerError from "./Errors";
 import * as Abstracts from "./Abstract";
 import * as http2 from "http2";
 import { IDictionary } from "@litert/core";
+import { cServer } from "./Internal";
 
 declare module "http2" {
 
@@ -78,7 +79,7 @@ extend("send", function(
 
 extenDef("server", {
     get(this: any): http.Server {
-        return this.connection.server.controlServer;
+        return this.connection.server[cServer];
     }
 });
 
@@ -144,11 +145,11 @@ extend("setCookie", function(
 
     if (args.length === 1) {
 
-        cookieText = this.plugins.cookies.stringify(args[0]);
+        cookieText = this.plugins["parser:cookies"].stringify(args[0]);
     }
     else {
 
-        cookieText = this.plugins.cookies.stringify({
+        cookieText = this.plugins["parser:cookies"].stringify({
             "name": args[0],
             "value": args[1],
             "ttl": args[2],

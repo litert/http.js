@@ -28,14 +28,13 @@ import "./Response";
 import "./Request";
 import Errors from "./Errors";
 import * as nodeConstants from "constants";
-
-export interface InternalServer extends http.Server {
-
-    controlServer: Abstracts.Server;
-}
-
-export const kStatus = Symbol("status");
-export const kServer = Symbol("server");
+import {
+    InternalServer,
+    kStatus,
+    kServer,
+    cServer
+} from "./Internal";
+import * as BIPlugins from "./built-in-plugins";
 
 export abstract class AbstractServer
 extends events.EventEmitter
@@ -49,7 +48,7 @@ implements Abstracts.Server {
 
     protected _mounted!: boolean;
 
-    protected _opts: Abstracts.CreateServerOptions;
+    protected _opts: Abstracts.ServerOptions;
 
     public setMounted(): void {
 
@@ -85,19 +84,47 @@ implements Abstracts.Server {
                             opts.timeout :
                             Abstracts.DEFAULT_TIMEOUT,
             "version": opts.version || Abstracts.DEFAULT_VERSION,
-            "ssl": opts.ssl,
+            "ssl": opts.ssl as Abstracts.SSLConfig,
             "port": opts.port || (opts.ssl ? Abstracts.DEFAULT_SSL_PORT :
                                              Abstracts.DEFAULT_PORT),
             "plugins": opts.plugins || {}
         };
 
-        /**
-         * @deprecated Remove in v0.5.0
-         */
-        // @ts-ignore
-        if (opts.cookies && !opts.plugins["cookies"]) {
-            // @ts-ignore
-            opts.plugins["cookies"] = opts.cookies;
+        if (!this._opts.plugins["parser:json"]) {
+
+            this._opts.plugins["parser:json"] = BIPlugins.createJSONParser();
+        }
+
+        if (!this._opts.plugins["parser:urlencode"]) {
+
+            this._opts.plugins["parser:urlencode"] = BIPlugins.createURLEncodeParser();
+        }
+
+        if (!this._opts.plugins["parser:raw"]) {
+
+            this._opts.plugins["parser:raw"] = BIPlugins.createRawParser();
+        }
+
+        if (!this._opts.plugins["parser:base64"]) {
+
+            this._opts.plugins["parser:base64"] = BIPlugins.createBase64Parser();
+        }
+
+        if (!this._opts.plugins["parser:string"]) {
+
+            this._opts.plugins["parser:string"] = BIPlugins.createStringParser();
+        }
+
+        if (!this._opts.plugins["parser:cookies"]) {
+
+            /**
+             * @deprecated cookies and plugins.cookies will be remove in v0.5.0
+             */
+            this._opts.plugins["parser:cookies"] =
+                                        this._opts.plugins["parser:cookies"] ||
+                                        this._opts.plugins["cookies"] ||
+                                        this._opts.cookies ||
+                                        BIPlugins.createCookiesEncoder();
         }
 
         this._router = opts.router;
@@ -188,7 +215,7 @@ implements Abstracts.Server {
 
         this[kServer].close(() => {
 
-            delete this[kServer].controlServer;
+            delete this[kServer][cServer];
             delete this[kServer];
             this[kStatus] = Abstracts.ServerStatus.READY;
 
@@ -217,9 +244,6 @@ implements Abstracts.Server {
 
             hostField = "host";
         }
-
-        let abortHandler = new Function(`this.aborted = true;`);
-        let closeHandler = new Function(`this.closed = true;`);
 
         let fnBody: string = `
 return function(request, response) {
@@ -281,7 +305,8 @@ return function(request, response) {
 
     request.time = Date.now();
 
-    request.on("aborted", onAborted).on("close", onClosed);
+    request.once("aborted", new Function("this.aborted = true;"))
+    .once("close", new Function("this.closed = true;"));
 
     let context = createContext(
         request,
@@ -296,18 +321,16 @@ return function(request, response) {
             "createContext",
             "server",
             "libUrl",
-            "onClosed",
-            "onAborted",
             "params",
+            "cServer",
             fnBody
         ))(
             opts.plugins || {},
             opts.contextCreator,
             server,
             libUrl,
-            closeHandler,
-            abortHandler,
-            params
+            params,
+            cServer
         );
     }
 
@@ -448,7 +471,7 @@ return function(request, response) {
                     this.emit("error", e);
                 });
 
-                this[kServer].controlServer = this;
+                this[kServer][cServer] = this;
 
                 ret.resolve();
 

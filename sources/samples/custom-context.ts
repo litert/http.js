@@ -56,16 +56,16 @@ router.use(async function(context, next) {
      */
     console.log(`${req.method} ${req.url} at ts ${context.requestTime}`);
 
-    if (req.isDoNotTrack) {
+    if (req.isDoNotTrack()) {
 
         console.log("Client denies trackings.");
     }
 
-    console.log(req.acceptableLanguages);
+    console.log(req.getAcceptableLanguages());
 
-    console.log(req.acceptableTypes);
+    console.log(req.getAcceptableTypes());
 
-    console.log(req.acceptableEncodings);
+    console.log(req.getAcceptableEncodings());
 
     await next();
 

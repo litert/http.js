@@ -89,9 +89,10 @@ router.notFound(async function(ctx) {
 
 }).post("/test", async function(ctx) {
 
-    ctx.response.write(await ctx.request.getBody());
-    ctx.response.write(await ctx.request.getBody());
-    ctx.response.end(JSON.stringify(ctx.request.contentInfo));
+    ctx.response.write(await ctx.request.getContent({"type": "raw"}));
+    ctx.response.write(JSON.stringify(await ctx.request.getContent()));
+    ctx.response.write(await ctx.request.getContent({"type": "string"}));
+    ctx.response.end(JSON.stringify(ctx.request.getContentInfo()));
 });
 
 let server = http.createServer({

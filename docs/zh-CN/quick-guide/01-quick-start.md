@@ -319,7 +319,10 @@ let cookies = http.createStandardCookiesEncoder();
 let server = http.createServer({
     "port": 8080,
     "router": router,
-    "cookies": cookies // 将 Cookies 编解码器对象注入到服务器。
+    "plugins": {
+
+        "parser:cookies": cookies // 将 Cookies 编解码器对象注入到服务器。
+    }
 });
 
 // 启动服务器

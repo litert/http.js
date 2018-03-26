@@ -43,8 +43,6 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "time": number;
 
-    "isDoNotTrack": boolean;
-
     "headers": IDictionary<string>;
 
     "acceptableLanguages": IDictionary<number>;
@@ -53,11 +51,45 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "acceptableEncodings": IDictionary<number>;
 
+    getAcceptableEncodings(): IDictionary<number>;
+
+    getAcceptableLanguages(): IDictionary<number>;
+
+    getAcceptableTypes(): IDictionary<number>;
+
     getBody(maxLength?: number): Promise<Buffer>;
 
     getBodyAsJSON(maxLength?: number): Promise<any>;
 
+    getContent(opts: {
+
+        type: "raw";
+
+        maxBytes?: number;
+
+    }): Promise<Buffer>;
+
+    getContent(opts: {
+
+        type: "string";
+
+        maxBytes?: number;
+
+    }): Promise<string>;
+
+    getContent<T>(opts: {
+
+        type: "json" | "xml" | "urlencode" | "base64" | "multipart" | "auto" | string;
+
+        maxBytes?: number;
+
+        [key: string]: any;
+
+    }): Promise<T>;
+
     isCookiesLoaded(): boolean;
+
+    isDoNotTrack(): boolean;
 
     loadCookies(): boolean;
 }
@@ -81,30 +113,39 @@ let aborted: boolean = false;
 
 ### 属性 acceptableEncodings
 
+> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
+> **请使用 getAcceptableEncodings 方法代替。**
+
 请求头中 Accept-Encoding 字段解析后的字典，键为编码代号，值为权重。
 
 ```ts
-let acceptableEncodings IDictionary<number>;
+let acceptableEncodings: IDictionary<number>;
 ```
 
 ------------------------------------------------------------------------------
 
 ### 属性 acceptableLanguages
 
+> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
+> **请使用 getAcceptableLanguages 方法代替。**
+
 请求头中 Accept-Language 字段解析后的字典，键为语言代号，值为权重。
 
 ```ts
-let acceptableLanguages IDictionary<number>;
+let acceptableLanguages: IDictionary<number>;
 ```
 
 ------------------------------------------------------------------------------
 
 ### 属性 acceptableTypes
 
+> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
+> **请使用 getAcceptableTypes 方法代替。**
+
 请求头中 Accept 字段解析后的字典，键为 MIME 代号，值为权重。
 
 ```ts
-let acceptableTypes IDictionary<number>;
+let acceptableTypes: IDictionary<number>;
 ```
 
 ------------------------------------------------------------------------------
@@ -115,6 +156,19 @@ closed 属性为 true 时，表示链接已经被关闭。
 
 ```ts
 let closed: boolean = false;
+```
+
+------------------------------------------------------------------------------
+
+### 属性 contentInfo
+
+> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
+> **请使用 getContentInfo 方法代替。**
+
+获取 HTTP 报文主体的基本信息，比如 Content-Length、Content-Type。
+
+```ts
+let contentInfo: ContentInfo;
 ```
 
 ------------------------------------------------------------------------------
@@ -136,7 +190,7 @@ let cookies: IDictionary<string>;
 headers 属性为请求携带的 HTTP 头字典。
 
 ```ts
-let headers IDictionary<string>;
+let headers: IDictionary<string>;
 ```
 
 ------------------------------------------------------------------------------
@@ -196,16 +250,6 @@ ip 属性的内容为客户端的 IP 地址。
 
 ```ts
 let ip: string;
-```
-
-------------------------------------------------------------------------------
-
-### 属性 isDoNotTrack
-
-isDoNotTrack 表示客户端是否发送了 DNT 头，以防止服务器追踪客户信息。
-
-```ts
-let isDoNotTrack: boolean;
 ```
 
 ------------------------------------------------------------------------------
@@ -282,15 +326,57 @@ time 属性为服务器收到请求时的时间（时间戳）。
 let time: number;
 ```
 
+------------------------------------------------------------------------------
+
+### 属性 url
+
+url 属性为服务器收到请求时的 URL （不包括域部分）。
+
+```ts
+let url: string;
+```
+
 ## 方法介绍
 
 > 根据方法名称按字母表顺序排列。
 
 ------------------------------------------------------------------------------
 
+### 方法 GetAcceptableEncodings
+
+获取请求头中 Accept-Encoding 字段解析后的字典，键为编码代号，值为权重。
+
+```ts
+function GetAcceptableEncodings(): IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
+### 方法 GetAcceptableLanguages
+
+获取请求头中 Accept-Language 字段解析后的字典，键为语言代号，值为权重。
+
+```ts
+function GetAcceptableLanguages(): IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
+### 方法 GetAcceptableTypes
+
+获取请求头中 Accept 字段解析后的字典，键为 MIME 代号，值为权重。
+
+```ts
+function GetAcceptableLanguages(): IDictionary<number>;
+```
+
+------------------------------------------------------------------------------
+
 ### 方法 getBody
 
 该方法用于从客户端读取请求的 HTTP Body 数据。
+
+> **该方法已经被废除，将在 v0.5.0 版本中彻底移除。请使用 getContent 方法代替。**
 
 #### 方法声明
 
@@ -320,6 +406,8 @@ async function getBody(maxLength?: number): Promise<Buffer>;
 
 该方法用于从客户端读取请求的 HTTP Body 数据，并将其以 JSON 解码后返回。
 
+> **该方法已经被废除，将在 v0.5.0 版本中彻底移除。请使用 getContent 方法代替。**
+
 #### 方法声明
 
 ```ts
@@ -344,6 +432,65 @@ async function getBodyAsJSON(maxLength?: number): Promise<any>;
 
 ------------------------------------------------------------------------------
 
+### 方法 getContent
+
+该方法用于从客户端读取请求的 HTTP Body 数据，并自动解码。
+
+#### 方法声明
+
+```ts
+async function getContent(opts: {
+
+    type: "raw";
+
+    maxBytes?: number;
+
+}): Promise<Buffer>;
+
+async function getContent(opts: {
+
+    type: "string";
+
+    maxBytes?: number;
+
+}): Promise<string>;
+
+async function getContent<T = any>(opts?: {
+
+    type: "json" | "xml" | "urlencode" | "base64" | "multipart" | "auto" | string;
+
+    maxBytes?: number;
+
+    [key: string]: any;
+
+}): Promise<T>;
+```
+
+#### 参数说明
+
+- `opts.type: string`
+
+    使用的解码方式，如果设置为 auto，则会根据 Content-Type 自动识别并使用对应的解码
+    方式。
+
+- `opts.maxBytes?: number`
+
+    允许的最大的 HTTP Body 长度（单位：字节）。
+
+    默认为 0，即不限制。
+
+#### 返回值
+
+如果 type=raw，则返回 Buffer 类型的 Promise 对象。
+如果 type=string，则返回 string 类型的 Promise 对象。
+其他则返回类型参数 T 类型的 Promise 对象，T 默认为 any。
+
+#### 错误处理
+
+通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
+
+------------------------------------------------------------------------------
+
 ### 方法 isCookiesLoaded
 
 该方法用于判断是否已经加载 Cookies，即判断 cookies 属性是否可用。
@@ -357,6 +504,16 @@ function isCookiesLoaded(): boolean;
 #### 返回值
 
 若 Cookies 已经加载，则返回 true。否则返回 false。
+
+------------------------------------------------------------------------------
+
+### 方法 isDoNotTrack
+
+该方法用于判断客户端是否发送了 DNT 头，以防止服务器追踪客户信息。
+
+```ts
+function isDoNotTrack(): boolean;
+```
 
 ------------------------------------------------------------------------------
 

@@ -16,6 +16,7 @@
 import * as Abstracts from "./Abstract";
 import AbstractServer from "./AbstractServer";
 import { IDictionary } from "@litert/core";
+import { cServer } from "./Internal";
 
 export class MountableHost extends AbstractServer {
 
@@ -65,7 +66,7 @@ export class MountableHost extends AbstractServer {
                 }
 
                 // @ts-ignore
-                request.connection.server.controlServer = this._mounts[prefix];
+                request.connection.server[cServer] = this._mounts[prefix];
 
                 // @ts-ignore
                 request.plugins = response.plugins = this._opts.plugins;

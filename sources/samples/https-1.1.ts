@@ -58,6 +58,13 @@ router.use("GET", async function(context, next): Promise<void> {
 }).get("/redirection", async function(context) {
 
     context.response.redirect("/");
+
+}).post("/content", async function(context) {
+
+    context.response.write(await context.request.getContent({type: "raw"}));
+    context.response.write(await context.request.getContent({type: "raw"}));
+
+    context.response.end("/");
 });
 
 let server = http.createServer({
