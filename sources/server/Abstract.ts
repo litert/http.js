@@ -605,6 +605,7 @@ export enum CookiesEncoding {
     PLAIN,
     BASE64,
     HEX,
+    URLENCODE,
     OTHER
 }
 

@@ -3,6 +3,8 @@
 ## v0.4.1
 
 - Added argument `assert` for method `ServerRequest.getContent`.
+- Added urlencode for `cookies` encoding.
+- Fixed some bug due to "=" insides the cookies value.
 
 ## v0.4.0
 

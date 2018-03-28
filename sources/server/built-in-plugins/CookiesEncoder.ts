@@ -83,6 +83,11 @@ class DefaultEncoder implements CookiesEncoder {
                 `${cfg.name}=${Buffer.from(cfg.value).toString("hex")}`
             );
             break;
+        case CookiesEncoding.URLENCODE:
+            cookieText.push(
+                `${cfg.name}=${encodeURIComponent(cfg.value)}`
+            );
+            break;
         default:
             cookieText.push(`${cfg.name}=${cfg.value}`);
             break;
@@ -132,22 +137,22 @@ class DefaultEncoder implements CookiesEncoder {
                 continue;
             }
 
-            let pair = item.trim().split("=", 2);
+            let pos = item.indexOf("=");
 
-            if (pair.length !== 2) {
-
-                continue;
-            }
+            let [k, v] = [item.substr(0, pos), item.substr(pos + 1)];
 
             switch (this._encoding) {
             case CookiesEncoding.BASE64:
-                ret[pair[0]] = Buffer.from(pair[1], "base64").toString();
+                ret[k] = Buffer.from(v, "base64").toString();
                 break;
             case CookiesEncoding.HEX:
-                ret[pair[0]] = Buffer.from(pair[1], "hex").toString();
+                ret[k] = Buffer.from(v, "hex").toString();
+                break;
+            case CookiesEncoding.URLENCODE:
+                ret[k] = decodeURIComponent(v);
                 break;
             default:
-                ret[pair[0]] = pair[1];
+                ret[k] = v;
                 break;
             }
         }
