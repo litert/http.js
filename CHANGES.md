@@ -5,6 +5,7 @@
 - Added argument `assert` for method `ServerRequest.getContent`.
 - Added urlencode for `cookies` encoding.
 - Fixed some bug due to "=" insides the cookies value.
+- Now the decorator supports multi-path rules for once registration.
 
 ## v0.4.0
 

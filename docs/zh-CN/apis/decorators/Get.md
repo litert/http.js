@@ -8,7 +8,7 @@
 
 ```ts
 function Get(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator;
 ```
@@ -18,7 +18,7 @@ function Get(
 ### 参数 path
 
 ```ts
-let path: string | RegExp;
+let path: string | RegExp | Array<string | RegExp>;
 ```
 
 path 参数用于指定路由规则的匹配路径，支持字符串匹配、正则表达式匹配、参数表达式匹配以及

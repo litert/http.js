@@ -67,6 +67,8 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
         maxBytes?: number;
 
+        assert?: boolean;
+
     }): Promise<Buffer>;
 
     getContent(opts: {
@@ -75,6 +77,8 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
         maxBytes?: number;
 
+        assert?: boolean;
+
     }): Promise<string>;
 
     getContent<T>(opts: {
@@ -82,6 +86,8 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
         type: "json" | "xml" | "urlencode" | "base64" | "multipart" | "auto" | string;
 
         maxBytes?: number;
+
+        assert?: boolean;
 
         [key: string]: any;
 
@@ -445,6 +451,8 @@ async function getContent(opts: {
 
     maxBytes?: number;
 
+    assert?: boolean;
+
 }): Promise<Buffer>;
 
 async function getContent(opts: {
@@ -453,6 +461,8 @@ async function getContent(opts: {
 
     maxBytes?: number;
 
+    assert?: boolean;
+
 }): Promise<string>;
 
 async function getContent<T = any>(opts?: {
@@ -460,6 +470,8 @@ async function getContent<T = any>(opts?: {
     type: "json" | "xml" | "urlencode" | "base64" | "multipart" | "auto" | string;
 
     maxBytes?: number;
+
+    assert?: boolean;
 
     [key: string]: any;
 
@@ -478,6 +490,12 @@ async function getContent<T = any>(opts?: {
     允许的最大的 HTTP Body 长度（单位：字节）。
 
     默认为 0，即不限制。
+
+- `opts.assert?: boolean`
+
+    是否对 Content-Type 进行校验，设置为 true 则强制校验，否则不校验。
+
+    校验失败抛出一个异常。
 
 #### 返回值
 

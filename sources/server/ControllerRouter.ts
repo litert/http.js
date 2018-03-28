@@ -35,7 +35,7 @@ interface RouterRule {
 
 export function Route(
     method: Abstract.HTTPMethod,
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -47,11 +47,25 @@ export function Route(
             methodName
         ) || [];
 
-        rules.push({
-            method,
-            path,
-            data
-        });
+        if (Array.isArray(path)) {
+
+            for (let item of path) {
+
+                rules.push({
+                    method,
+                    path: item,
+                    data
+                });
+            }
+        }
+        else {
+
+            rules.push({
+                method,
+                path,
+                data
+            });
+        }
 
         Reflect.defineMetadata(
             META_KEY_RULE,
@@ -63,7 +77,7 @@ export function Route(
 }
 
 export function Get(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -71,7 +85,7 @@ export function Get(
 }
 
 export function Post(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -79,7 +93,7 @@ export function Post(
 }
 
 export function Put(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -87,7 +101,7 @@ export function Put(
 }
 
 export function Patch(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -95,7 +109,7 @@ export function Patch(
 }
 
 export function Delete(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -103,7 +117,7 @@ export function Delete(
 }
 
 export function Head(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 
@@ -111,7 +125,7 @@ export function Head(
 }
 
 export function Options(
-    path: string | RegExp,
+    path: string | RegExp | Array<string | RegExp>,
     data?: Core.IDictionary<any>
 ): Core.MethodDecorator {
 

@@ -21,6 +21,11 @@ enum CookiesEncoding {
     HEX,
 
     /**
+     * 使用 URL 安全编码
+     */
+    URLENCODE,
+
+    /**
      * 其他方式，仅用于自定义的 Cookies 编解码器。
      */
     OTHER
