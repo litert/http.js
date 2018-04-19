@@ -2,6 +2,7 @@
 
 ## v0.4.1
 
+- Upgraded `@litert/core` to v0.5.0.
 - Added argument `assert` for method `ServerRequest.getContent`.
 - Added urlencode for `cookies` encoding.
 - Fixed some bug due to "=" insides the cookies value.
