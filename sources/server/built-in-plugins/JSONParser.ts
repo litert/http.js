@@ -44,7 +44,17 @@ class JSONParser implements ContentParser {
             maxBytes: opts.maxBytes
         });
 
-        return JSON.parse(data.toString());
+        try {
+
+            return JSON.parse(data.toString());
+        }
+        catch {
+
+            throw new HttpException(
+                ServerErrors.UNACCEPTABLE_CONTENT_TYPE,
+                "The content data is unparsable."
+            );
+        }
     }
 }
 
