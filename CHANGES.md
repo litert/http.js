@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.4.3
+
+- Upgraded `@litert/core` to v0.6.0.
+
 ## v0.4.2
 
 - Fixed: The JSON parsing exception is uncaught.
