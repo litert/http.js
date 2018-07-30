@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.5.0
+
+- Added method `createClient`.
+
 ## v0.4.3
 
 - Upgraded `@litert/core` to v0.6.0.

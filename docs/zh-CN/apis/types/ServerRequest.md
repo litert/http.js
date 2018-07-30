@@ -45,21 +45,11 @@ interface ServerRequest extends nodeHTTP.IncomingMessage {
 
     "headers": IDictionary<string>;
 
-    "acceptableLanguages": IDictionary<number>;
-
-    "acceptableTypes": IDictionary<number>;
-
-    "acceptableEncodings": IDictionary<number>;
-
     getAcceptableEncodings(): IDictionary<number>;
 
     getAcceptableLanguages(): IDictionary<number>;
 
     getAcceptableTypes(): IDictionary<number>;
-
-    getBody(maxLength?: number): Promise<Buffer>;
-
-    getBodyAsJSON(maxLength?: number): Promise<any>;
 
     getContent(opts: {
 
@@ -117,64 +107,12 @@ let aborted: boolean = false;
 
 ------------------------------------------------------------------------------
 
-### 属性 acceptableEncodings
-
-> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
-> **请使用 getAcceptableEncodings 方法代替。**
-
-请求头中 Accept-Encoding 字段解析后的字典，键为编码代号，值为权重。
-
-```ts
-let acceptableEncodings: IDictionary<number>;
-```
-
-------------------------------------------------------------------------------
-
-### 属性 acceptableLanguages
-
-> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
-> **请使用 getAcceptableLanguages 方法代替。**
-
-请求头中 Accept-Language 字段解析后的字典，键为语言代号，值为权重。
-
-```ts
-let acceptableLanguages: IDictionary<number>;
-```
-
-------------------------------------------------------------------------------
-
-### 属性 acceptableTypes
-
-> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
-> **请使用 getAcceptableTypes 方法代替。**
-
-请求头中 Accept 字段解析后的字典，键为 MIME 代号，值为权重。
-
-```ts
-let acceptableTypes: IDictionary<number>;
-```
-
-------------------------------------------------------------------------------
-
 ### 属性 closed
 
 closed 属性为 true 时，表示链接已经被关闭。
 
 ```ts
 let closed: boolean = false;
-```
-
-------------------------------------------------------------------------------
-
-### 属性 contentInfo
-
-> **该属性已经被废除，将在 v0.5.0 版本中彻底移除。**
-> **请使用 getContentInfo 方法代替。**
-
-获取 HTTP 报文主体的基本信息，比如 Content-Length、Content-Type。
-
-```ts
-let contentInfo: ContentInfo;
 ```
 
 ------------------------------------------------------------------------------
@@ -375,66 +313,6 @@ function GetAcceptableLanguages(): IDictionary<number>;
 ```ts
 function GetAcceptableLanguages(): IDictionary<number>;
 ```
-
-------------------------------------------------------------------------------
-
-### 方法 getBody
-
-该方法用于从客户端读取请求的 HTTP Body 数据。
-
-> **该方法已经被废除，将在 v0.5.0 版本中彻底移除。请使用 getContent 方法代替。**
-
-#### 方法声明
-
-```ts
-async function getBody(maxLength?: number): Promise<Buffer>;
-```
-
-#### 参数说明
-
-- `maxLength?: number`
-
-    允许的最大的 HTTP Body 长度（单位：字节）。
-
-    默认为 0，即不限制。
-
-#### 返回值
-
-返回 Buffer 类型的 Promise 对象。
-
-#### 错误处理
-
-通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
-
-------------------------------------------------------------------------------
-
-### 方法 getBodyAsJSON
-
-该方法用于从客户端读取请求的 HTTP Body 数据，并将其以 JSON 解码后返回。
-
-> **该方法已经被废除，将在 v0.5.0 版本中彻底移除。请使用 getContent 方法代替。**
-
-#### 方法声明
-
-```ts
-async function getBodyAsJSON(maxLength?: number): Promise<any>;
-```
-
-#### 参数说明
-
-- `maxLength?: number`
-
-    允许的最大的 HTTP Body 长度（单位：字节）。
-
-    默认为 0，即不限制。
-
-#### 返回值
-
-返回 any 类型的 Promise 对象。
-
-#### 错误处理
-
-通过 Promise 对象的 catch 分支捕获 http.Exception 异常对象。
 
 ------------------------------------------------------------------------------
 

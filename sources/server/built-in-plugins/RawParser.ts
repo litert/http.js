@@ -45,9 +45,11 @@ class RawParser implements ContentParser {
 
         const maxLength = opts.maxBytes || 0;
 
+        const contentInfo = request.getContentInfo();
+
         if (maxLength > 0
-            && request.contentInfo.length > -1
-            && request.contentInfo.length < maxLength
+            && contentInfo.length > -1
+            && contentInfo.length < maxLength
         ) {
 
             return Promise.reject(new HttpException(

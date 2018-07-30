@@ -38,17 +38,6 @@ function extenDef(name: keyof InternalRequest, fn: Object) {
     Object.defineProperty(http2.Http2ServerRequest.prototype, name, fn);
 }
 
-extend("getBodyAsJSON", function(
-    this: Abstracts.ServerRequest,
-    maxLength: number = 0
-): Promise<any> {
-
-    return this.getContent({
-        "type": "json",
-        "maxBytes": maxLength
-    });
-});
-
 extend("getContent", function(
     this: Abstracts.ServerRequest,
     opts?: Abstracts.GetContentOptions<string>
@@ -219,96 +208,6 @@ extend("getContentInfo", function(
     return ret;
 });
 
-extenDef("acceptableLanguages", {
-    get(this: InternalRequest): IDictionary<number> {
-
-        delete this.acceptableLanguages;
-
-        const raw = this.headers["accept-language"];
-
-        Object.defineProperty(this, "acceptableLanguages", {
-            "value": raw ? _splitWeightString(raw) : {}
-        });
-
-        return this.acceptableLanguages;
-    }
-});
-
-extenDef("acceptableTypes", {
-    get(this: InternalRequest): IDictionary<number> {
-
-        delete this.acceptableTypes;
-
-        const raw = this.headers["accept"];
-
-        Object.defineProperty(this, "acceptableTypes", {
-            "value": raw ? _splitWeightString(raw) : {}
-        });
-
-        return this.acceptableTypes;
-    }
-});
-
-extenDef("acceptableEncodings", {
-    get(this: InternalRequest): IDictionary<number> {
-
-        delete this.acceptableEncodings;
-
-        const raw = this.headers["accept-encoding"];
-
-        Object.defineProperty(this, "acceptableEncodings", {
-            "value": raw ? _splitWeightString(raw) : {}
-        });
-
-        return this.acceptableEncodings;
-    }
-});
-
-extenDef("contentInfo", {
-    get(this: any): http.Server {
-
-        delete this.contentInfo;
-
-        let ret: Abstracts.ContentInfo = {
-            "type": "",
-            "extras": {},
-            "length": -1
-        };
-
-        let data: any;
-
-        if (data = this.headers["content-length"]) {
-
-            ret.length = parseInt(data);
-        }
-
-        if (data = this.headers["content-type"]) {
-
-            data = data.toLowerCase().split(";").map((x: string) => x.trim());
-
-            for (let el of data) {
-
-                if (el.indexOf("=") > -1) {
-
-                    let kv = el.split("=", 2);
-                    // @ts-ignore
-                    ret.extras[kv[0]] = kv[1];
-                }
-                else {
-
-                    ret.type = el;
-                }
-            }
-        }
-
-        Object.defineProperty(this, "contentInfo", {
-            "value": ret
-        });
-
-        return this.contentInfo;
-    }
-});
-
 extenDef("query", {
 
     get(this: InternalRequest): IDictionary<any> {
@@ -332,17 +231,6 @@ extenDef("query", {
 
         return this.query;
     }
-});
-
-extend("getBody", async function(
-    this: InternalRequest,
-    maxLength: number = 0
-): Promise<Buffer> {
-
-    return this.getContent({
-        "type": "raw",
-        maxBytes: maxLength
-    });
 });
 
 extend("loadCookies", function(

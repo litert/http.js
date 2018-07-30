@@ -49,22 +49,15 @@ export {
 
 import * as plugins from "./server/built-in-plugins";
 
-export {
-
-    /**
-     * @deprecated Use method `createCookiesEncoder` instead, this method will
-     *             be removed in v0.5.0.
-     */
-    createCookiesEncoder as createStandardCookiesEncoder
-} from "./server/built-in-plugins";
-
 import MountableHost from "./server/MountableHost";
 import StandardDispatcher from "./server/StandardDispatcher";
 import StandardHost from "./server/StandardHost";
 
 export { createStandardRouter } from "./server/StandardRouter";
 export * from "./server/ControllerRouter";
+export * from "./client/Client";
 import ServerError from "./server/Errors";
+import ClientError from "./client/Errors";
 import Exception from "./server/Exception";
 import {
     CreateServerOptions,
@@ -94,6 +87,7 @@ export function createVirtualDispatcher(
 
 export {
     ServerError,
+    ClientError,
     Exception,
     plugins
 };

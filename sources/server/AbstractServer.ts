@@ -115,17 +115,9 @@ implements Abstracts.Server {
             this._opts.plugins["parser:string"] = BIPlugins.createStringParser();
         }
 
-        if (!this._opts.plugins["parser:cookies"]) {
-
-            /**
-             * @deprecated cookies and plugins.cookies will be remove in v0.5.0
-             */
-            this._opts.plugins["parser:cookies"] =
-                                        this._opts.plugins["parser:cookies"] ||
-                                        this._opts.plugins["cookies"] ||
-                                        this._opts.cookies ||
-                                        BIPlugins.createCookiesEncoder();
-        }
+        this._opts.plugins["parser:cookies"] =
+                                    this._opts.plugins["parser:cookies"] ||
+                                    BIPlugins.createCookiesEncoder();
 
         this._router = opts.router;
 

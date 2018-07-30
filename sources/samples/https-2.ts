@@ -97,7 +97,7 @@ router.notFound(async function(ctx) {
     context.response.end("/");
 });
 
-let cookies = http.createStandardCookiesEncoder();
+let cookies = http.plugins.createCookiesEncoder();
 
 let server = http.createServer({
     "port": 443,

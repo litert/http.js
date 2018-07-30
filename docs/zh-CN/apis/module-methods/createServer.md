@@ -116,24 +116,9 @@ function createServer(cfg: {
 
         /**
          * HTTP Cookies 编码器对象。
-         *
-         * @deprecated 该字段将在 v0.5.0 中废除，请用 parser:cookies 代替。
-         */
-        "cookies"?: CookiesEncoder;
-
-        /**
-         * HTTP Cookies 编码器对象。
          */
         "parser:cookies"?: CookiesEncoder;
     };
-
-    /**
-     * HTTP Cookies 编码器对象。
-     *
-     * @deprecated 该字段将在 v0.5.0 版本中移除，请改用 plugins 字段注入 HTTP
-     * Cookies 编码器对象。
-     */
-    "cookies"?: CookiesEncoder;
 
     /**
      * 上下文对象工厂。
@@ -166,16 +151,6 @@ let contextCreator: ContextCreator<RequestContext> = createDefaultContext;
 ```
 
 contextCreator 参数用于配置请求的上下文对象的工厂函数。
-
-### 参数 cookies
-
-> 该字段将在 v0.5.0 中被移除，请使用 `plugins["parser:cookies"]` 代替。
-
-```ts
-let cookies: CookiesEncoder;
-```
-
-cookies 参数用于配置服务器的 HTTP Cookies 编解码器对象。
 
 ### 参数 expectRequest
 

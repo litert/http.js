@@ -1,16 +1,17 @@
-/*
-   +----------------------------------------------------------------------+
-   | LiteRT HTTP.js Library                                               |
-   +----------------------------------------------------------------------+
-   | Copyright (c) 2018 Fenying Studio                                    |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.0 of the Apache license,    |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | https://github.com/litert/http.js/blob/master/LICENSE                |
-   +----------------------------------------------------------------------+
-   | Authors: Angus Fenying <fenying@litert.org>                          |
-   +----------------------------------------------------------------------+
+/**
+ *  Copyright 2018 Angus.Fenying <fenying@litert.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 import http = require("http");
@@ -130,14 +131,6 @@ export interface ServerRequest extends http.IncomingMessage {
     "cookies": IDictionary<string>;
 
     /**
-     * Get basic information of HTTP request body.
-     *
-     * @deprecated Use method getContentInfo instead, this method will
-     *             be removed in v0.5.0.
-     */
-    "contentInfo": ContentInfo;
-
-    /**
      * Check if the cookies are already loaded into field cookies.
      */
     isCookiesLoaded(): boolean;
@@ -192,50 +185,6 @@ export interface ServerRequest extends http.IncomingMessage {
      *             on the content-type will be selected instead.
      */
     getContent<T = any>(opts?: GetContentOptions<string>): Promise<T>;
-
-    /**
-     * Get the acceptable languages list of client.
-     *
-     * @deprecated Use method getAcceptableLanguages instead, this method will
-     *             be removed in v0.5.0.
-     */
-    "acceptableLanguages": IDictionary<number>;
-
-    /**
-     * Get the acceptable content types list of client.
-     *
-     * @deprecated Use method getAcceptableTypes instead, this method will
-     *             be removed in v0.5.0.
-     */
-    "acceptableTypes": IDictionary<number>;
-
-    /**
-     * Get the acceptable content types list of client.
-     *
-     * @deprecated Use method getAcceptableEncodings instead, this method will
-     *             be removed in v0.5.0.
-     */
-    "acceptableEncodings": IDictionary<number>;
-
-    /**
-     * Get HTTP request body as raw stream.
-     *
-     * @param maxLength (uint) Limit the max length of body.
-     *
-     * @deprecated Use method getContent instead, this method will be removed
-     *             in v0.5.0.
-     */
-    getBody(maxLength?: number): Promise<Buffer>;
-
-    /**
-     * Get HTTP request body as JSON encoded data.
-     *
-     * @param maxLength (uint) Limit the max length of body.
-     *
-     * @deprecated Use method getContent instead, this method will be removed
-     *             in v0.5.0.
-     */
-    getBodyAsJSON(maxLength?: number): Promise<any>;
 
     /**
      * Check if the request is sent with DNT header.
@@ -553,14 +502,6 @@ export interface CreateServerOptions extends CreateServerOptionsBase {
      * The router object.
      */
     "router": Router;
-
-    /**
-     * Setup the plugins for parsing cookies.
-     *
-     * @deprecated Use `plugins["parser:cookies"]` instead. This field will be
-     *             removed in v0.5.0.
-     */
-    "cookies"?: CookiesEncoder;
 
     /**
      * Configure this field to enabled HTTPS.

@@ -50,8 +50,7 @@ export interface RequestContext {
 
 ## 1. Demo I: 读取 HTTP Body 数据
 
-通过 context.request.getBody 方法，即可读取 HTTP 请求的 Body 数据。如果希望读取并
-解析 JSON，则使用 context.request.getBodyAsJSON 方法。
+通过 context.request.getContent 方法，即可读取 HTTP 请求的 Body 数据。
 
 ### 1.1. 示例代码
 
@@ -60,7 +59,7 @@ router.post("/users/{id:uint}", async function(ctx) {
 
     try {
 
-        await ctx.request.getBody();
+        await ctx.request.getContent({"type": "raw"});
 
         ctx.response.send("OK");
     }
@@ -77,8 +76,7 @@ router.post("/users/{id:uint}", async function(ctx) {
 
 ### 1.2. 参考
 
-- HTTP.ServerRequest.getBody
-- HTTP.ServerRequest.getBodyAsJSON
+- HTTP.ServerRequest.getContent
 
 -------------------------------------------------------------------------------
 
@@ -130,7 +128,7 @@ router.get("/users/{id:uint}", async function(ctx) {
 ```ts
 router.get("/client", async function(ctx) {
 
-    ctx.response.statusCode = http.HTTPStatus.OK;
+    ctx.response.statusCode = http.HTTPStatus.OKOK;
     ctx.response.statusMessage = "OK";
     ctx.response.setHeader("Content-Type", "text/plain");
     let content = `
