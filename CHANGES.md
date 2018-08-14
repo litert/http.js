@@ -1,5 +1,10 @@
 # Changes Logs
 
+## v0.5.1
+
+- Improved the timeout-controlling of client request.
+- Fixed using Readable stream as `data` of client request.
+
 ## v0.5.0
 
 - Added method `createClient`.

@@ -51,28 +51,82 @@ export interface URLInfo {
 
 export interface IHttpRequestOptions {
 
+    /**
+     * The URL to be requested.
+     */
     url: string | {
 
+        /**
+         * The host of remote server to be requested.
+         */
         host: string;
 
+        /**
+         * The path (pathname + querystring) of URL to be requested.
+         */
         path: string;
 
+        /**
+         * The port of remote server to be requested.
+         */
         port?: number;
 
+        /**
+         * Use HTTP over SSL/TLS, or not.
+         */
         https?: boolean;
     };
 
+    /**
+     * The headers to be sent.
+     */
     headers?: Record<string, string>;
 
+    /**
+     * The authentication to be sent.
+     */
     auth?: BasicAuthOptions | BearerAuthOptions;
 
+    /**
+     * The data to be sent.
+     */
     data?: Buffer | string | Readable;
 
+    /**
+     * The content-type of data to be sent.
+     */
     dataType?: string;
 
+    /**
+     * Return headers of response only.
+     */
     headerOnly?: boolean;
 
-    timeout?: number;
+    /**
+     * Specify the timeout of request.
+     */
+    timeout?: number | {
+
+        /**
+         * Timeout for connecting remote server.
+         */
+        connection?: number;
+
+        /**
+         * Timeout for sending data of request.
+         */
+        sending?: number;
+
+        /**
+         * Timeout for waiting headers of response.
+         */
+        headers?: number;
+
+        /**
+         * Timeout for waiting body of response.
+         */
+        receiving?: number;
+    };
 }
 
 export interface IHttpRequestDataOptions extends IHttpRequestOptions {
@@ -84,36 +138,86 @@ export interface IHttpRequestDataOptions extends IHttpRequestOptions {
 
 export interface IFullHttpRequestOptions extends IHttpRequestOptions {
 
-    "method": "GET" | "POST" | "PUT" | "PATCH" | "HEAD" | "DELETE" | "OPTIONS";
+    /**
+     * The method of request.
+     */
+    method: "GET" | "POST" | "PUT" | "PATCH" | "HEAD" | "DELETE" | "OPTIONS";
 }
 
 export interface IHttpResponse {
 
+    /**
+     * The status code of response.
+     */
     code: number;
 
+    /**
+     * The data of response.
+     */
     data: Buffer;
 
+    /**
+     * The headers of response.
+     */
     headers: Record<string, string | string[]>;
 }
 
 export interface IHttpClient {
 
-    request(
-        opt: IFullHttpRequestOptions
-    ): Promise<IHttpResponse>;
+    /**
+     * Send a request.
+     *
+     * @param opt The options of request.
+     */
+    request(opt: IFullHttpRequestOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a GET request.
+     *
+     * @param opt The options of request.
+     */
     get(opts: IHttpRequestOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a POST request.
+     *
+     * @param opt The options of request.
+     */
     post(opts: IHttpRequestDataOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a PUT request.
+     *
+     * @param opt The options of request.
+     */
     put(opts: IHttpRequestDataOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a DELETE request.
+     *
+     * @param opt The options of request.
+     */
     delete(opts: IHttpRequestOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a PATCH request.
+     *
+     * @param opt The options of request.
+     */
     patch(opts: IHttpRequestDataOptions): Promise<IHttpResponse>;
 
+    /**
+     * Send a HEAD request.
+     *
+     * @param opt The options of request.
+     */
     head(opts: IHttpRequestOptions): Promise<Pick<IHttpResponse, "code" | "headers">>;
 
+    /**
+     * Send a OPTIONS request.
+     *
+     * @param opt The options of request.
+     */
     options(opts: IHttpRequestOptions): Promise<IHttpResponse>;
 }
 
@@ -190,6 +294,9 @@ implements IHttpClient {
 
         let urlInfo: URLInfo;
 
+        /**
+         * Parsing URL
+         */
         if (typeof opt.url === "string") {
 
             const url = URL.parse(opt.url);
@@ -214,6 +321,9 @@ implements IHttpClient {
             method: opt.method
         };
 
+        /**
+         * The HEAD method doesn't response with the body.
+         */
         if (opt.method === "HEAD") {
 
             opt.headerOnly = true;
@@ -262,7 +372,7 @@ implements IHttpClient {
             if (opt.data instanceof Readable) {
 
                 if (!Object.keys(cfg.headers).map(
-                    String.prototype.toLowerCase
+                    (x) => x.toLowerCase()
                 ).includes("content-length")) {
 
                     return Promise.reject(new Exception(
@@ -333,13 +443,64 @@ implements IHttpClient {
 
             if (opt.timeout) {
 
-                req.setTimeout(opt.timeout);
+                const TIMEOUT = typeof opt.timeout === "number" ?
+                                opt.timeout : 0;
+                const TIMEOUT_CONN = typeof opt.timeout !== "number" ?
+                                     opt.timeout.connection || 0 : 0;
+                const TIMEOUT_SEND = typeof opt.timeout !== "number" ?
+                                     opt.timeout.sending || 0 : 0;
+                const TIMEOUT_HEAD = typeof opt.timeout !== "number" ?
+                                     opt.timeout.headers || 0 : 0;
+                const TIMEOUT_RECV = typeof opt.timeout !== "number" ?
+                                     opt.timeout.receiving || 0 : 0;
+
+                if (TIMEOUT) {
+
+                    req.setTimeout(TIMEOUT, function() {
+
+                        req.destroy(new Error("Request timeout."));
+                    });
+                }
+                else if (TIMEOUT_CONN) {
+
+                    let reason = "Connect";
+
+                    /**
+                     * Set the timeout for connecting.
+                     */
+                    req.setTimeout(TIMEOUT_CONN, function() {
+
+                        req.destroy(new Error(`${reason} timeout.`));
+                    });
+
+                    req.on("socket", function(this: typeof req): void {
+
+                        this.socket.on(
+                            "connect",
+                            function(this: typeof req.socket): void {
+
+                                reason = "Send-Data";
+                                this.setTimeout(TIMEOUT_SEND);
+                            }
+                        );
+                    });
+
+                    req.on("finish", function(this: typeof req): void {
+
+                        reason = "Response";
+                        this.setTimeout(TIMEOUT_HEAD);
+                    });
+
+                    req.on("response", function(this: typeof req): void {
+
+                        reason = "Receive-Data";
+                        this.setTimeout(TIMEOUT_RECV);
+                    });
+                }
             }
 
             req.once("error", (e) => {
 
-                // tslint:disable-next-line:no-console
-                console.error(e);
                 reject(e);
             });
 
@@ -365,6 +526,7 @@ implements IHttpClient {
 
                 req.end();
             }
+
         });
     }
 }

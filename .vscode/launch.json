@@ -17,6 +17,16 @@
         },
         {
             "type": "node",
+            "request": "attach",
+            "name": "Attach Debugger",
+            "outFiles": [
+                "${workspaceRoot}\\*.js",
+                "${workspaceRoot}\\**\\*.js"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
             "request": "launch",
             "name": "HTTPS/1.1 Server",
             "program": "${workspaceRoot}\\sources\\samples\\https-1.1.ts",
