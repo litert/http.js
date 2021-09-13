@@ -1,5 +1,9 @@
 # Changes Logs
 
+## v0.4.4
+
+- Fixed: Read all packets.
+
 ## v0.4.3
 
 - Upgraded `@litert/core` to v0.6.0.

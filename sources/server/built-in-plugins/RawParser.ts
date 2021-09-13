@@ -137,7 +137,7 @@ class RawParser implements ContentParser {
             ));
         };
 
-        request.once("data", onData)
+        request.on("data", onData)
         .once("end", onEnd)
         .once("close", onClose)
         .once("timeout", onTimeout);
